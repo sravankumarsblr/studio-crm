@@ -79,15 +79,18 @@ export type Milestone = {
 }
 
 export type Contract = {
-  id:string;
+  id: string;
   opportunityId: string;
+  contractTitle: string;
   companyName: string;
   value: number;
-  startDate: string;
-  endDate: string;
-  status: 'Draft' | 'Active' | 'Completed' | 'Terminated';
+  contractDate: string;
+  expiryDate: string;
+  status: 'Draft' | 'Active' | 'Expired' | 'Terminated' | 'Renewed';
+  type: 'One-time' | 'Subscription' | 'Retainer' | 'SLA';
+  scopeOfWork: string;
   milestones: Milestone[];
-}
+};
 
 export type Product = {
   id: string;
@@ -138,16 +141,20 @@ export const opportunities: Opportunity[] = [
 
 export const contracts: Contract[] = [
   {
-    id: 'cont1',
+    id: 'CT-2024-001',
     opportunityId: 'deal3',
+    contractTitle: 'Service Agreement with Precision Instruments Inc.',
     companyName: 'Precision Instruments Inc.',
     value: 22000,
-    startDate: '2024-07-01',
-    endDate: '2025-06-30',
+    contractDate: '2024-07-01',
+    expiryDate: '2025-06-30',
     status: 'Active',
+    type: 'Retainer',
+    scopeOfWork: 'Annual calibration and verification for all torque wrenches at the main facility. Includes two on-site visits and unlimited remote support.',
     milestones: [
-      { id: 'm1', name: 'Initial Setup', dueDate: '2024-07-15', status: 'Completed', poNumber: 'PO12345', invoiceStatus: 'Paid' },
-      { id: 'm2', name: 'Mid-term Review', dueDate: '2025-01-15', status: 'Pending', poNumber: 'PO12345', invoiceStatus: 'Not Invoiced' }
+      { id: 'm1', name: 'Initial On-site Calibration', dueDate: '2024-07-15', status: 'Completed', poNumber: 'PO-PINC-1138', invoiceStatus: 'Paid' },
+      { id: 'm2', name: 'Mid-term Review & Report', dueDate: '2025-01-15', status: 'Pending', poNumber: 'PO-PINC-1138', invoiceStatus: 'Not Invoiced' },
+      { id: 'm3', name: 'Final On-site Calibration', dueDate: '2025-06-15', status: 'Pending', poNumber: 'PO-PINC-1138', invoiceStatus: 'Not Invoiced' }
     ]
   }
 ];

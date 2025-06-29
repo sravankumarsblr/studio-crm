@@ -1,3 +1,4 @@
+
 import { Header } from "@/components/header";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { contracts } from "@/lib/data";
@@ -8,8 +9,10 @@ export default function ContractsPage() {
   const getStatusVariant = (status: string) => {
     switch (status) {
       case 'Active': return 'default';
-      case 'Completed': return 'secondary';
+      case 'Renewed': return 'default';
+      case 'Draft': return 'secondary';
       case 'Terminated': return 'destructive';
+      case 'Expired': return 'outline';
       default: return 'outline';
     }
   }
@@ -22,9 +25,11 @@ export default function ContractsPage() {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead>Contract Title</TableHead>
                 <TableHead>Company</TableHead>
+                <TableHead>Type</TableHead>
                 <TableHead>Value</TableHead>
-                <TableHead>Start Date</TableHead>
+                <TableHead>Effective Date</TableHead>
                 <TableHead>End Date</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
@@ -33,10 +38,12 @@ export default function ContractsPage() {
             <TableBody>
               {contracts.map((contract) => (
                 <TableRow key={contract.id}>
-                  <TableCell className="font-medium">{contract.companyName}</TableCell>
-                  <TableCell>${contract.value.toLocaleString()}</TableCell>
-                  <TableCell>{contract.startDate}</TableCell>
-                  <TableCell>{contract.endDate}</TableCell>
+                  <TableCell className="font-medium">{contract.contractTitle}</TableCell>
+                  <TableCell>{contract.companyName}</TableCell>
+                  <TableCell>{contract.type}</TableCell>
+                  <TableCell>₹{contract.value.toLocaleString('en-IN')}</TableCell>
+                  <TableCell>{contract.contractDate}</TableCell>
+                  <TableCell>{contract.expiryDate}</TableCell>
                   <TableCell>
                     <Badge variant={getStatusVariant(contract.status) as any}>{contract.status}</Badge>
                   </TableCell>
