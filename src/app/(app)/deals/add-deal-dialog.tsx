@@ -22,12 +22,12 @@ export function AddDealDialog({
   const { toast } = useToast();
 
   const handleSave = (data: AddDealFormValues) => {
-    // In a real app, this would trigger a server action to save the new deal
+    // In a real app, this would trigger a server action to save the new deal and its initial quote
     console.log("New deal to save:", data);
 
     toast({
-      title: "Deal Created",
-      description: `The deal "${data.name}" has been successfully created.`,
+      title: "Deal & Quote Created",
+      description: `The deal "${data.name}" and an initial quote have been successfully created.`,
     });
     setIsOpen(false);
   };
@@ -38,7 +38,7 @@ export function AddDealDialog({
         <DialogHeader>
           <DialogTitle>Add New Deal</DialogTitle>
           <DialogDescription>
-            Fill in the details for the new deal.
+            Fill in the details for the new deal and its initial quote.
           </DialogDescription>
         </DialogHeader>
         <div className="flex-1 overflow-y-auto -mr-6 pr-6 py-4">

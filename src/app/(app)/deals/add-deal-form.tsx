@@ -21,6 +21,7 @@ import {
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -41,11 +42,11 @@ import {
 } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 import { AddCompanyDialog } from "../companies/add-company-dialog";
 
 const addDealSchema = z.object({
   name: z.string().min(1, "Deal name is required."),
-  value: z.coerce.number().min(0, "Value must be a positive number."),
   stage: z.string().min(1, "Stage is required."),
   closeDate: z.string().min(1, "Close date is required"),
   companyId: z.string().min(1, "Company is required."),
@@ -56,6 +57,10 @@ const addDealSchema = z.object({
   productIds: z
     .array(z.string())
     .min(1, "You have to select at least one product."),
+  // Quote fields
+  quoteValue: z.coerce.number().min(1, "Quote value is required."),
+  quoteExpiryDate: z.string().min(1, "Expiry date is required."),
+  quoteDocument: z.any().optional(),
 }).refine(
   (data) => {
     if (data.contactIds.length > 0) {
@@ -88,13 +93,14 @@ export function AddDealForm({
     resolver: zodResolver(addDealSchema),
     defaultValues: {
       name: "",
-      value: 0,
       stage: "Qualification",
       closeDate: "",
       companyId: "",
       contactIds: [],
       primaryContactId: "",
       productIds: [],
+      quoteValue: 0,
+      quoteExpiryDate: "",
     },
   });
 
@@ -161,21 +167,7 @@ export function AddDealForm({
               </FormItem>
             )}
           />
-          <div className="grid grid-cols-2 gap-4">
-            <FormField
-              control={form.control}
-              name="value"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Value ($)</FormLabel>
-                  <FormControl>
-                    <Input type="number" placeholder="e.g., 100000" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
+           <FormField
               control={form.control}
               name="stage"
               render={({ field }) => (
@@ -199,7 +191,6 @@ export function AddDealForm({
                 </FormItem>
               )}
             />
-          </div>
            <FormField
               control={form.control}
               name="closeDate"
@@ -437,6 +428,80 @@ export function AddDealForm({
               </FormItem>
             )}
           />
+
+          <Separator className="my-6" />
+
+          <div className="space-y-4">
+            <h3 className="text-lg font-medium text-foreground">Initial Quote Details</h3>
+             <FormField
+              control={form.control}
+              name="quoteValue"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Quote Value ($)</FormLabel>
+                  <FormControl>
+                    <Input type="number" placeholder="e.g., 50000" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="quoteExpiryDate"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel>Expiry Date</FormLabel>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant={"outline"}
+                          className={cn(
+                            "w-full text-left font-normal",
+                            !field.value && "text-muted-foreground"
+                          )}
+                        >
+                          {field.value ? (
+                            format(field.value, "PPP")
+                          ) : (
+                            <span>Pick an expiry date</span>
+                          )}
+                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={field.value ? new Date(field.value) : undefined}
+                        onSelect={(date) => field.onChange(date?.toISOString().split('T')[0])}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+             <FormField
+              control={form.control}
+              name="quoteDocument"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Attach Document</FormLabel>
+                  <FormControl>
+                    <Input 
+                        type="file"
+                        onChange={(e) => field.onChange(e.target.files ? e.target.files[0] : null)}
+                      />
+                  </FormControl>
+                  <FormDescription>Optionally attach a PO or quote document.</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
 
           <div className="flex justify-end gap-2 pt-4">
             <Button type="button" variant="outline" onClick={onCancel}>
