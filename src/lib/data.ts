@@ -27,6 +27,22 @@ export type Lead = {
   leadData: Record<string, any>;
 };
 
+export type Quote = {
+  id: string;
+  quoteNumber: string;
+  dealId: string;
+  date: string;
+  expiryDate: string;
+  preparedBy: string;
+  value: number;
+  status: 'Draft' | 'Sent' | 'Accepted' | 'Rejected';
+  documentName?: string;
+  discount?: {
+    type: 'percentage' | 'fixed';
+    value: number;
+  };
+};
+
 export type Deal = {
   id: string;
   name: string;
@@ -35,7 +51,17 @@ export type Deal = {
   stage: 'Qualification' | 'Proposal' | 'Negotiation' | 'Closed Won' | 'Closed Lost';
   value: number;
   closeDate: string;
+  quotes: Quote[];
 };
+
+export type Milestone = {
+  id: string;
+  name: string;
+  dueDate: string;
+  status: 'Pending' | 'In Progress' | 'Completed';
+  poNumber: string;
+  invoiceStatus: 'Not Invoiced' | 'Invoiced' | 'Paid';
+}
 
 export type Contract = {
   id:string;
@@ -46,15 +72,6 @@ export type Contract = {
   endDate: string;
   status: 'Draft' | 'Active' | 'Completed' | 'Terminated';
   milestones: Milestone[];
-}
-
-export type Milestone = {
-  id: string;
-  name: string;
-  dueDate: string;
-  status: 'Pending' | 'In Progress' | 'Completed';
-  poNumber: string;
-  invoiceStatus: 'Not Invoiced' | 'Invoiced' | 'Paid';
 }
 
 export type Product = {
@@ -91,9 +108,16 @@ export const leads: Lead[] = [
 ];
 
 export const deals: Deal[] = [
-  { id: 'deal1', name: 'Q3 Pressure Sensor Contract', companyName: 'AeroCal Labs', contactName: 'Jane Smith', stage: 'Proposal', value: 50000, closeDate: '2024-08-30' },
-  { id: 'deal2', name: 'Medical Scale Fleet Calibration', companyName: 'MediTech Solutions', contactName: 'Peter Jones', stage: 'Negotiation', value: 120000, closeDate: '2024-07-25' },
-  { id: 'deal3', name: 'Torque Wrench Verification', companyName: 'Precision Instruments Inc.', contactName: 'John Doe', stage: 'Closed Won', value: 22000, closeDate: '2024-06-15' },
+  { id: 'deal1', name: 'Q3 Pressure Sensor Contract', companyName: 'AeroCal Labs', contactName: 'Jane Smith', stage: 'Proposal', value: 50000, closeDate: '2024-08-30', quotes: [
+    { id: 'qt1', dealId: 'deal1', quoteNumber: 'QT-2024-001', date: '2024-06-10', expiryDate: '2024-07-10', preparedBy: 'Alex Green', value: 50000, status: 'Sent', documentName: 'AeroCal_Quote_v1.pdf' }
+  ] },
+  { id: 'deal2', name: 'Medical Scale Fleet Calibration', companyName: 'MediTech Solutions', contactName: 'Peter Jones', stage: 'Negotiation', value: 120000, closeDate: '2024-07-25', quotes: [
+     { id: 'qt2', dealId: 'deal2', quoteNumber: 'QT-2024-002', date: '2024-06-15', expiryDate: '2024-07-15', preparedBy: 'Alex Green', value: 125000, status: 'Sent' },
+     { id: 'qt3', dealId: 'deal2', quoteNumber: 'QT-2024-003', date: '2024-06-20', expiryDate: '2024-07-20', preparedBy: 'Alex Green', value: 120000, status: 'Draft', discount: { type: 'fixed', value: 5000 } }
+  ] },
+  { id: 'deal3', name: 'Torque Wrench Verification', companyName: 'Precision Instruments Inc.', contactName: 'John Doe', stage: 'Closed Won', value: 22000, closeDate: '2024-06-15', quotes: [
+    { id: 'qt4', dealId: 'deal3', quoteNumber: 'QT-2024-004', date: '2024-06-01', expiryDate: '2024-07-01', preparedBy: 'Alex Green', value: 22000, status: 'Accepted', documentName: 'PO-PINC-1138.pdf' }
+  ] },
 ];
 
 export const contracts: Contract[] = [

@@ -1,11 +1,20 @@
+
 "use client";
 
+import Link from "next/link";
 import { Header } from "@/components/header";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { deals } from "@/lib/data";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { MoreHorizontal } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const stageProgress: { [key: string]: number } = {
   'Qualification': 20,
@@ -53,7 +62,20 @@ export default function DealsPage() {
                     <Progress value={stageProgress[deal.stage]} className="h-2" />
                   </TableCell>
                   <TableCell className="text-right">
-                    <Button variant="ghost" size="sm">View</Button>
+                     <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem asChild>
+                           <Link href={`/deals/${deal.id}`}>View Details</Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>Close as Won</DropdownMenuItem>
+                        <DropdownMenuItem className="text-destructive">Close as Lost</DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </TableCell>
                 </TableRow>
               ))}
