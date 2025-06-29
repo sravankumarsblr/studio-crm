@@ -30,13 +30,37 @@ const statusConfig = {
 export function QuoteCard({ quote, onDelete }: QuoteCardProps) {
     const {variant, icon: Icon, label} = statusConfig[quote.status];
 
+    const getDiscountDisplay = () => {
+        if (!quote.discount) return null;
+        return quote.discount.type === 'fixed' 
+            ? `$${quote.discount.value.toLocaleString()}` 
+            : `${quote.discount.value}%`;
+    };
+
+    const getFinalValue = () => {
+        if (!quote.discount) {
+            return quote.value;
+        }
+        if (quote.discount.type === 'fixed') {
+            return quote.value - quote.discount.value;
+        }
+        // Percentage
+        return quote.value * (1 - (quote.discount.value / 100));
+    };
+
   return (
     <Card>
       <CardHeader className="flex-row items-start justify-between p-4">
         <div>
           <CardTitle className="text-base font-bold">{quote.quoteNumber}</CardTitle>
           <CardDescription className="text-xs">
-            Value: ${quote.value.toLocaleString()}
+             {quote.discount ? (
+                <span>
+                    Value: <span className="line-through">${quote.value.toLocaleString()}</span> &rarr; ${getFinalValue().toLocaleString()}
+                </span>
+            ) : (
+                <span>Value: ${quote.value.toLocaleString()}</span>
+            )}
           </CardDescription>
         </div>
         <DropdownMenu>
@@ -62,6 +86,12 @@ export function QuoteCard({ quote, onDelete }: QuoteCardProps) {
               {label}
             </Badge>
         </div>
+         {quote.discount && (
+            <div className="flex justify-between">
+                <span className="text-muted-foreground">Discount Applied</span>
+                <span className="font-medium text-destructive">{getDiscountDisplay()}</span>
+            </div>
+        )}
         <div className="flex justify-between">
             <span className="text-muted-foreground">Issue Date</span>
             <span>{quote.date}</span>

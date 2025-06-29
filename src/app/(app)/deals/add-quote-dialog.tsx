@@ -36,6 +36,10 @@ export function AddQuoteDialog({
       value: data.value,
       status: "Draft",
       documentName: data.document?.name,
+      discount: (data.discountType && data.discountType !== 'none' && data.discountValue) ? {
+        type: data.discountType as 'percentage' | 'fixed',
+        value: data.discountValue
+      } : undefined,
     };
     onQuoteAdded(newQuote);
     setIsOpen(false);

@@ -21,12 +21,24 @@ import {
 import { Input } from "@/components/ui/input";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 const addQuoteSchema = z.object({
   value: z.coerce.number().min(1, "Quote value is required."),
   expiryDate: z.string().min(1, "Expiry date is required."),
   document: z.any().optional(),
+  discountType: z.enum(['none', 'percentage', 'fixed']).default('none'),
+  discountValue: z.coerce.number().optional(),
+}).refine(data => {
+    if (data.discountType !== 'none' && (!data.discountValue || data.discountValue <= 0)) {
+        return false;
+    }
+    return true;
+}, {
+    message: "A positive discount value is required.",
+    path: ["discountValue"],
 });
+
 
 export type AddQuoteFormValues = z.infer<typeof addQuoteSchema>;
 
@@ -42,12 +54,15 @@ export function AddQuoteForm({
     defaultValues: {
       value: 0,
       expiryDate: "",
+      discountType: 'none',
     },
   });
 
   const onSubmit = (values: AddQuoteFormValues) => {
     onSave(values);
   };
+
+  const discountType = form.watch("discountType");
 
   return (
     <Form {...form}>
@@ -57,7 +72,7 @@ export function AddQuoteForm({
           name="value"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Quote Value ($)</FormLabel>
+              <FormLabel>List Value ($)</FormLabel>
               <FormControl>
                 <Input type="number" placeholder="e.g., 50000" {...field} />
               </FormControl>
@@ -65,6 +80,65 @@ export function AddQuoteForm({
             </FormItem>
           )}
         />
+
+        <FormField
+          control={form.control}
+          name="discountType"
+          render={({ field }) => (
+            <FormItem className="space-y-3">
+              <FormLabel>Discount</FormLabel>
+              <FormControl>
+                <RadioGroup
+                  onValueChange={(value) => {
+                    field.onChange(value);
+                    if (value === 'none') {
+                      form.setValue('discountValue', undefined);
+                    }
+                  }}
+                  defaultValue={field.value}
+                  className="flex items-center space-x-4"
+                >
+                  <FormItem className="flex items-center space-x-2 space-y-0">
+                    <FormControl>
+                      <RadioGroupItem value="none" />
+                    </FormControl>
+                    <FormLabel className="font-normal">None</FormLabel>
+                  </FormItem>
+                  <FormItem className="flex items-center space-x-2 space-y-0">
+                    <FormControl>
+                      <RadioGroupItem value="percentage" />
+                    </FormControl>
+                    <FormLabel className="font-normal">Percentage (%)</FormLabel>
+                  </FormItem>
+                  <FormItem className="flex items-center space-x-2 space-y-0">
+                    <FormControl>
+                      <RadioGroupItem value="fixed" />
+                    </FormControl>
+                    <FormLabel className="font-normal">Fixed ($)</FormLabel>
+                  </FormItem>
+                </RadioGroup>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {discountType && discountType !== 'none' && (
+           <FormField
+              control={form.control}
+              name="discountValue"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Discount Value</FormLabel>
+                  <FormControl>
+                    <Input type="number" placeholder={discountType === 'percentage' ? "e.g., 10" : "e.g., 500"} {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+        )}
+
         <FormField
           control={form.control}
           name="expiryDate"
