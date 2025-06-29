@@ -65,6 +65,8 @@ export type Opportunity = {
   stage: 'Qualification' | 'Proposal' | 'Negotiation' | 'Closed Won' | 'Closed Lost';
   value: number;
   closeDate: string;
+  createdDate: string;
+  winProbability: number;
   quotes: Quote[];
   lineItems: LineItem[];
 };
@@ -127,16 +129,78 @@ export const leads: Lead[] = [
 ];
 
 export const opportunities: Opportunity[] = [
-  { id: 'deal1', name: 'Q3 Pressure Sensor Contract', companyName: 'AeroCal Labs', contactName: 'Jane Smith', stage: 'Proposal', value: 49900, closeDate: '2024-08-30', lineItems: [{ productId: 'prod1', quantity: 100 }], quotes: [
-    { id: 'qt1', opportunityId: 'deal1', quoteNumber: 'QT-2024-001', date: '2024-06-10', expiryDate: '2024-07-10', preparedBy: 'Alex Green', value: 50000, status: 'Sent', documentName: 'AeroCal_Quote_v1.pdf' }
-  ] },
-  { id: 'deal2', name: 'Medical Scale Fleet Calibration', companyName: 'MediTech Solutions', contactName: 'Peter Jones', stage: 'Negotiation', value: 119508, closeDate: '2024-07-25', lineItems: [{ productId: 'prod2', quantity: 92 }], quotes: [
-     { id: 'qt2', opportunityId: 'deal2', quoteNumber: 'QT-2024-002', date: '2024-06-15', expiryDate: '2024-07-15', preparedBy: 'Alex Green', value: 125000, status: 'Sent' },
-     { id: 'qt3', opportunityId: 'deal2', quoteNumber: 'QT-2024-003', date: '2024-06-20', expiryDate: '2024-07-20', preparedBy: 'Alex Green', value: 120000, status: 'Draft', discount: { type: 'fixed', value: 5000 } }
-  ] },
-  { id: 'deal3', name: 'Torque Wrench Verification', companyName: 'Precision Instruments Inc.', contactName: 'John Doe', stage: 'Closed Won', value: 22100, closeDate: '2024-06-15', lineItems: [{ productId: 'prod3', quantity: 26 }], quotes: [
-    { id: 'qt4', opportunityId: 'deal3', quoteNumber: 'QT-2024-004', date: '2024-06-01', expiryDate: '2024-07-01', preparedBy: 'Alex Green', value: 22000, status: 'Accepted', poNumber: 'PO-PINC-1138', poValue: 22000, poDate: '2024-06-14', poDocumentName: 'PO-PINC-1138.pdf' }
-  ] },
+  { 
+    id: 'deal1', 
+    name: 'Q3 Pressure Sensor Contract', 
+    companyName: 'AeroCal Labs', 
+    contactName: 'Jane Smith', 
+    stage: 'Proposal', 
+    value: 49900, 
+    createdDate: '2024-06-01',
+    closeDate: '2024-08-30', 
+    winProbability: 0.5,
+    lineItems: [{ productId: 'prod1', quantity: 100 }], 
+    quotes: [
+      { id: 'qt1', opportunityId: 'deal1', quoteNumber: 'QT-2024-001', date: '2024-06-10', expiryDate: '2024-07-10', preparedBy: 'Alex Green', value: 50000, status: 'Sent', documentName: 'AeroCal_Quote_v1.pdf' }
+    ] 
+  },
+  { 
+    id: 'deal2', 
+    name: 'Medical Scale Fleet Calibration', 
+    companyName: 'MediTech Solutions', 
+    contactName: 'Peter Jones', 
+    stage: 'Negotiation', 
+    value: 119508, 
+    createdDate: '2024-05-15',
+    closeDate: '2024-07-25', 
+    winProbability: 0.75,
+    lineItems: [{ productId: 'prod2', quantity: 92 }], 
+    quotes: [
+       { id: 'qt2', opportunityId: 'deal2', quoteNumber: 'QT-2024-002', date: '2024-06-15', expiryDate: '2024-07-15', preparedBy: 'Alex Green', value: 125000, status: 'Sent' },
+       { id: 'qt3', opportunityId: 'deal2', quoteNumber: 'QT-2024-003', date: '2024-06-20', expiryDate: '2024-07-20', preparedBy: 'Alex Green', value: 120000, status: 'Draft', discount: { type: 'fixed', value: 5000 } }
+    ] 
+  },
+  { 
+    id: 'deal3', 
+    name: 'Torque Wrench Verification', 
+    companyName: 'Precision Instruments Inc.', 
+    contactName: 'John Doe', 
+    stage: 'Closed Won', 
+    value: 22100, 
+    createdDate: '2024-05-20',
+    closeDate: '2024-06-15', 
+    winProbability: 1,
+    lineItems: [{ productId: 'prod3', quantity: 26 }], 
+    quotes: [
+      { id: 'qt4', opportunityId: 'deal3', quoteNumber: 'QT-2024-004', date: '2024-06-01', expiryDate: '2024-07-01', preparedBy: 'Alex Green', value: 22000, status: 'Accepted', poNumber: 'PO-PINC-1138', poValue: 22000, poDate: '2024-06-14', poDocumentName: 'PO-PINC-1138.pdf' }
+    ] 
+  },
+  { 
+    id: 'deal4', 
+    name: 'Software Suite License', 
+    companyName: 'FutureGadget Labs', 
+    contactName: 'Alex Ray', 
+    stage: 'Qualification', 
+    value: 25000, 
+    createdDate: '2024-06-10', 
+    closeDate: '2024-09-15', 
+    winProbability: 0.2, 
+    lineItems: [{ productId: 'prod5', quantity: 10 }], 
+    quotes: [] 
+  },
+  { 
+    id: 'deal5', 
+    name: 'Sensor Batch Order', 
+    companyName: 'Global Petro', 
+    contactName: 'Maria Garcia', 
+    stage: 'Closed Lost', 
+    value: 9980, 
+    createdDate: '2024-05-01', 
+    closeDate: '2024-06-20', 
+    winProbability: 0, 
+    lineItems: [{ productId: 'prod1', quantity: 20 }], 
+    quotes: [] 
+  },
 ];
 
 export const contracts: Contract[] = [
