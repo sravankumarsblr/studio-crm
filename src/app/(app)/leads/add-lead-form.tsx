@@ -196,80 +196,78 @@ export function AddLeadForm({
             )}
           />
         </div>
-         <div className="grid grid-cols-2 gap-4">
-            <FormField
-              control={form.control}
-              name="source"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Source</FormLabel>
+        <FormField
+          control={form.control}
+          name="source"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Source</FormLabel>
+              <FormControl>
+                <Input placeholder="e.g., Web Form" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="companyId"
+          render={({ field }) => (
+            <FormItem className="flex flex-col">
+              <FormLabel>Company</FormLabel>
+              <Popover open={companyOpen} onOpenChange={setCompanyOpen}>
+                <PopoverTrigger asChild>
                   <FormControl>
-                    <Input placeholder="e.g., Web Form" {...field} />
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      aria-expanded={companyOpen}
+                      className="w-full justify-between"
+                    >
+                      {field.value
+                        ? companies.find((c) => c.id === field.value)?.name
+                        : "Select a company"}
+                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
                   </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="companyId"
-              render={({ field }) => (
-                <FormItem className="flex flex-col">
-                  <FormLabel>Company</FormLabel>
-                  <Popover open={companyOpen} onOpenChange={setCompanyOpen}>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant="outline"
-                          role="combobox"
-                          aria-expanded={companyOpen}
-                          className="w-full justify-between"
-                        >
-                          {field.value
-                            ? companies.find((c) => c.id === field.value)?.name
-                            : "Select a company"}
-                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
-                      <Command>
-                        <CommandInput placeholder="Search company..." />
-                        <CommandEmpty>No company found.</CommandEmpty>
-                        <CommandList>
-                          <CommandGroup>
-                            {companies.map((c) => (
-                              <CommandItem
-                                value={c.name}
-                                key={c.id}
-                                onSelect={() => {
-                                  form.setValue("companyId", c.id);
-                                  form.setValue("contactIds", []);
-                                  form.setValue("primaryContactId", "");
-                                  setCompanyOpen(false);
-                                }}
-                              >
-                                <Check
-                                  className={cn(
-                                    "mr-2 h-4 w-4",
-                                    c.id === field.value
-                                      ? "opacity-100"
-                                      : "opacity-0"
-                                  )}
-                                />
-                                {c.name}
-                              </CommandItem>
-                            ))}
-                          </CommandGroup>
-                        </CommandList>
-                      </Command>
-                    </PopoverContent>
-                  </Popover>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-        </div>
+                </PopoverTrigger>
+                <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                  <Command>
+                    <CommandInput placeholder="Search company..." />
+                    <CommandEmpty>No company found.</CommandEmpty>
+                    <CommandList>
+                      <CommandGroup>
+                        {companies.map((c) => (
+                          <CommandItem
+                            value={c.name}
+                            key={c.id}
+                            onSelect={() => {
+                              form.setValue("companyId", c.id);
+                              form.setValue("contactIds", []);
+                              form.setValue("primaryContactId", "");
+                              setCompanyOpen(false);
+                            }}
+                          >
+                            <Check
+                              className={cn(
+                                "mr-2 h-4 w-4",
+                                c.id === field.value
+                                  ? "opacity-100"
+                                  : "opacity-0"
+                              )}
+                            />
+                            {c.name}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
         <FormField
           control={form.control}
