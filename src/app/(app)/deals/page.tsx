@@ -1,6 +1,7 @@
 
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { Header } from "@/components/header";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -15,6 +16,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { AddDealDialog } from "./add-deal-dialog";
 
 const stageProgress: { [key: string]: number } = {
   'Qualification': 20,
@@ -33,9 +35,11 @@ const stageVariant: { [key: string]: "default" | "secondary" | "destructive" | "
 };
 
 export default function DealsPage() {
+  const [isAddDealOpen, setIsAddDealOpen] = useState(false);
+
   return (
     <div className="flex flex-col h-full">
-      <Header title="Deals" actionText="Add Deal" onActionClick={() => {}} />
+      <Header title="Deals" actionText="Add Deal" onActionClick={() => setIsAddDealOpen(true)} />
       <main className="flex-1 overflow-y-auto p-4 sm:p-6">
         <div className="bg-card rounded-lg shadow-sm border">
           <Table>
@@ -83,6 +87,7 @@ export default function DealsPage() {
           </Table>
         </div>
       </main>
+      <AddDealDialog isOpen={isAddDealOpen} setIsOpen={setIsAddDealOpen} />
     </div>
   );
 }

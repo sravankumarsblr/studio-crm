@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { useState } from 'react';
@@ -14,6 +15,7 @@ import { deals, contacts, companies, products, Quote } from '@/lib/data';
 import { QuoteCard } from '../quote-card';
 import { AddQuoteDialog } from '../add-quote-dialog';
 import { LogActivityDialog } from '../log-activity-dialog';
+import { EditDealDialog } from '../edit-deal-dialog';
 
 const stageVariant: { [key: string]: "default" | "secondary" | "destructive" | "outline" } = {
   'Qualification': 'outline',
@@ -37,6 +39,7 @@ export default function DealDetailPage() {
   const [deal, setDeal] = useState(() => deals.find((d) => d.id === dealId));
   const [isAddQuoteOpen, setIsAddQuoteOpen] = useState(false);
   const [isLogActivityOpen, setIsLogActivityOpen] = useState(false);
+  const [isEditDealOpen, setIsEditDealOpen] = useState(false);
 
   // In a real app, this data would be fetched together. Here we simulate joins.
   const company = companies.find(c => c.name === deal?.companyName);
@@ -88,7 +91,7 @@ export default function DealDetailPage() {
             </div>
         </div>
         <Button variant="outline" onClick={() => setIsLogActivityOpen(true)}>Log Activity</Button>
-        <Button variant="outline"><Edit className="mr-2"/> Edit</Button>
+        <Button variant="outline" onClick={() => setIsEditDealOpen(true)}><Edit className="mr-2"/> Edit</Button>
         <Button>Convert to Contract</Button>
       </Header>
 
@@ -221,6 +224,11 @@ export default function DealDetailPage() {
         setIsOpen={setIsLogActivityOpen}
         deal={deal}
         contacts={associatedContacts}
+      />
+      <EditDealDialog
+        isOpen={isEditDealOpen}
+        setIsOpen={setIsEditDealOpen}
+        deal={deal}
       />
     </div>
   );
