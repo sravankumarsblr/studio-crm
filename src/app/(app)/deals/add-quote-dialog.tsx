@@ -47,14 +47,14 @@ export function GenerateQuoteDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="sm:max-w-3xl">
+      <DialogContent className="sm:max-w-3xl max-h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>Generate Quote</DialogTitle>
           <DialogDescription>
             Review the line items and generate a new quote for the opportunity: "{opportunity.name}".
           </DialogDescription>
         </DialogHeader>
-        <div className="py-4">
+        <div className="flex-1 overflow-y-auto -mr-6 pr-6 py-4">
           <GenerateQuoteForm 
             opportunity={opportunity}
             onSave={handleSave} 

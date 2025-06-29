@@ -61,7 +61,7 @@ export function GenerateQuoteForm({
       value: opportunity.value,
       expiryDate: "",
       discountType: 'none',
-      discountValue: undefined,
+      discountValue: 0,
     },
   });
 
@@ -111,20 +111,60 @@ export function GenerateQuoteForm({
         <Separator />
 
         <div className="space-y-4">
-          <FormField
-            control={form.control}
-            name="value"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Quoted Value (₹)</FormLabel>
-                <FormControl>
-                  <Input type="number" placeholder="e.g., 50000" {...field} />
-                </FormControl>
-                <FormDescription>This value can be adjusted from the line item total if needed.</FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField
+              control={form.control}
+              name="value"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Quoted Value (₹)</FormLabel>
+                  <FormControl>
+                    <Input type="number" placeholder="e.g., 50000" {...field} />
+                  </FormControl>
+                  <FormDescription>This value can be adjusted from the line item total if needed.</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="expiryDate"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel>Expiry Date</FormLabel>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant={"outline"}
+                          className={cn(
+                            "w-full text-left font-normal",
+                            !field.value && "text-muted-foreground"
+                          )}
+                        >
+                          {field.value ? (
+                            format(new Date(field.value), "PPP")
+                          ) : (
+                            <span>Pick a date</span>
+                          )}
+                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={field.value ? new Date(field.value) : undefined}
+                        onSelect={(date) => field.onChange(date?.toISOString().split('T')[0])}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
 
           <FormField
             control={form.control}
@@ -137,7 +177,7 @@ export function GenerateQuoteForm({
                     onValueChange={(value) => {
                       field.onChange(value);
                       if (value === 'none') {
-                        form.setValue('discountValue', undefined);
+                        form.setValue('discountValue', 0);
                         form.clearErrors('discountValue');
                       }
                     }}
@@ -181,7 +221,6 @@ export function GenerateQuoteForm({
                           type="number" 
                           placeholder={discountType === 'percentage' ? "e.g., 10" : "e.g., 500"} 
                           {...field}
-                          value={field.value ?? ""} 
                       />
                     </FormControl>
                     <FormMessage />
@@ -190,44 +229,6 @@ export function GenerateQuoteForm({
               />
           )}
 
-          <FormField
-            control={form.control}
-            name="expiryDate"
-            render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel>Expiry Date</FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant={"outline"}
-                        className={cn(
-                          "w-full text-left font-normal",
-                          !field.value && "text-muted-foreground"
-                        )}
-                      >
-                        {field.value ? (
-                          format(new Date(field.value), "PPP")
-                        ) : (
-                          <span>Pick a date</span>
-                        )}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={field.value ? new Date(field.value) : undefined}
-                      onSelect={(date) => field.onChange(date?.toISOString().split('T')[0])}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
           <FormField
             control={form.control}
             name="document"
