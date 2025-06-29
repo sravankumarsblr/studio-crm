@@ -15,6 +15,7 @@ import { QuoteCard } from '../quote-card';
 import { AddQuoteDialog } from '../add-quote-dialog';
 import { LogActivityDialog } from '../log-activity-dialog';
 import { EditOpportunityDialog } from '../edit-deal-dialog';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 const stageVariant: { [key: string]: "default" | "secondary" | "destructive" | "outline" } = {
   'Qualification': 'outline',
@@ -43,7 +44,6 @@ export default function OpportunityDetailPage() {
   // In a real app, this data would be fetched together. Here we simulate joins.
   const company = companies.find(c => c.name === opportunity?.companyName);
   const primaryContact = contacts.find(c => c.name === opportunity?.contactName);
-  const associatedProducts = opportunity ? products.filter(p => opportunity.productIds.includes(p.id)) : [];
   const associatedContacts = company ? contacts.filter(c => c.companyId === company.id) : [];
 
   const handleQuoteAdded = (newQuote: Quote) => {
@@ -104,7 +104,7 @@ export default function OpportunityDetailPage() {
                         <DollarSign className="w-4 h-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">${opportunity.value.toLocaleString()}</div>
+                        <div className="text-2xl font-bold">₹{opportunity.value.toLocaleString('en-IN')}</div>
                     </CardContent>
                 </Card>
                  <Card>
@@ -148,18 +148,40 @@ export default function OpportunityDetailPage() {
                              <p className="text-muted-foreground text-xs">{primaryContact?.email}</p>
                         </div>
                     </div>
-                    <div className="flex items-start gap-3">
-                        <Briefcase className="w-5 h-5 mt-1 text-muted-foreground" />
-                        <div>
-                            <p className="text-muted-foreground">Interested Products</p>
-                            {associatedProducts.length > 0 ? (
-                                <div className="flex flex-wrap gap-2 mt-1">
-                                    {associatedProducts.map(p => <Badge key={p.id} variant="secondary">{p.name}</Badge>)}
-                                </div>
-                            ) : <p className="font-medium">N/A</p>}
-                        </div>
-                    </div>
                 </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Products & Services</CardTitle>
+              </CardHeader>
+              <CardContent>
+                 <Table>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead>Product</TableHead>
+                            <TableHead className="w-[100px]">Quantity</TableHead>
+                            <TableHead className="w-[120px] text-right">Unit Price</TableHead>
+                            <TableHead className="w-[120px] text-right">Total</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {opportunity.lineItems.map(item => {
+                            const product = products.find(p => p.id === item.productId);
+                            if (!product) return null;
+                            const total = product.price * item.quantity;
+                            return (
+                                <TableRow key={item.productId}>
+                                    <TableCell className="font-medium">{product.name}</TableCell>
+                                    <TableCell>{item.quantity}</TableCell>
+                                    <TableCell className="text-right">₹{product.price.toLocaleString('en-IN')}</TableCell>
+                                    <TableCell className="text-right">₹{total.toLocaleString('en-IN')}</TableCell>
+                                </TableRow>
+                            );
+                        })}
+                    </TableBody>
+                 </Table>
+              </CardContent>
             </Card>
 
           </div>

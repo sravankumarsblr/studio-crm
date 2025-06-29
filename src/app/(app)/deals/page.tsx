@@ -58,7 +58,7 @@ export default function OpportunitiesPage() {
                 <TableRow key={opportunity.id}>
                   <TableCell className="font-medium">{opportunity.name}</TableCell>
                   <TableCell>{opportunity.companyName}</TableCell>
-                  <TableCell>${opportunity.value.toLocaleString()}</TableCell>
+                  <TableCell>₹{opportunity.value.toLocaleString('en-IN')}</TableCell>
                   <TableCell>
                     <Badge variant={stageVariant[opportunity.stage]}>{opportunity.stage}</Badge>
                   </TableCell>

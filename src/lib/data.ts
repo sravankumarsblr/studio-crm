@@ -48,6 +48,11 @@ export type Quote = {
   };
 };
 
+export type LineItem = {
+  productId: string;
+  quantity: number;
+};
+
 export type Opportunity = {
   id: string;
   name: string;
@@ -57,7 +62,7 @@ export type Opportunity = {
   value: number;
   closeDate: string;
   quotes: Quote[];
-  productIds: string[];
+  lineItems: LineItem[];
 };
 
 export type Milestone = {
@@ -115,14 +120,14 @@ export const leads: Lead[] = [
 ];
 
 export const opportunities: Opportunity[] = [
-  { id: 'deal1', name: 'Q3 Pressure Sensor Contract', companyName: 'AeroCal Labs', contactName: 'Jane Smith', stage: 'Proposal', value: 50000, closeDate: '2024-08-30', productIds: ['prod1'], quotes: [
+  { id: 'deal1', name: 'Q3 Pressure Sensor Contract', companyName: 'AeroCal Labs', contactName: 'Jane Smith', stage: 'Proposal', value: 49900, closeDate: '2024-08-30', lineItems: [{ productId: 'prod1', quantity: 100 }], quotes: [
     { id: 'qt1', opportunityId: 'deal1', quoteNumber: 'QT-2024-001', date: '2024-06-10', expiryDate: '2024-07-10', preparedBy: 'Alex Green', value: 50000, status: 'Sent', documentName: 'AeroCal_Quote_v1.pdf' }
   ] },
-  { id: 'deal2', name: 'Medical Scale Fleet Calibration', companyName: 'MediTech Solutions', contactName: 'Peter Jones', stage: 'Negotiation', value: 120000, closeDate: '2024-07-25', productIds: ['prod2'], quotes: [
+  { id: 'deal2', name: 'Medical Scale Fleet Calibration', companyName: 'MediTech Solutions', contactName: 'Peter Jones', stage: 'Negotiation', value: 119508, closeDate: '2024-07-25', lineItems: [{ productId: 'prod2', quantity: 92 }], quotes: [
      { id: 'qt2', opportunityId: 'deal2', quoteNumber: 'QT-2024-002', date: '2024-06-15', expiryDate: '2024-07-15', preparedBy: 'Alex Green', value: 125000, status: 'Sent' },
      { id: 'qt3', opportunityId: 'deal2', quoteNumber: 'QT-2024-003', date: '2024-06-20', expiryDate: '2024-07-20', preparedBy: 'Alex Green', value: 120000, status: 'Draft', discount: { type: 'fixed', value: 5000 } }
   ] },
-  { id: 'deal3', name: 'Torque Wrench Verification', companyName: 'Precision Instruments Inc.', contactName: 'John Doe', stage: 'Closed Won', value: 22000, closeDate: '2024-06-15', productIds: ['prod3'], quotes: [
+  { id: 'deal3', name: 'Torque Wrench Verification', companyName: 'Precision Instruments Inc.', contactName: 'John Doe', stage: 'Closed Won', value: 22100, closeDate: '2024-06-15', lineItems: [{ productId: 'prod3', quantity: 26 }], quotes: [
     { id: 'qt4', opportunityId: 'deal3', quoteNumber: 'QT-2024-004', date: '2024-06-01', expiryDate: '2024-07-01', preparedBy: 'Alex Green', value: 22000, status: 'Accepted', documentName: 'PO-PINC-1138.pdf' }
   ] },
 ];

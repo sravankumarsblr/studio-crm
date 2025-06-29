@@ -1,11 +1,11 @@
 
 "use client";
 
-import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useState, useEffect } from "react";
+import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Check, ChevronsUpDown, PlusCircle, CalendarIcon } from "lucide-react";
+import { Check, ChevronsUpDown, PlusCircle, CalendarIcon, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 
 import { cn } from "@/lib/utils";
@@ -21,7 +21,6 @@ import {
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -44,6 +43,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { AddCompanyDialog } from "../companies/add-company-dialog";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 const addOpportunitySchema = z.object({
   name: z.string().min(1, "Opportunity name is required."),
@@ -54,15 +54,10 @@ const addOpportunitySchema = z.object({
     .array(z.string())
     .min(1, "You must select at least one contact."),
   primaryContactId: z.string().optional(),
-  productIds: z
-    .array(z.string())
-    .min(1, "You have to select at least one product."),
-  // Quote fields
-  quoteValue: z.coerce.number().min(1, "Quote value is required."),
-  quoteExpiryDate: z.string().min(1, "Expiry date is required."),
-  quoteDocument: z.any().optional(),
-  discountType: z.enum(['none', 'percentage', 'fixed']).default('none'),
-  discountValue: z.coerce.number().optional(),
+  lineItems: z.array(z.object({
+    productId: z.string().min(1),
+    quantity: z.coerce.number().int().min(1, "Qty must be at least 1."),
+  })).min(1, "Please add at least one product."),
 }).refine(
   (data) => {
     if (data.contactIds.length > 0) {
@@ -74,15 +69,7 @@ const addOpportunitySchema = z.object({
     message: "You must designate one contact as primary.",
     path: ["primaryContactId"],
   }
-).refine(data => {
-    if (data.discountType !== 'none' && (!data.discountValue || data.discountValue <= 0)) {
-        return false;
-    }
-    return true;
-}, {
-    message: "A positive discount value is required.",
-    path: ["discountValue"],
-});
+);
 
 export type AddOpportunityFormValues = z.infer<typeof addOpportunitySchema>;
 
@@ -97,7 +84,8 @@ export function AddOpportunityForm({
   const [isAddCompanyOpen, setIsAddCompanyOpen] = useState(false);
   const [companies, setCompanies] = useState<Company[]>(staticCompanies);
   const [contactSearch, setContactSearch] = useState("");
-  const [productSearch, setProductSearch] = useState("");
+  const [productPopoverOpen, setProductPopoverOpen] = useState(false);
+  const [totalValue, setTotalValue] = useState(0);
 
   const form = useForm<AddOpportunityFormValues>({
     resolver: zodResolver(addOpportunitySchema),
@@ -108,30 +96,37 @@ export function AddOpportunityForm({
       companyId: "",
       contactIds: [],
       primaryContactId: "",
-      productIds: [],
-      quoteValue: 0,
-      quoteExpiryDate: "",
-      discountType: 'none',
-      discountValue: undefined,
+      lineItems: [],
     },
+  });
+
+  const { fields, append, remove, update } = useFieldArray({
+    control: form.control,
+    name: "lineItems"
   });
 
   const selectedCompanyId = form.watch("companyId");
   const selectedContactIds = form.watch("contactIds");
-  const discountType = form.watch("discountType");
+  const lineItems = form.watch("lineItems");
+
+  useEffect(() => {
+    const newTotal = lineItems.reduce((acc, item) => {
+        const product = products.find(p => p.id === item.productId);
+        return acc + (product ? product.price * item.quantity : 0);
+    }, 0);
+    setTotalValue(newTotal);
+  }, [lineItems]);
 
   const availableContacts = selectedCompanyId
     ? contacts.filter((c) => c.companyId === selectedCompanyId)
     : [];
+  
+  const availableProducts = products.filter(p => !fields.some(field => field.productId === p.id));
+
 
   const filteredContacts = availableContacts.filter(c => 
     c.name.toLowerCase().includes(contactSearch.toLowerCase()) || 
     c.email.toLowerCase().includes(contactSearch.toLowerCase())
-  );
-
-  const filteredProducts = products.filter(p => 
-    p.name.toLowerCase().includes(productSearch.toLowerCase()) ||
-    p.category.toLowerCase().includes(productSearch.toLowerCase())
   );
 
   const handleContactCheckedChange = (checked: boolean, contactId: string) => {
@@ -384,204 +379,96 @@ export function AddOpportunityForm({
               </FormItem>
             )}
           />
-          
+
           <FormField
             control={form.control}
-            name="productIds"
+            name="lineItems"
             render={() => (
-              <FormItem>
-                <FormLabel>Products & Services</FormLabel>
-                <FormControl>
-                  <div className="rounded-md border">
-                      <div className="p-2 border-b">
-                        <Input 
-                          placeholder="Search products..."
-                          value={productSearch}
-                          onChange={(e) => setProductSearch(e.target.value)}
-                        />
-                      </div>
-                    <ScrollArea className="h-32">
-                      <div className="p-2">
-                        {filteredProducts.map((product) => (
-                          <FormField
-                            key={product.id}
-                            control={form.control}
-                            name="productIds"
-                            render={({ field }) => {
-                              return (
-                                <FormItem
-                                  key={product.id}
-                                  className="flex flex-row items-center space-x-3 space-y-0 p-2 rounded-md hover:bg-secondary"
-                                >
-                                  <FormControl>
-                                    <Checkbox
-                                      checked={field.value?.includes(product.id)}
-                                      onCheckedChange={(checked) => {
-                                          const newValues = checked
-                                            ? [...(field.value || []), product.id]
-                                            : field.value?.filter(
-                                                (value) => value !== product.id
-                                              ) || [];
-                                          field.onChange(newValues);
-                                      }}
-                                    />
-                                  </FormControl>
-                                  <FormLabel className="font-normal w-full cursor-pointer">
-                                    {product.name}
-                                    <span className="text-muted-foreground ml-2">({product.category})</span>
-                                  </FormLabel>
-                                </FormItem>
-                              );
-                            }}
-                          />
-                        ))}
-                      </div>
-                    </ScrollArea>
-                  </div>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
+                <FormItem>
+                    <FormLabel>Products & Services</FormLabel>
+                    <div className="rounded-md border bg-card">
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Product</TableHead>
+                                    <TableHead className="w-[100px]">Qty</TableHead>
+                                    <TableHead className="w-[120px] text-right">Unit Price</TableHead>
+                                    <TableHead className="w-[120px] text-right">Total</TableHead>
+                                    <TableHead className="w-[50px]"></TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {fields.map((field, index) => {
+                                    const product = products.find(p => p.id === field.productId);
+                                    const price = product?.price ?? 0;
+                                    const total = price * field.quantity;
+                                    return (
+                                        <TableRow key={field.id}>
+                                            <TableCell className="font-medium">{product?.name}</TableCell>
+                                            <TableCell>
+                                                <Input
+                                                    type="number"
+                                                    min="1"
+                                                    {...form.register(`lineItems.${index}.quantity`)}
+                                                    className="h-8"
+                                                />
+                                            </TableCell>
+                                            <TableCell className="text-right">₹{price.toLocaleString('en-IN')}</TableCell>
+                                            <TableCell className="text-right">₹{total.toLocaleString('en-IN')}</TableCell>
+                                            <TableCell>
+                                                <Button variant="ghost" size="icon" onClick={() => remove(index)}>
+                                                    <Trash2 className="h-4 w-4 text-destructive"/>
+                                                </Button>
+                                            </TableCell>
+                                        </TableRow>
+                                    );
+                                })}
+                            </TableBody>
+                        </Table>
+                         <div className="p-2 flex items-center justify-between">
+                            <Popover open={productPopoverOpen} onOpenChange={setProductPopoverOpen}>
+                                <PopoverTrigger asChild>
+                                <Button variant="outline" size="sm">
+                                    <PlusCircle className="mr-2 h-4 w-4" />
+                                    Add Product
+                                </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-[300px] p-0">
+                                <Command>
+                                    <CommandInput placeholder="Search products..." />
+                                    <CommandList>
+                                        <CommandEmpty>No products found.</CommandEmpty>
+                                        <CommandGroup>
+                                            {availableProducts.map((product) => (
+                                                <CommandItem
+                                                key={product.id}
+                                                onSelect={() => {
+                                                    append({ productId: product.id, quantity: 1 });
+                                                    setProductPopoverOpen(false);
+                                                }}
+                                                >
+                                                <div className="flex justify-between w-full">
+                                                    <span>{product.name}</span>
+                                                    <span className="text-muted-foreground">₹{product.price.toLocaleString('en-IN')}</span>
+                                                </div>
+                                                </CommandItem>
+                                            ))}
+                                        </CommandGroup>
+                                    </CommandList>
+                                </Command>
+                                </PopoverContent>
+                            </Popover>
+                             {fields.length > 0 && (
+                                <div className="text-right font-medium pr-4">
+                                    Total: <span className="text-lg font-bold">₹{totalValue.toLocaleString('en-IN')}</span>
+                                </div>
+                            )}
+                         </div>
+                    </div>
+                    <FormMessage />
+                </FormItem>
             )}
           />
-
-          <Separator className="my-6" />
-
-          <div className="space-y-4">
-            <h3 className="text-lg font-medium text-foreground">Initial Quote Details</h3>
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="quoteValue"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>List Value ($)</FormLabel>
-                    <FormControl>
-                      <Input type="number" placeholder="e.g., 50000" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="quoteExpiryDate"
-                render={({ field }) => (
-                  <FormItem className="flex flex-col">
-                    <FormLabel>Expiry Date</FormLabel>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <FormControl>
-                          <Button
-                            variant={"outline"}
-                            className={cn(
-                              "w-full text-left font-normal",
-                              !field.value && "text-muted-foreground"
-                            )}
-                          >
-                            {field.value ? (
-                              format(field.value, "PPP")
-                            ) : (
-                              <span>Pick an expiry date</span>
-                            )}
-                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                          </Button>
-                        </FormControl>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={field.value ? new Date(field.value) : undefined}
-                          onSelect={(date) => field.onChange(date?.toISOString().split('T')[0])}
-                          initialFocus
-                        />
-                      </PopoverContent>
-                    </Popover>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-             <FormField
-                control={form.control}
-                name="discountType"
-                render={({ field }) => (
-                  <FormItem className="space-y-3">
-                    <FormLabel>Discount</FormLabel>
-                    <FormControl>
-                      <RadioGroup
-                        onValueChange={(value) => {
-                          field.onChange(value);
-                          if (value === 'none') {
-                            form.setValue('discountValue', undefined);
-                            form.clearErrors('discountValue');
-                          }
-                        }}
-                        defaultValue={field.value}
-                        className="flex items-center space-x-4"
-                      >
-                        <FormItem className="flex items-center space-x-2 space-y-0">
-                          <FormControl>
-                            <RadioGroupItem value="none" />
-                          </FormControl>
-                          <FormLabel className="font-normal">None</FormLabel>
-                        </FormItem>
-                        <FormItem className="flex items-center space-x-2 space-y-0">
-                          <FormControl>
-                            <RadioGroupItem value="percentage" />
-                          </FormControl>
-                          <FormLabel className="font-normal">Percentage (%)</FormLabel>
-                        </FormItem>
-                        <FormItem className="flex items-center space-x-2 space-y-0">
-                          <FormControl>
-                            <RadioGroupItem value="fixed" />
-                          </FormControl>
-                          <FormLabel className="font-normal">Fixed ($)</FormLabel>
-                        </FormItem>
-                      </RadioGroup>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {discountType && discountType !== 'none' && (
-                <FormField
-                    control={form.control}
-                    name="discountValue"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Discount Value</FormLabel>
-                        <FormControl>
-                          <Input 
-                              type="number" 
-                              placeholder={discountType === 'percentage' ? "e.g., 10" : "e.g., 500"} 
-                              {...field}
-                              value={field.value ?? ""} 
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-              )}
-             <FormField
-              control={form.control}
-              name="quoteDocument"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Attach Document</FormLabel>
-                  <FormControl>
-                    <Input 
-                        type="file"
-                        onChange={(e) => field.onChange(e.target.files ? e.target.files[0] : null)}
-                      />
-                  </FormControl>
-                  <FormDescription>Optionally attach a PO or quote document.</FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
 
           <div className="flex justify-end gap-2 pt-4">
             <Button type="button" variant="outline" onClick={onCancel}>

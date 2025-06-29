@@ -2,10 +2,10 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Check, ChevronsUpDown, PlusCircle, CalendarIcon } from "lucide-react";
+import { Check, ChevronsUpDown, PlusCircle, CalendarIcon, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 
 import { cn } from "@/lib/utils";
@@ -42,10 +42,10 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Badge } from "@/components/ui/badge";
 import { AddCompanyDialog } from "../companies/add-company-dialog";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 const editOpportunitySchema = z.object({
   name: z.string().min(1, "Opportunity name is required."),
-  value: z.coerce.number().min(0, "Value must be a positive number."),
   stage: z.string().min(1, "Stage is required."),
   closeDate: z.string().min(1, "Close date is required"),
   companyId: z.string().min(1, "Company is required."),
@@ -53,9 +53,10 @@ const editOpportunitySchema = z.object({
     .array(z.string())
     .min(1, "You must select at least one contact."),
   primaryContactId: z.string().optional(),
-  productIds: z
-    .array(z.string())
-    .min(1, "You have to select at least one product."),
+  lineItems: z.array(z.object({
+    productId: z.string().min(1),
+    quantity: z.coerce.number().int().min(1, "Qty must be at least 1."),
+  })).min(1, "Please add at least one product."),
 }).refine(
   (data) => {
     if (data.contactIds.length > 0) {
@@ -84,27 +85,23 @@ export function EditOpportunityForm({
   const [isAddCompanyOpen, setIsAddCompanyOpen] = useState(false);
   const [companies, setCompanies] = useState<Company[]>(staticCompanies);
   const [contactSearch, setContactSearch] = useState("");
-  const [productSearch, setProductSearch] = useState("");
+  const [productPopoverOpen, setProductPopoverOpen] = useState(false);
+  const [totalValue, setTotalValue] = useState(opportunity.value);
 
   const defaultValues = useMemo(() => {
     const company = companies.find(c => c.name === opportunity.companyName);
     const primaryContact = contacts.find(c => c.name === opportunity.contactName && c.companyId === company?.id);
-    
-    // In a real app, an opportunity would have a list of contact IDs. We simulate this here.
     const associatedContacts = company ? contacts.filter(c => c.companyId === company.id) : [];
-    // For this mock, we'll just pre-select the primary one.
-    const contactIds = primaryContact ? [primaryContact.id] : [];
-
+    const contactIds = primaryContact ? [primaryContact.id, ...associatedContacts.filter(c => c.id !== primaryContact.id && opportunity.contactName.includes(c.name)).map(c => c.id)] : [];
 
     return {
       name: opportunity.name,
-      value: opportunity.value,
       stage: opportunity.stage,
-      closeDate: opportunity.closeDate, // This needs to be a string in 'YYYY-MM-DD' format if not already
+      closeDate: opportunity.closeDate,
       companyId: company?.id || "",
       contactIds: contactIds,
       primaryContactId: primaryContact?.id || "",
-      productIds: opportunity.productIds || [],
+      lineItems: opportunity.lineItems || [],
     };
   }, [opportunity, companies]);
 
@@ -113,25 +110,38 @@ export function EditOpportunityForm({
     defaultValues,
   });
 
+   const { fields, append, remove, update } = useFieldArray({
+    control: form.control,
+    name: "lineItems"
+  });
+
   useEffect(() => {
     form.reset(defaultValues);
   }, [defaultValues, form]);
 
   const selectedCompanyId = form.watch("companyId");
   const selectedContactIds = form.watch("contactIds");
+  const lineItems = form.watch("lineItems");
+
+  useEffect(() => {
+    const newTotal = lineItems.reduce((acc, item) => {
+        const product = products.find(p => p.id === item.productId);
+        return acc + (product ? product.price * item.quantity : 0);
+    }, 0);
+    setTotalValue(newTotal);
+  }, [lineItems]);
+
 
   const availableContacts = selectedCompanyId
     ? contacts.filter((c) => c.companyId === selectedCompanyId)
     : [];
+  
+  const availableProducts = products.filter(p => !fields.some(field => field.productId === p.id));
+
 
   const filteredContacts = availableContacts.filter(c => 
     c.name.toLowerCase().includes(contactSearch.toLowerCase()) || 
     c.email.toLowerCase().includes(contactSearch.toLowerCase())
-  );
-
-  const filteredProducts = products.filter(p => 
-    p.name.toLowerCase().includes(productSearch.toLowerCase()) ||
-    p.category.toLowerCase().includes(productSearch.toLowerCase())
   );
 
   const handleContactCheckedChange = (checked: boolean, contactId: string) => {
@@ -175,19 +185,6 @@ export function EditOpportunityForm({
                 <FormLabel>Opportunity Name</FormLabel>
                 <FormControl>
                   <Input placeholder="e.g., Q4 Sensor Contract" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="value"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Value ($)</FormLabel>
-                <FormControl>
-                  <Input type="number" placeholder="e.g., 100000" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -397,63 +394,94 @@ export function EditOpportunityForm({
               </FormItem>
             )}
           />
-          
-          <FormField
+
+           <FormField
             control={form.control}
-            name="productIds"
+            name="lineItems"
             render={() => (
-              <FormItem>
-                <FormLabel>Products & Services</FormLabel>
-                <FormControl>
-                  <div className="rounded-md border">
-                      <div className="p-2 border-b">
-                        <Input 
-                          placeholder="Search products..."
-                          value={productSearch}
-                          onChange={(e) => setProductSearch(e.target.value)}
-                        />
-                      </div>
-                    <ScrollArea className="h-32">
-                      <div className="p-2">
-                        {filteredProducts.map((product) => (
-                          <FormField
-                            key={product.id}
-                            control={form.control}
-                            name="productIds"
-                            render={({ field }) => {
-                              return (
-                                <FormItem
-                                  key={product.id}
-                                  className="flex flex-row items-center space-x-3 space-y-0 p-2 rounded-md hover:bg-secondary"
-                                >
-                                  <FormControl>
-                                    <Checkbox
-                                      checked={field.value?.includes(product.id)}
-                                      onCheckedChange={(checked) => {
-                                          const newValues = checked
-                                            ? [...(field.value || []), product.id]
-                                            : field.value?.filter(
-                                                (value) => value !== product.id
-                                              ) || [];
-                                          field.onChange(newValues);
-                                      }}
-                                    />
-                                  </FormControl>
-                                  <FormLabel className="font-normal w-full cursor-pointer">
-                                    {product.name}
-                                    <span className="text-muted-foreground ml-2">({product.category})</span>
-                                  </FormLabel>
-                                </FormItem>
-                              );
-                            }}
-                          />
-                        ))}
-                      </div>
-                    </ScrollArea>
-                  </div>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
+                <FormItem>
+                    <FormLabel>Products & Services</FormLabel>
+                    <div className="rounded-md border bg-card">
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Product</TableHead>
+                                    <TableHead className="w-[100px]">Qty</TableHead>
+                                    <TableHead className="w-[120px] text-right">Unit Price</TableHead>
+                                    <TableHead className="w-[120px] text-right">Total</TableHead>
+                                    <TableHead className="w-[50px]"></TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {fields.map((field, index) => {
+                                    const product = products.find(p => p.id === field.productId);
+                                    const price = product?.price ?? 0;
+                                    const total = price * field.quantity;
+                                    return (
+                                        <TableRow key={field.id}>
+                                            <TableCell className="font-medium">{product?.name}</TableCell>
+                                            <TableCell>
+                                                <Input
+                                                    type="number"
+                                                    min="1"
+                                                    {...form.register(`lineItems.${index}.quantity`)}
+                                                    className="h-8"
+                                                />
+                                            </TableCell>
+                                            <TableCell className="text-right">₹{price.toLocaleString('en-IN')}</TableCell>
+                                            <TableCell className="text-right">₹{total.toLocaleString('en-IN')}</TableCell>
+                                            <TableCell>
+                                                <Button variant="ghost" size="icon" onClick={() => remove(index)}>
+                                                    <Trash2 className="h-4 w-4 text-destructive"/>
+                                                </Button>
+                                            </TableCell>
+                                        </TableRow>
+                                    );
+                                })}
+                            </TableBody>
+                        </Table>
+                         <div className="p-2 flex items-center justify-between">
+                            <Popover open={productPopoverOpen} onOpenChange={setProductPopoverOpen}>
+                                <PopoverTrigger asChild>
+                                <Button variant="outline" size="sm">
+                                    <PlusCircle className="mr-2 h-4 w-4" />
+                                    Add Product
+                                </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-[300px] p-0">
+                                <Command>
+                                    <CommandInput placeholder="Search products..." />
+                                    <CommandList>
+                                        <CommandEmpty>No products found.</CommandEmpty>
+                                        <CommandGroup>
+                                            {availableProducts.map((product) => (
+                                                <CommandItem
+                                                key={product.id}
+                                                onSelect={() => {
+                                                    append({ productId: product.id, quantity: 1 });
+                                                    setProductPopoverOpen(false);
+                                                }}
+                                                >
+                                                <div className="flex justify-between w-full">
+                                                    <span>{product.name}</span>
+                                                    <span className="text-muted-foreground">₹{product.price.toLocaleString('en-IN')}</span>
+                                                </div>
+                                                </CommandItem>
+                                            ))}
+                                        </CommandGroup>
+                                    </CommandList>
+                                </Command>
+                                </PopoverContent>
+                            </Popover>
+                             {fields.length > 0 && (
+                                <div className="text-right font-medium pr-4">
+                                    Total: <span className="text-lg font-bold">₹{totalValue.toLocaleString('en-IN')}</span>
+                                </div>
+                            )}
+                         </div>
+                    </div>
+                    <FormMessage />
+                </FormItem>
             )}
           />
 

@@ -11,6 +11,7 @@ import {
 import { AddOpportunityForm } from "./add-deal-form";
 import { useToast } from "@/hooks/use-toast";
 import type { AddOpportunityFormValues } from "./add-deal-form";
+import { products } from "@/lib/data";
 
 export function AddOpportunityDialog({
   isOpen,
@@ -22,12 +23,17 @@ export function AddOpportunityDialog({
   const { toast } = useToast();
 
   const handleSave = (data: AddOpportunityFormValues) => {
-    // In a real app, this would trigger a server action to save the new opportunity and its initial quote
-    console.log("New opportunity to save:", data);
+    // In a real app, this would trigger a server action to save the new opportunity
+    const totalValue = data.lineItems.reduce((acc, item) => {
+        const product = products.find(p => p.id === item.productId);
+        return acc + (product?.price || 0) * item.quantity;
+    }, 0);
+
+    console.log("New opportunity to save:", { ...data, value: totalValue });
 
     toast({
-      title: "Opportunity & Quote Created",
-      description: `The opportunity "${data.name}" and an initial quote have been successfully created.`,
+      title: "Opportunity Created",
+      description: `The opportunity "${data.name}" has been successfully created with a value of $${totalValue.toLocaleString()}.`,
     });
     setIsOpen(false);
   };
@@ -38,7 +44,7 @@ export function AddOpportunityDialog({
         <DialogHeader>
           <DialogTitle>Add New Opportunity</DialogTitle>
           <DialogDescription>
-            Fill in the details for the new opportunity and its initial quote.
+            Fill in the details for the new opportunity and add products to calculate its value.
           </DialogDescription>
         </DialogHeader>
         <div className="flex-1 overflow-y-auto -mr-6 pr-6 py-4">

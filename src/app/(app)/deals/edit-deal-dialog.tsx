@@ -11,7 +11,7 @@ import {
 import { EditOpportunityForm } from "./edit-deal-form";
 import { useToast } from "@/hooks/use-toast";
 import type { EditOpportunityFormValues } from "./edit-deal-form";
-import type { Opportunity } from "@/lib/data";
+import { products, type Opportunity } from "@/lib/data";
 
 export function EditOpportunityDialog({
   isOpen,
@@ -26,7 +26,12 @@ export function EditOpportunityDialog({
 
   const handleSave = (data: EditOpportunityFormValues) => {
     // In a real app, this would trigger a server action to update the opportunity.
-    console.log("Updated opportunity data to save:", data);
+    const totalValue = data.lineItems.reduce((acc, item) => {
+        const product = products.find(p => p.id === item.productId);
+        return acc + (product?.price || 0) * item.quantity;
+    }, 0);
+
+    console.log("Updated opportunity data to save:", { ...data, value: totalValue });
     toast({
       title: "Opportunity Updated",
       description: `The opportunity "${data.name}" has been successfully updated.`,
