@@ -143,22 +143,22 @@ export default function DashboardPage() {
             </Card>
             <Card>
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
-                    <CardTitle className="text-sm font-medium">Deals Won</CardTitle>
+                    <CardTitle className="text-sm font-medium">Opportunities Won</CardTitle>
                     <ThumbsUp className="w-4 h-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
                     <div className="text-2xl font-bold">₹{dashboardData.totalWonValue.toLocaleString('en-IN')}</div>
-                    <p className="text-xs text-muted-foreground">{dashboardData.wonOpportunities.length} Deals</p>
+                    <p className="text-xs text-muted-foreground">{dashboardData.wonOpportunities.length} Opportunities</p>
                 </CardContent>
             </Card>
             <Card>
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
-                    <CardTitle className="text-sm font-medium">Deals Lost</CardTitle>
+                    <CardTitle className="text-sm font-medium">Opportunities Lost</CardTitle>
                     <ThumbsDown className="w-4 h-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
                     <div className="text-2xl font-bold">₹{dashboardData.totalLostValue.toLocaleString('en-IN')}</div>
-                    <p className="text-xs text-muted-foreground">{dashboardData.lostOpportunities.length} Deals</p>
+                    <p className="text-xs text-muted-foreground">{dashboardData.lostOpportunities.length} Opportunities</p>
                 </CardContent>
             </Card>
             <Card>
