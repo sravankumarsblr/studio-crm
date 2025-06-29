@@ -14,6 +14,7 @@ import {
   Gem,
   PanelLeft,
   ChevronLeft,
+  ChevronRight,
   Shield,
   UserCog
 } from "lucide-react";
@@ -111,12 +112,16 @@ export default function Nav() {
       </SidebarContent>
        <SidebarFooter>
          <Button variant="ghost" onClick={toggleSidebar} className="w-full justify-center group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:w-8 group-data-[collapsible=icon]:h-8">
-            <ChevronLeft className="w-4 h-4 transition-transform ease-in-out duration-200 group-data-[collapsible=icon]:rotate-180" />
-            <span className="group-data-[collapsible=icon]:hidden">Collapse</span>
+            {isCollapsed ? (
+              <ChevronRight className="w-4 h-4" />
+            ) : (
+              <>
+                <ChevronLeft className="w-4 h-4" />
+                <span className="group-data-[collapsible=icon]:hidden">Collapse</span>
+              </>
+            )}
          </Button>
       </SidebarFooter>
     </Sidebar>
   );
 }
-
-    
