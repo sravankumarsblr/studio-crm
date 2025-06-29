@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import type { Quote } from "@/lib/data";
-import { MoreVertical, Trash2, Download, CheckCircle, XCircle, Clock } from "lucide-react";
+import { MoreVertical, Trash2, Download, CheckCircle, XCircle, Clock, Paperclip } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,6 +17,7 @@ import {
 type QuoteCardProps = {
   quote: Quote;
   onDelete: (quoteId: string) => void;
+  onAttachPo: (quote: Quote) => void;
 };
 
 const statusConfig = {
@@ -27,7 +28,7 @@ const statusConfig = {
 } as const;
 
 
-export function QuoteCard({ quote, onDelete }: QuoteCardProps) {
+export function QuoteCard({ quote, onDelete, onAttachPo }: QuoteCardProps) {
     const {variant, icon: Icon, label} = statusConfig[quote.status];
 
     const getDiscountDisplay = () => {
@@ -70,6 +71,11 @@ export function QuoteCard({ quote, onDelete }: QuoteCardProps) {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
+            {quote.status !== 'Accepted' && (
+              <DropdownMenuItem onClick={() => onAttachPo(quote)}>
+                <Paperclip className="mr-2 h-4 w-4"/>Attach PO
+              </DropdownMenuItem>
+            )}
             <DropdownMenuItem><Download className="mr-2 h-4 w-4"/>Download</DropdownMenuItem>
             <DropdownMenuItem className="text-destructive" onClick={() => onDelete(quote.id)}>
               <Trash2 className="mr-2 h-4 w-4"/>Delete
@@ -100,10 +106,22 @@ export function QuoteCard({ quote, onDelete }: QuoteCardProps) {
             <span className="text-muted-foreground">Expiry Date</span>
             <span>{quote.expiryDate}</span>
         </div>
+         {quote.poNumber && (
+          <div className="flex justify-between">
+              <span className="text-muted-foreground">PO Number</span>
+              <span className="font-medium">{quote.poNumber}</span>
+          </div>
+        )}
         {quote.documentName && (
              <div className="flex justify-between items-center pt-2">
-                <span className="text-muted-foreground">Attachment</span>
+                <span className="text-muted-foreground">Quote Doc</span>
                 <Button variant="link" size="sm" className="p-0 h-auto">{quote.documentName}</Button>
+            </div>
+        )}
+        {quote.poDocumentName && (
+             <div className="flex justify-between items-center">
+                <span className="text-muted-foreground">PO Doc</span>
+                <Button variant="link" size="sm" className="p-0 h-auto">{quote.poDocumentName}</Button>
             </div>
         )}
       </CardContent>

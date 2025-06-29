@@ -46,6 +46,10 @@ export type Quote = {
     type: 'percentage' | 'fixed';
     value: number;
   };
+  poNumber?: string;
+  poValue?: number;
+  poDate?: string;
+  poDocumentName?: string;
 };
 
 export type LineItem = {
@@ -128,7 +132,7 @@ export const opportunities: Opportunity[] = [
      { id: 'qt3', opportunityId: 'deal2', quoteNumber: 'QT-2024-003', date: '2024-06-20', expiryDate: '2024-07-20', preparedBy: 'Alex Green', value: 120000, status: 'Draft', discount: { type: 'fixed', value: 5000 } }
   ] },
   { id: 'deal3', name: 'Torque Wrench Verification', companyName: 'Precision Instruments Inc.', contactName: 'John Doe', stage: 'Closed Won', value: 22100, closeDate: '2024-06-15', lineItems: [{ productId: 'prod3', quantity: 26 }], quotes: [
-    { id: 'qt4', opportunityId: 'deal3', quoteNumber: 'QT-2024-004', date: '2024-06-01', expiryDate: '2024-07-01', preparedBy: 'Alex Green', value: 22000, status: 'Accepted', documentName: 'PO-PINC-1138.pdf' }
+    { id: 'qt4', opportunityId: 'deal3', quoteNumber: 'QT-2024-004', date: '2024-06-01', expiryDate: '2024-07-01', preparedBy: 'Alex Green', value: 22000, status: 'Accepted', poNumber: 'PO-PINC-1138', poValue: 22000, poDate: '2024-06-14', poDocumentName: 'PO-PINC-1138.pdf' }
   ] },
 ];
 

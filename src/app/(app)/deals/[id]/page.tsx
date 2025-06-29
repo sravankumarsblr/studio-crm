@@ -16,6 +16,8 @@ import { GenerateQuoteDialog } from '../add-quote-dialog';
 import { LogActivityDialog } from '../log-activity-dialog';
 import { EditOpportunityDialog } from '../edit-deal-dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { AttachPoDialog } from '../attach-po-dialog';
+import type { AttachPoFormValues } from '../attach-po-form';
 
 const stageVariant: { [key: string]: "default" | "secondary" | "destructive" | "outline" } = {
   'Qualification': 'outline',
@@ -40,6 +42,8 @@ export default function OpportunityDetailPage() {
   const [isGenerateQuoteOpen, setIsGenerateQuoteOpen] = useState(false);
   const [isLogActivityOpen, setIsLogActivityOpen] = useState(false);
   const [isEditOpportunityOpen, setIsEditOpportunityOpen] = useState(false);
+  const [isAttachPoOpen, setIsAttachPoOpen] = useState(false);
+  const [selectedQuoteForPo, setSelectedQuoteForPo] = useState<Quote | null>(null);
 
   // In a real app, this data would be fetched together. Here we simulate joins.
   const company = companies.find(c => c.name === opportunity?.companyName);
@@ -66,6 +70,35 @@ export default function OpportunityDetailPage() {
       setOpportunity(updatedOpportunity);
     }
   }
+
+  const handleAttachPoClick = (quote: Quote) => {
+    setSelectedQuoteForPo(quote);
+    setIsAttachPoOpen(true);
+  };
+
+  const handlePoAttached = (quoteId: string, poDetails: AttachPoFormValues) => {
+    if (opportunity) {
+      const updatedQuotes = opportunity.quotes.map(q => {
+        if (q.id === quoteId) {
+          return {
+            ...q,
+            status: 'Accepted' as 'Accepted',
+            poNumber: poDetails.poNumber,
+            poValue: poDetails.poValue,
+            poDate: poDetails.poDate,
+            poDocumentName: poDetails.poDocument?.name,
+          };
+        }
+        return q;
+      });
+
+      setOpportunity({
+        ...opportunity,
+        quotes: updatedQuotes,
+        stage: 'Closed Won'
+      });
+    }
+  };
 
   if (!opportunity) {
     return (
@@ -215,7 +248,12 @@ export default function OpportunityDetailPage() {
                 <div className="space-y-4">
                   {opportunity.quotes.length > 0 ? (
                     opportunity.quotes.map(quote => (
-                      <QuoteCard key={quote.id} quote={quote} onDelete={handleQuoteDeleted} />
+                      <QuoteCard 
+                        key={quote.id} 
+                        quote={quote} 
+                        onDelete={handleQuoteDeleted}
+                        onAttachPo={handleAttachPoClick}
+                      />
                     ))
                   ) : (
                     <div className="text-center text-sm text-muted-foreground p-8 border-dashed border-2 rounded-lg">
@@ -249,6 +287,14 @@ export default function OpportunityDetailPage() {
         setIsOpen={setIsEditOpportunityOpen}
         opportunity={opportunity}
       />
+      {selectedQuoteForPo && (
+        <AttachPoDialog
+          isOpen={isAttachPoOpen}
+          setIsOpen={setIsAttachPoOpen}
+          quote={selectedQuoteForPo}
+          onPoAttached={handlePoAttached}
+        />
+      )}
     </div>
   );
 }
