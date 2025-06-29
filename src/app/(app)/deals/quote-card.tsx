@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import type { Quote } from "@/lib/data";
-import { MoreVertical, Trash2, Download, CheckCircle, XCircle, Clock, Paperclip } from "lucide-react";
+import { MoreVertical, Trash2, Download, CheckCircle, XCircle, Clock } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,7 +17,6 @@ import {
 type QuoteCardProps = {
   quote: Quote;
   onDelete: (quoteId: string) => void;
-  onAttachPo: (quote: Quote) => void;
 };
 
 const statusConfig = {
@@ -28,7 +27,7 @@ const statusConfig = {
 } as const;
 
 
-export function QuoteCard({ quote, onDelete, onAttachPo }: QuoteCardProps) {
+export function QuoteCard({ quote, onDelete }: QuoteCardProps) {
     const {variant, icon: Icon, label} = statusConfig[quote.status];
 
     const getDiscountDisplay = () => {
@@ -71,11 +70,6 @@ export function QuoteCard({ quote, onDelete, onAttachPo }: QuoteCardProps) {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            {quote.status !== 'Accepted' && (
-              <DropdownMenuItem onClick={() => onAttachPo(quote)}>
-                <Paperclip className="mr-2 h-4 w-4"/>Attach PO
-              </DropdownMenuItem>
-            )}
             <DropdownMenuItem><Download className="mr-2 h-4 w-4"/>Download</DropdownMenuItem>
             <DropdownMenuItem className="text-destructive" onClick={() => onDelete(quote.id)}>
               <Trash2 className="mr-2 h-4 w-4"/>Delete

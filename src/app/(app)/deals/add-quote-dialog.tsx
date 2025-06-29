@@ -34,12 +34,16 @@ export function GenerateQuoteDialog({
       expiryDate: data.expiryDate,
       preparedBy: "Alex Green", // In a real app, this would be the current user
       value: data.value,
-      status: "Draft",
+      status: data.attachPo ? "Accepted" : "Draft",
       documentName: data.document?.name,
       discount: (data.discountType && data.discountType !== 'none' && data.discountValue) ? {
         type: data.discountType as 'percentage' | 'fixed',
         value: data.discountValue
       } : undefined,
+      poNumber: data.attachPo ? data.poNumber : undefined,
+      poValue: data.attachPo ? data.poValue : undefined,
+      poDate: data.attachPo ? data.poDate : undefined,
+      poDocumentName: data.attachPo ? data.poDocument?.name : undefined,
     };
     onQuoteAdded(newQuote);
     setIsOpen(false);
