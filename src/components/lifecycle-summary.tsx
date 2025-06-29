@@ -2,7 +2,7 @@
 "use client";
 
 import * as React from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Users, Briefcase, FileText, ChevronRight } from "lucide-react"
 import {
   Tooltip,
@@ -20,22 +20,18 @@ export function LifecycleSummary() {
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Sales Lifecycle at a Glance</CardTitle>
-        <CardDescription>Follow a customer's journey from initial contact to a signed contract.</CardDescription>
-      </CardHeader>
-      <CardContent>
+      <CardContent className="p-4">
         <TooltipProvider>
-          <div className="flex items-center justify-center gap-4 md:gap-12 py-4">
+          <div className="flex items-center justify-center gap-4 md:gap-8">
             {stages.map((stage, index) => (
               <React.Fragment key={stage.name}>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <div className="flex flex-col items-center gap-2 text-center cursor-default">
-                      <div className="flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 text-primary">
-                        <stage.icon className="w-8 h-8" />
+                    <div className="flex flex-col items-center gap-1 text-center cursor-default">
+                      <div className="flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 text-primary">
+                        <stage.icon className="w-6 h-6" />
                       </div>
-                      <h3 className="text-lg font-semibold">{stage.name}</h3>
+                      <h3 className="text-sm font-medium">{stage.name}</h3>
                     </div>
                   </TooltipTrigger>
                   <TooltipContent>
@@ -44,7 +40,7 @@ export function LifecycleSummary() {
                 </Tooltip>
 
                 {index < stages.length - 1 && (
-                  <ChevronRight className="w-8 h-8 text-muted-foreground shrink-0 hidden sm:block" />
+                  <ChevronRight className="w-6 h-6 text-muted-foreground shrink-0 hidden sm:block" />
                 )}
               </React.Fragment>
             ))}
