@@ -1,3 +1,5 @@
+"use client";
+
 import { Header } from "@/components/header";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { companies } from "@/lib/data";
