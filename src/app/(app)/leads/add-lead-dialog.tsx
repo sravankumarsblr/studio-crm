@@ -41,11 +41,11 @@ export function AddLeadDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh] flex flex-col">
+      <DialogContent className="sm:max-w-[800px] max-h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>Add New Lead</DialogTitle>
           <DialogDescription>
-            Fill in the details below to create a new lead. Select a company to see available contacts.
+            Fill in the details below. You can select multiple contacts and designate one as primary.
           </DialogDescription>
         </DialogHeader>
         <div className="flex-1 overflow-y-auto -mr-6 pr-6 py-4">
