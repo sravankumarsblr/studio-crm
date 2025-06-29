@@ -3,8 +3,8 @@ import { Toaster } from "@/components/ui/toaster";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "CalTrack CRM",
-  description: "CRM for the Calibration Testing Industry",
+  title: "CRM",
+  description: "Customer Relationship Management",
 };
 
 export default function RootLayout({

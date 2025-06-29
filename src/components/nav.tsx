@@ -43,7 +43,7 @@ export default function Nav() {
       <SidebarHeader>
         <div className="flex items-center gap-2 p-2 justify-center">
           <Gem className="w-8 h-8 text-primary" />
-           <h2 className="text-xl font-headline font-semibold group-data-[collapsible=icon]:hidden">CalTrack</h2>
+           <h2 className="text-xl font-headline font-semibold group-data-[collapsible=icon]:hidden">CRM</h2>
         </div>
       </SidebarHeader>
       <SidebarContent>
@@ -66,7 +66,7 @@ export default function Nav() {
       </SidebarContent>
        <SidebarFooter className="group-data-[collapsible=icon]:hidden">
          <div className="p-2 text-center text-xs text-muted-foreground">
-            © 2024 CalTrack CRM
+            © 2024 CRM
          </div>
       </SidebarFooter>
     </Sidebar>
