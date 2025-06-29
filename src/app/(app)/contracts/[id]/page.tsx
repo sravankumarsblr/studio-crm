@@ -111,44 +111,6 @@ export default function ContractDetailPage() {
             </Card>
         </div>
 
-        <Card>
-            <CardHeader>
-                <CardTitle>Contract Information</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4 text-sm">
-               <div className="grid md:grid-cols-2 gap-4">
-                    <div className="flex items-start gap-3">
-                        <Building2 className="w-5 h-5 mt-1 text-muted-foreground" />
-                        <div>
-                            <p className="text-muted-foreground">Company</p>
-                            <p className="font-medium">{company?.name || contract.companyName}</p>
-                        </div>
-                    </div>
-                    <div className="flex items-start gap-3">
-                        <Calendar className="w-5 h-5 mt-1 text-muted-foreground" />
-                        <div>
-                            <p className="text-muted-foreground">Effective Date</p>
-                            <p className="font-medium">{contract.contractDate}</p>
-                        </div>
-                    </div>
-                    <div className="flex items-start gap-3">
-                        <MilestoneIcon className="w-5 h-5 mt-1 text-muted-foreground" />
-                        <div>
-                            <p className="text-muted-foreground">Scope of Work</p>
-                            <p className="font-medium whitespace-pre-wrap">{contract.scopeOfWork}</p>
-                        </div>
-                    </div>
-                    <div className="flex items-start gap-3">
-                        <Calendar className="w-5 h-5 mt-1 text-muted-foreground" />
-                        <div>
-                            <p className="text-muted-foreground">Expiry Date</p>
-                            <p className="font-medium">{contract.expiryDate}</p>
-                        </div>
-                    </div>
-               </div>
-            </CardContent>
-        </Card>
-
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
             <Card className="lg:col-span-3">
                 <CardHeader>
@@ -190,12 +152,36 @@ export default function ContractDetailPage() {
             </Card>
              <Card className="lg:col-span-2">
                 <CardHeader>
-                    <CardTitle>Order Details</CardTitle>
-                    <CardDescription>Products and PO from the original opportunity.</CardDescription>
+                    <CardTitle>Contract &amp; Order Details</CardTitle>
+                    <CardDescription>Key terms and items from the original opportunity.</CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="space-y-4 text-sm">
+                    <div className="space-y-4">
+                        <div className="flex items-start gap-3">
+                            <Calendar className="w-5 h-5 mt-1 text-muted-foreground" />
+                            <div>
+                                <p className="text-muted-foreground">Effective Date</p>
+                                <p className="font-medium">{contract.contractDate}</p>
+                            </div>
+                        </div>
+                         <div className="flex items-start gap-3">
+                            <Calendar className="w-5 h-5 mt-1 text-muted-foreground" />
+                            <div>
+                                <p className="text-muted-foreground">Expiry Date</p>
+                                <p className="font-medium">{contract.expiryDate}</p>
+                            </div>
+                        </div>
+                        <div className="flex items-start gap-3">
+                            <MilestoneIcon className="w-5 h-5 mt-1 text-muted-foreground" />
+                            <div>
+                                <p className="text-muted-foreground">Scope of Work</p>
+                                <p className="font-medium whitespace-pre-wrap">{contract.scopeOfWork}</p>
+                            </div>
+                        </div>
+                    </div>
+                     <Separator className="my-4"/>
                     {acceptedQuote && (
-                        <div className="space-y-4 text-sm mb-4">
+                        <div className="space-y-4 text-sm">
                              <div className="flex items-start gap-3">
                                 <Hash className="w-4 h-4 mt-1 text-muted-foreground" />
                                 <div>
