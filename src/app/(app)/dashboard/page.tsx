@@ -7,6 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { opportunities as allOpportunities, contacts } from "@/lib/data";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
 import { ThumbsUp, ThumbsDown, DollarSign, Target, Clock, Filter } from 'lucide-react';
@@ -34,6 +36,7 @@ const getStatus = (stage: Opportunity['stage']) => {
 export default function DashboardPage() {
   const [statusFilter, setStatusFilter] = useState<string[]>([]);
   const [stageFilter, setStageFilter] = useState<string[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const dashboardData = useMemo(() => {
     const openOpportunities = allOpportunities.filter(o => getStatus(o.stage) === 'Open');
@@ -90,9 +93,15 @@ export default function DashboardPage() {
       const opportunityStatus = getStatus(o.stage);
       const statusMatch = statusFilter.length === 0 || statusFilter.includes(opportunityStatus);
       const stageMatch = stageFilter.length === 0 || stageFilter.includes(o.stage);
-      return statusMatch && stageMatch;
+      
+      const searchTermLower = searchTerm.toLowerCase();
+      const searchMatch = !searchTerm || 
+        o.name.toLowerCase().includes(searchTermLower) ||
+        o.companyName.toLowerCase().includes(searchTermLower);
+
+      return statusMatch && stageMatch && searchMatch;
     });
-  }, [statusFilter, stageFilter]);
+  }, [statusFilter, stageFilter, searchTerm]);
 
   const handleFilterToggle = (filterList: string[], setFilterList: React.Dispatch<React.SetStateAction<string[]>>, item: string) => {
     const currentIndex = filterList.indexOf(item);
@@ -217,6 +226,12 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           <div className="lg:col-span-9">
             <Card>
+              <CardHeader>
+                <CardTitle>All Opportunities</CardTitle>
+                <CardDescription>
+                  A filterable list of all sales opportunities in the pipeline.
+                </CardDescription>
+              </CardHeader>
               <CardContent className="p-0">
                  <div className="overflow-x-auto">
                     <Table>
@@ -258,13 +273,22 @@ export default function DashboardPage() {
 
           <div className="lg:col-span-3">
              <Card>
-                <CardHeader className="flex flex-row items-center gap-2">
+                <CardHeader className="flex flex-row items-center gap-2 pb-4">
                     <Filter className="w-4 h-4" />
-                    <CardTitle className="text-base">Filter Table</CardTitle>
+                    <CardTitle className="text-base">Filter & Search</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                    <div>
-                        <h4 className="text-sm font-medium mb-2">Status</h4>
+                     <div className="space-y-2">
+                        <Label htmlFor="opp-search">Search</Label>
+                        <Input 
+                          id="opp-search"
+                          placeholder="By opportunity or company..."
+                          value={searchTerm}
+                          onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label>Status</Label>
                         <div className="flex flex-col gap-2">
                            {STATUSES.map(status => (
                             <Button
@@ -278,8 +302,8 @@ export default function DashboardPage() {
                            ))}
                         </div>
                     </div>
-                     <div>
-                        <h4 className="text-sm font-medium mb-2">Stage</h4>
+                     <div className="space-y-2">
+                        <Label>Stage</Label>
                         <div className="flex flex-col gap-2">
                            {[...STAGES, 'Closed Won', 'Closed Lost'].map(stage => (
                              <Button
