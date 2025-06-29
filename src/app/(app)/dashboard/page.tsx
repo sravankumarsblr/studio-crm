@@ -11,13 +11,17 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { opportunities as allOpportunities, contacts } from "@/lib/data";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
-import { ThumbsUp, ThumbsDown, DollarSign, Target, Clock, Filter } from 'lucide-react';
+import { ThumbsUp, ThumbsDown, DollarSign, Target, Clock, Filter, ChevronsUpDown, Check } from 'lucide-react';
 import { format, differenceInDays, parseISO } from 'date-fns';
 import { cn } from '@/lib/utils';
 import type { Opportunity } from '@/lib/data';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { Separator } from '@/components/ui/separator';
 
 const STAGES = ['Qualification', 'Proposal', 'Negotiation'];
 const STATUSES = ['Open', 'Won', 'Lost'];
+const ALL_STAGES = [...STAGES, 'Closed Won', 'Closed Lost'];
 
 const STAGE_COLORS: { [key: string]: string } = {
   Qualification: 'hsl(var(--chart-1))',
@@ -289,33 +293,97 @@ export default function DashboardPage() {
                     </div>
                     <div className="space-y-2">
                         <Label>Status</Label>
-                        <div className="flex flex-col gap-2">
-                           {STATUSES.map(status => (
-                            <Button
-                                key={status}
-                                variant={statusFilter.includes(status) ? "default" : "outline"}
-                                onClick={() => handleFilterToggle(statusFilter, setStatusFilter, status)}
-                                className="w-full justify-start"
-                            >
-                                {status}
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button variant="outline" className="w-full justify-between">
+                              {statusFilter.length > 0
+                                ? `${statusFilter.length} selected`
+                                : "Select status..."}
+                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                             </Button>
-                           ))}
-                        </div>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                            <Command>
+                              <CommandInput placeholder="Filter status..." />
+                              <CommandList>
+                                <CommandEmpty>No results found.</CommandEmpty>
+                                <CommandGroup>
+                                  {STATUSES.map((status) => (
+                                    <CommandItem
+                                      key={status}
+                                      onSelect={() => handleFilterToggle(statusFilter, setStatusFilter, status)}
+                                    >
+                                      <Check
+                                        className={cn(
+                                          "mr-2 h-4 w-4",
+                                          statusFilter.includes(status) ? "opacity-100" : "opacity-0"
+                                        )}
+                                      />
+                                      <span>{status}</span>
+                                    </CommandItem>
+                                  ))}
+                                </CommandGroup>
+                                {statusFilter.length > 0 && (
+                                  <>
+                                    <Separator />
+                                    <CommandGroup>
+                                      <CommandItem onSelect={() => setStatusFilter([])} className="justify-center text-center">
+                                        Clear filters
+                                      </CommandItem>
+                                    </CommandGroup>
+                                  </>
+                                )}
+                              </CommandList>
+                            </Command>
+                          </PopoverContent>
+                        </Popover>
                     </div>
                      <div className="space-y-2">
                         <Label>Stage</Label>
-                        <div className="flex flex-col gap-2">
-                           {[...STAGES, 'Closed Won', 'Closed Lost'].map(stage => (
-                             <Button
-                                key={stage}
-                                variant={stageFilter.includes(stage) ? "default" : "outline"}
-                                onClick={() => handleFilterToggle(stageFilter, setStageFilter, stage)}
-                                className="w-full justify-start"
-                            >
-                                {stage}
+                         <Popover>
+                          <PopoverTrigger asChild>
+                            <Button variant="outline" className="w-full justify-between">
+                              {stageFilter.length > 0
+                                ? `${stageFilter.length} selected`
+                                : "Select stage..."}
+                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                             </Button>
-                           ))}
-                        </div>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                            <Command>
+                              <CommandInput placeholder="Filter stages..." />
+                              <CommandList>
+                                <CommandEmpty>No results found.</CommandEmpty>
+                                <CommandGroup>
+                                  {ALL_STAGES.map((stage) => (
+                                    <CommandItem
+                                      key={stage}
+                                      onSelect={() => handleFilterToggle(stageFilter, setStageFilter, stage)}
+                                    >
+                                      <Check
+                                        className={cn(
+                                          "mr-2 h-4 w-4",
+                                          stageFilter.includes(stage) ? "opacity-100" : "opacity-0"
+                                        )}
+                                      />
+                                      <span>{stage}</span>
+                                    </CommandItem>
+                                  ))}
+                                </CommandGroup>
+                                {stageFilter.length > 0 && (
+                                  <>
+                                    <Separator />
+                                    <CommandGroup>
+                                      <CommandItem onSelect={() => setStageFilter([])} className="justify-center text-center">
+                                        Clear filters
+                                      </CommandItem>
+                                    </CommandGroup>
+                                  </>
+                                )}
+                              </CommandList>
+                            </Command>
+                          </PopoverContent>
+                        </Popover>
                     </div>
                 </CardContent>
              </Card>
