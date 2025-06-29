@@ -8,7 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { opportunities as allOpportunities, contacts } from "@/lib/data";
-import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, PieChart, Pie, Cell, Legend, Tooltip } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
 import { ThumbsUp, ThumbsDown, DollarSign, Target, Clock, Filter } from 'lucide-react';
 import { format, differenceInDays, parseISO } from 'date-fns';
 import { cn } from '@/lib/utils';
@@ -60,15 +60,15 @@ export default function DashboardPage() {
             stage,
             count: stageOpps.length,
             value: stageOpps.reduce((sum, o) => sum + o.value, 0),
-            expectedValue: stageOpps.reduce((sum, o) => sum + (o.value * o.winProbability), 0)
         };
     });
-
-    const lostByStageData = STAGES.map(stage => ({
-        name: stage,
-        value: lostOpportunities.filter(o => o.stage === stage).length // Simplified for demo
-    })).filter(d => d.value > 0);
-
+    
+    const pipelineChartData = [
+      stageStats.reduce((acc, s) => {
+        acc[s.stage] = s.value;
+        return acc;
+      }, { name: 'pipeline' } as Record<string, any>)
+    ];
 
     return {
       openOpportunities,
@@ -80,7 +80,8 @@ export default function DashboardPage() {
       totalLostValue,
       conversionRate,
       timeTuWinDays,
-      stageStats
+      stageStats,
+      pipelineChartData,
     };
   }, []);
 
@@ -162,26 +163,42 @@ export default function DashboardPage() {
                 <CardDescription>Value of open opportunities by stage.</CardDescription>
             </CardHeader>
             <CardContent>
-                <ResponsiveContainer width="100%" height={120}>
-                    <BarChart layout="vertical" data={dashboardData.stageStats} stackOffset="expand" barCategoryGap={0}>
-                        <XAxis type="number" hide />
-                        <YAxis type="category" dataKey="stage" hide />
+                <ResponsiveContainer width="100%" height={30}>
+                     <BarChart layout="vertical" data={dashboardData.pipelineChartData} stackOffset="expand" margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
+                        <XAxis type="number" hide domain={[0, 1]}/>
+                        <YAxis type="category" dataKey="name" hide />
                         <Tooltip
+                            cursor={{ fill: 'transparent' }}
                             content={({ active, payload }) => {
-                            if (active && payload && payload.length) {
-                                const data = payload[0].payload;
-                                return (
-                                <div className="rounded-lg border bg-background p-2 shadow-sm">
-                                    <p className="font-bold">{`${data.stage}`}</p>
-                                    <p className="text-sm">{`Count: ${data.count}`}</p>
-                                    <p className="text-sm">{`Value: ₹${data.value.toLocaleString('en-IN')}`}</p>
-                                </div>
-                                );
-                            }
-                            return null;
+                                if (active && payload && payload.length) {
+                                    const stage = payload[0].name;
+                                    const value = payload[0].payload[stage!];
+                                    const stageData = dashboardData.stageStats.find(s => s.stage === stage);
+
+                                    return (
+                                    <div className="rounded-lg border bg-background p-2 shadow-sm">
+                                        <p className="font-bold">{stage}</p>
+                                        <p className="text-sm">{`Count: ${stageData?.count}`}</p>
+                                        <p className="text-sm">{`Value: ₹${value.toLocaleString('en-IN')}`}</p>
+                                    </div>
+                                    );
+                                }
+                                return null;
                             }}
                         />
-                        <Bar dataKey="value" stackId="a" fill="hsl(var(--chart-1))" radius={[4, 4, 4, 4]} />
+                         {STAGES.map((stage, index) => (
+                          <Bar 
+                            key={stage} 
+                            dataKey={stage} 
+                            stackId="a" 
+                            fill={STAGE_COLORS[stage]} 
+                            radius={
+                                STAGES.length === 1 ? [4, 4, 4, 4] :
+                                index === 0 ? [4, 0, 0, 4] :
+                                index === STAGES.length - 1 ? [0, 4, 4, 0] : 0
+                            }
+                          />
+                        ))}
                     </BarChart>
                 </ResponsiveContainer>
                 <div className="flex justify-around text-center mt-4">
