@@ -27,7 +27,7 @@ import { useSidebar } from "./ui/sidebar";
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/leads", label: "Leads", icon: Users },
-  { href: "/deals", label: "Deals", icon: Briefcase },
+  { href: "/deals", label: "Opportunities", icon: Briefcase },
   { href: "/contracts", label: "Contracts", icon: FileText },
   { href: "/companies", label: "Companies", icon: Building2 },
   { href: "/contacts", label: "Contacts", icon: Phone },

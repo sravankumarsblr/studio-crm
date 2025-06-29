@@ -11,7 +11,7 @@ export default function ProductsPage() {
     switch (status) {
       case 'Contract': return 'default';
       case 'Lead': return 'outline';
-      case 'Deal': return 'secondary';
+      case 'Opportunity': return 'secondary';
       default: return 'outline';
     }
   };

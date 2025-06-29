@@ -9,19 +9,19 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { AddQuoteForm, AddQuoteFormValues } from "./add-quote-form";
-import type { Deal, Quote } from "@/lib/data";
+import type { Opportunity, Quote } from "@/lib/data";
 
 type AddQuoteDialogProps = {
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
-  deal: Deal;
+  opportunity: Opportunity;
   onQuoteAdded: (newQuote: Quote) => void;
 };
 
 export function AddQuoteDialog({
   isOpen,
   setIsOpen,
-  deal,
+  opportunity,
   onQuoteAdded,
 }: AddQuoteDialogProps) {
 
@@ -29,7 +29,7 @@ export function AddQuoteDialog({
     const newQuote: Quote = {
       id: `qt${new Date().getTime()}`,
       quoteNumber: `QT-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 900) + 100).padStart(3, '0')}`,
-      dealId: deal.id,
+      opportunityId: opportunity.id,
       date: new Date().toISOString().split("T")[0],
       expiryDate: data.expiryDate,
       preparedBy: "Alex Green", // In a real app, this would be the current user
@@ -51,7 +51,7 @@ export function AddQuoteDialog({
         <DialogHeader>
           <DialogTitle>Add New Quote</DialogTitle>
           <DialogDescription>
-            Create a new quote for the deal: "{deal.name}".
+            Create a new quote for the opportunity: "{opportunity.name}".
           </DialogDescription>
         </DialogHeader>
         <div className="py-4">

@@ -21,32 +21,32 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Phone, Mail, StickyNote } from 'lucide-react';
-import type { Deal, Contact } from '@/lib/data';
+import type { Opportunity, Contact } from '@/lib/data';
 
 type LogActivityDialogProps = {
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
-  deal: Deal;
+  opportunity: Opportunity;
   contacts: Contact[];
 };
 
-export function LogActivityDialog({ isOpen, setIsOpen, deal, contacts }: LogActivityDialogProps) {
+export function LogActivityDialog({ isOpen, setIsOpen, opportunity, contacts }: LogActivityDialogProps) {
   const [activeTab, setActiveTab] = useState("call");
   
   const handleSave = () => {
     // In a real app, this would save the activity and re-fetch the timeline
-    console.log("Activity saved for deal:", deal.name);
+    console.log("Activity saved for opportunity:", opportunity.name);
     // Here you would also handle email sending logic if the active tab is 'email'
     setIsOpen(false);
   };
 
-  const primaryContactEmail = contacts.find(c => c.name === deal.contactName)?.email || '';
+  const primaryContactEmail = contacts.find(c => c.name === opportunity.contactName)?.email || '';
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
-          <DialogTitle>Log Activity for "{deal.name}"</DialogTitle>
+          <DialogTitle>Log Activity for "{opportunity.name}"</DialogTitle>
           <DialogDescription>
             Record a call, send an email, or add a note. Your activity history will be updated.
           </DialogDescription>
@@ -65,7 +65,7 @@ export function LogActivityDialog({ isOpen, setIsOpen, deal, contacts }: LogActi
                 <Textarea id="call-summary" placeholder="Enter details of the call..." className="min-h-[150px]" />
             </div>
              <p className="text-sm text-muted-foreground">
-                The call will be logged with the primary contact: {deal.contactName}.
+                The call will be logged with the primary contact: {opportunity.contactName}.
             </p>
           </TabsContent>
           

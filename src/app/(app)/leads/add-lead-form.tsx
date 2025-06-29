@@ -56,7 +56,7 @@ const addLeadSchema = z.object({
   productIds: z
     .array(z.string())
     .min(1, "You have to select at least one product."),
-  convertToDeal: z.boolean().default(false),
+  convertToOpportunity: z.boolean().default(false),
 }).refine(
   (data) => {
     // If there are contacts selected, a primary contact must also be selected.
@@ -97,7 +97,7 @@ export function AddLeadForm({
       contactIds: [],
       primaryContactId: "",
       productIds: [],
-      convertToDeal: false,
+      convertToOpportunity: false,
     },
   });
 
@@ -167,20 +167,20 @@ export function AddLeadForm({
               </FormItem>
             )}
           />
+          <FormField
+            control={form.control}
+            name="value"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Value ($)</FormLabel>
+                <FormControl>
+                  <Input type="number" placeholder="e.g., 50000" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <div className="grid grid-cols-2 gap-4">
-            <FormField
-              control={form.control}
-              name="value"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Value ($)</FormLabel>
-                  <FormControl>
-                    <Input type="number" placeholder="e.g., 50000" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
             <FormField
               control={form.control}
               name="status"
@@ -205,20 +205,20 @@ export function AddLeadForm({
                 </FormItem>
               )}
             />
+            <FormField
+              control={form.control}
+              name="source"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Source</FormLabel>
+                  <FormControl>
+                    <Input placeholder="e.g., Web Form" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </div>
-          <FormField
-            control={form.control}
-            name="source"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Source</FormLabel>
-                <FormControl>
-                  <Input placeholder="e.g., Web Form" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
           <FormField
             control={form.control}
             name="companyId"
@@ -421,13 +421,13 @@ export function AddLeadForm({
           
           <FormField
             control={form.control}
-            name="convertToDeal"
+            name="convertToOpportunity"
             render={({ field }) => (
               <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm bg-secondary/50">
                 <div className="space-y-0.5">
-                  <FormLabel>Create a Deal</FormLabel>
+                  <FormLabel>Create an Opportunity</FormLabel>
                   <FormDescription>
-                    Also create a new deal for this lead in the pipeline.
+                    Also create a new opportunity for this lead in the pipeline.
                   </FormDescription>
                 </div>
                 <FormControl>

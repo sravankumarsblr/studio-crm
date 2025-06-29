@@ -30,7 +30,7 @@ export type Lead = {
 export type Quote = {
   id: string;
   quoteNumber: string;
-  dealId: string;
+  opportunityId: string;
   date: string;
   expiryDate: string;
   preparedBy: string;
@@ -43,7 +43,7 @@ export type Quote = {
   };
 };
 
-export type Deal = {
+export type Opportunity = {
   id: string;
   name: string;
   companyName: string;
@@ -65,7 +65,7 @@ export type Milestone = {
 
 export type Contract = {
   id:string;
-  dealId: string;
+  opportunityId: string;
   companyName: string;
   value: number;
   startDate: string;
@@ -78,8 +78,8 @@ export type Product = {
   id: string;
   name: string;
   category: string;
-  lifecycleStage: 'Lead' | 'Deal' | 'Contract' | 'Inactive';
-  associatedId: string; // leadId, dealId, or contractId
+  lifecycleStage: 'Lead' | 'Opportunity' | 'Contract' | 'Inactive';
+  associatedId: string; // leadId, opportunityId, or contractId
 }
 
 export const companies: Company[] = [
@@ -107,23 +107,23 @@ export const leads: Lead[] = [
   { id: 'lead4', name: 'Legacy System Upgrade Inquiry', companyName: 'FutureGadget Labs', contactName: 'Alex Ray', value: 5000, status: 'Junk', source: 'Cold Call', createdDate: '2024-05-22', leadData: { industry: 'R&D', companySize: 50, pastPurchases: 0, websiteVisits: 0, reason: 'Out of budget' } },
 ];
 
-export const deals: Deal[] = [
+export const opportunities: Opportunity[] = [
   { id: 'deal1', name: 'Q3 Pressure Sensor Contract', companyName: 'AeroCal Labs', contactName: 'Jane Smith', stage: 'Proposal', value: 50000, closeDate: '2024-08-30', quotes: [
-    { id: 'qt1', dealId: 'deal1', quoteNumber: 'QT-2024-001', date: '2024-06-10', expiryDate: '2024-07-10', preparedBy: 'Alex Green', value: 50000, status: 'Sent', documentName: 'AeroCal_Quote_v1.pdf' }
+    { id: 'qt1', opportunityId: 'deal1', quoteNumber: 'QT-2024-001', date: '2024-06-10', expiryDate: '2024-07-10', preparedBy: 'Alex Green', value: 50000, status: 'Sent', documentName: 'AeroCal_Quote_v1.pdf' }
   ] },
   { id: 'deal2', name: 'Medical Scale Fleet Calibration', companyName: 'MediTech Solutions', contactName: 'Peter Jones', stage: 'Negotiation', value: 120000, closeDate: '2024-07-25', quotes: [
-     { id: 'qt2', dealId: 'deal2', quoteNumber: 'QT-2024-002', date: '2024-06-15', expiryDate: '2024-07-15', preparedBy: 'Alex Green', value: 125000, status: 'Sent' },
-     { id: 'qt3', dealId: 'deal2', quoteNumber: 'QT-2024-003', date: '2024-06-20', expiryDate: '2024-07-20', preparedBy: 'Alex Green', value: 120000, status: 'Draft', discount: { type: 'fixed', value: 5000 } }
+     { id: 'qt2', opportunityId: 'deal2', quoteNumber: 'QT-2024-002', date: '2024-06-15', expiryDate: '2024-07-15', preparedBy: 'Alex Green', value: 125000, status: 'Sent' },
+     { id: 'qt3', opportunityId: 'deal2', quoteNumber: 'QT-2024-003', date: '2024-06-20', expiryDate: '2024-07-20', preparedBy: 'Alex Green', value: 120000, status: 'Draft', discount: { type: 'fixed', value: 5000 } }
   ] },
   { id: 'deal3', name: 'Torque Wrench Verification', companyName: 'Precision Instruments Inc.', contactName: 'John Doe', stage: 'Closed Won', value: 22000, closeDate: '2024-06-15', quotes: [
-    { id: 'qt4', dealId: 'deal3', quoteNumber: 'QT-2024-004', date: '2024-06-01', expiryDate: '2024-07-01', preparedBy: 'Alex Green', value: 22000, status: 'Accepted', documentName: 'PO-PINC-1138.pdf' }
+    { id: 'qt4', opportunityId: 'deal3', quoteNumber: 'QT-2024-004', date: '2024-06-01', expiryDate: '2024-07-01', preparedBy: 'Alex Green', value: 22000, status: 'Accepted', documentName: 'PO-PINC-1138.pdf' }
   ] },
 ];
 
 export const contracts: Contract[] = [
   { 
     id: 'cont1', 
-    dealId: 'deal3', 
+    opportunityId: 'deal3', 
     companyName: 'Precision Instruments Inc.', 
     value: 22000, 
     startDate: '2024-07-01', 
@@ -137,8 +137,8 @@ export const contracts: Contract[] = [
 ];
 
 export const products: Product[] = [
-  { id: 'prod1', name: 'Pressure Sensor X1', category: 'Sensors', lifecycleStage: 'Deal', associatedId: 'deal1' },
-  { id: 'prod2', name: 'Medical Scale M2', category: 'Scales', lifecycleStage: 'Deal', associatedId: 'deal2' },
+  { id: 'prod1', name: 'Pressure Sensor X1', category: 'Sensors', lifecycleStage: 'Opportunity', associatedId: 'deal1' },
+  { id: 'prod2', name: 'Medical Scale M2', category: 'Scales', lifecycleStage: 'Opportunity', associatedId: 'deal2' },
   { id: 'prod3', name: 'Torque Wrench T3', category: 'Tools', lifecycleStage: 'Contract', associatedId: 'cont1' },
   { id: 'prod4', name: 'Pipette P4', category: 'Lab Equipment', lifecycleStage: 'Lead', associatedId: 'lead3' },
 ];

@@ -5,7 +5,7 @@ import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Users, Briefcase, FileText, Package } from "lucide-react";
-import { leads, deals, contracts, products } from "@/lib/data";
+import { leads, opportunities, contracts, products } from "@/lib/data";
 import {
   ChartContainer,
   ChartTooltip,
@@ -15,7 +15,7 @@ import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
 
 const chartData = [
   { stage: 'Lead', count: products.filter(p => p.lifecycleStage === 'Lead').length, fill: "var(--color-lead)" },
-  { stage: 'Deal', count: products.filter(p => p.lifecycleStage === 'Deal').length, fill: "var(--color-deal)" },
+  { stage: 'Opportunity', count: products.filter(p => p.lifecycleStage === 'Opportunity').length, fill: "var(--color-opportunity)" },
   { stage: 'Contract', count: products.filter(p => p.lifecycleStage === 'Contract').length, fill: "var(--color-contract)" },
 ];
 
@@ -27,8 +27,8 @@ const chartConfig = {
     label: "Lead",
     color: "hsl(var(--chart-1))",
   },
-  deal: {
-    label: "Deal",
+  opportunity: {
+    label: "Opportunity",
     color: "hsl(var(--chart-2))",
   },
   contract: {
@@ -39,7 +39,7 @@ const chartConfig = {
 
 export default function DashboardPage() {
   const totalLeadValue = leads.reduce((acc, lead) => acc + lead.value, 0);
-  const totalDealValue = deals.reduce((acc, deal) => acc + deal.value, 0);
+  const totalOpportunityValue = opportunities.reduce((acc, deal) => acc + deal.value, 0);
 
   return (
     <div className="flex flex-col h-full">
@@ -60,13 +60,13 @@ export default function DashboardPage() {
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Open Deals</CardTitle>
+              <CardTitle className="text-sm font-medium">Open Opportunities</CardTitle>
               <Briefcase className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{deals.length}</div>
+              <div className="text-2xl font-bold">{opportunities.length}</div>
               <p className="text-xs text-muted-foreground">
-                ${totalDealValue.toLocaleString()} in pipeline
+                ${totalOpportunityValue.toLocaleString()} in pipeline
               </p>
             </CardContent>
           </Card>

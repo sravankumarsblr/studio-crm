@@ -8,11 +8,11 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { AddDealForm } from "./add-deal-form";
+import { AddOpportunityForm } from "./add-deal-form";
 import { useToast } from "@/hooks/use-toast";
-import type { AddDealFormValues } from "./add-deal-form";
+import type { AddOpportunityFormValues } from "./add-deal-form";
 
-export function AddDealDialog({
+export function AddOpportunityDialog({
   isOpen,
   setIsOpen,
 }: {
@@ -21,13 +21,13 @@ export function AddDealDialog({
 }) {
   const { toast } = useToast();
 
-  const handleSave = (data: AddDealFormValues) => {
-    // In a real app, this would trigger a server action to save the new deal and its initial quote
-    console.log("New deal to save:", data);
+  const handleSave = (data: AddOpportunityFormValues) => {
+    // In a real app, this would trigger a server action to save the new opportunity and its initial quote
+    console.log("New opportunity to save:", data);
 
     toast({
-      title: "Deal & Quote Created",
-      description: `The deal "${data.name}" and an initial quote have been successfully created.`,
+      title: "Opportunity & Quote Created",
+      description: `The opportunity "${data.name}" and an initial quote have been successfully created.`,
     });
     setIsOpen(false);
   };
@@ -36,13 +36,13 @@ export function AddDealDialog({
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className="sm:max-w-[800px] max-h-[90vh] flex flex-col">
         <DialogHeader>
-          <DialogTitle>Add New Deal</DialogTitle>
+          <DialogTitle>Add New Opportunity</DialogTitle>
           <DialogDescription>
-            Fill in the details for the new deal and its initial quote.
+            Fill in the details for the new opportunity and its initial quote.
           </DialogDescription>
         </DialogHeader>
         <div className="flex-1 overflow-y-auto -mr-6 pr-6 py-4">
-            <AddDealForm onSave={handleSave} onCancel={() => setIsOpen(false)} />
+            <AddOpportunityForm onSave={handleSave} onCancel={() => setIsOpen(false)} />
         </div>
       </DialogContent>
     </Dialog>

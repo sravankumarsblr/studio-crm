@@ -34,12 +34,12 @@ export default function LeadsPage() {
     }
   };
   
-  const handleConvertToDeal = (leadName: string) => {
+  const handleConvertToOpportunity = (leadName: string) => {
     // In a real app, this would trigger a server action
-    console.log(`Converting ${leadName} to a deal.`);
+    console.log(`Converting ${leadName} to an opportunity.`);
     toast({
       title: "Lead Converted",
-      description: `A new deal has been created for "${leadName}".`,
+      description: `A new opportunity has been created for "${leadName}".`,
     });
   };
 
@@ -82,8 +82,8 @@ export default function LeadsPage() {
                         <DropdownMenuItem asChild>
                            <Link href={`/leads/${lead.id}`}>View Details</Link>
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleConvertToDeal(lead.name)}>
-                          Convert to Deal
+                        <DropdownMenuItem onClick={() => handleConvertToOpportunity(lead.name)}>
+                          Convert to Opportunity
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>

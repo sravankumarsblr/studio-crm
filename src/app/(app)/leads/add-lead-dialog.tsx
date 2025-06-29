@@ -22,13 +22,13 @@ export function AddLeadDialog({
 
   const handleSave = (data: AddLeadFormValues) => {
     // In a real app, this would trigger a server action to save the new lead
-    // and potentially a deal, then re-fetch data.
+    // and potentially a opportunity, then re-fetch data.
     console.log("New lead to save:", data);
 
-    if (data.convertToDeal) {
+    if (data.convertToOpportunity) {
       toast({
-        title: "Lead & Deal Created",
-        description: `The lead "${data.name}" and a corresponding deal have been created.`,
+        title: "Lead & Opportunity Created",
+        description: `The lead "${data.name}" and a corresponding opportunity have been created.`,
       });
     } else {
       toast({

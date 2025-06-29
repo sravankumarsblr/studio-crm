@@ -11,11 +11,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { deals, contacts, companies, products, Quote } from '@/lib/data';
+import { opportunities, contacts, companies, products, Quote } from '@/lib/data';
 import { QuoteCard } from '../quote-card';
 import { AddQuoteDialog } from '../add-quote-dialog';
 import { LogActivityDialog } from '../log-activity-dialog';
-import { EditDealDialog } from '../edit-deal-dialog';
+import { EditOpportunityDialog } from '../edit-deal-dialog';
 
 const stageVariant: { [key: string]: "default" | "secondary" | "destructive" | "outline" } = {
   'Qualification': 'outline',
@@ -31,49 +31,49 @@ const dummyActivity = [
     { type: 'call', content: 'Discussed terms with primary contact, they are reviewing internally.', user: 'Alex Green', time: '4 days ago', icon: Phone },
 ];
 
-export default function DealDetailPage() {
+export default function OpportunityDetailPage() {
   const router = useRouter();
   const params = useParams();
-  const dealId = params.id as string;
+  const opportunityId = params.id as string;
   
-  const [deal, setDeal] = useState(() => deals.find((d) => d.id === dealId));
+  const [opportunity, setOpportunity] = useState(() => opportunities.find((d) => d.id === opportunityId));
   const [isAddQuoteOpen, setIsAddQuoteOpen] = useState(false);
   const [isLogActivityOpen, setIsLogActivityOpen] = useState(false);
-  const [isEditDealOpen, setIsEditDealOpen] = useState(false);
+  const [isEditOpportunityOpen, setIsEditOpportunityOpen] = useState(false);
 
   // In a real app, this data would be fetched together. Here we simulate joins.
-  const company = companies.find(c => c.name === deal?.companyName);
-  const primaryContact = contacts.find(c => c.name === deal?.contactName);
-  const associatedProducts = products.filter(p => p.associatedId === dealId);
+  const company = companies.find(c => c.name === opportunity?.companyName);
+  const primaryContact = contacts.find(c => c.name === opportunity?.contactName);
+  const associatedProducts = products.filter(p => p.associatedId === opportunityId);
   const associatedContacts = company ? contacts.filter(c => c.companyId === company.id) : [];
 
   const handleQuoteAdded = (newQuote: Quote) => {
-    if (deal) {
-      const updatedDeal = {
-        ...deal,
-        quotes: [...deal.quotes, newQuote],
-        value: deal.quotes.reduce((acc, q) => acc + q.value, 0) + newQuote.value
+    if (opportunity) {
+      const updatedOpportunity = {
+        ...opportunity,
+        quotes: [...opportunity.quotes, newQuote],
+        value: opportunity.quotes.reduce((acc, q) => acc + q.value, 0) + newQuote.value
       };
-      setDeal(updatedDeal);
+      setOpportunity(updatedOpportunity);
     }
   };
 
   const handleQuoteDeleted = (quoteId: string) => {
-     if (deal) {
-      const updatedQuotes = deal.quotes.filter(q => q.id !== quoteId);
-      const updatedDeal = {
-        ...deal,
+     if (opportunity) {
+      const updatedQuotes = opportunity.quotes.filter(q => q.id !== quoteId);
+      const updatedOpportunity = {
+        ...opportunity,
         quotes: updatedQuotes,
         value: updatedQuotes.reduce((acc, q) => acc + q.value, 0)
       };
-      setDeal(updatedDeal);
+      setOpportunity(updatedOpportunity);
     }
   }
 
-  if (!deal) {
+  if (!opportunity) {
     return (
         <div className="flex items-center justify-center h-full">
-            <p>Deal not found.</p>
+            <p>Opportunity not found.</p>
         </div>
     );
   }
@@ -86,12 +86,12 @@ export default function DealDetailPage() {
                 <ArrowLeft />
             </Button>
             <div>
-                <h1 className="text-2xl font-bold text-foreground font-headline">{deal.name}</h1>
-                <p className="text-sm text-muted-foreground">{deal.companyName}</p>
+                <h1 className="text-2xl font-bold text-foreground font-headline">{opportunity.name}</h1>
+                <p className="text-sm text-muted-foreground">{opportunity.companyName}</p>
             </div>
         </div>
         <Button variant="outline" onClick={() => setIsLogActivityOpen(true)}>Log Activity</Button>
-        <Button variant="outline" onClick={() => setIsEditDealOpen(true)}><Edit className="mr-2"/> Edit</Button>
+        <Button variant="outline" onClick={() => setIsEditOpportunityOpen(true)}><Edit className="mr-2"/> Edit</Button>
         <Button>Convert to Contract</Button>
       </Header>
 
@@ -105,7 +105,7 @@ export default function DealDetailPage() {
                         <DollarSign className="w-4 h-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">${deal.value.toLocaleString()}</div>
+                        <div className="text-2xl font-bold">${opportunity.value.toLocaleString()}</div>
                     </CardContent>
                 </Card>
                  <Card>
@@ -114,7 +114,7 @@ export default function DealDetailPage() {
                         <FileText className="w-4 h-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <Badge variant={stageVariant[deal.stage]} className="text-base">{deal.stage}</Badge>
+                        <Badge variant={stageVariant[opportunity.stage]} className="text-base">{opportunity.stage}</Badge>
                     </CardContent>
                 </Card>
                 <Card>
@@ -123,21 +123,21 @@ export default function DealDetailPage() {
                         <FileText className="w-4 h-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">{deal.closeDate}</div>
+                        <div className="text-2xl font-bold">{opportunity.closeDate}</div>
                     </CardContent>
                 </Card>
             </div>
 
             <Card>
                 <CardHeader>
-                    <CardTitle>Deal Information</CardTitle>
+                    <CardTitle>Opportunity Information</CardTitle>
                 </CardHeader>
                 <CardContent className="grid md:grid-cols-2 gap-4 text-sm">
                     <div className="flex items-start gap-3">
                         <Building2 className="w-5 h-5 mt-1 text-muted-foreground" />
                         <div>
                             <p className="text-muted-foreground">Company</p>
-                            <p className="font-medium">{company?.name || deal.companyName}</p>
+                            <p className="font-medium">{company?.name || opportunity.companyName}</p>
                             <p className="text-muted-foreground text-xs">{company?.industry}</p>
                         </div>
                     </div>
@@ -145,7 +145,7 @@ export default function DealDetailPage() {
                         <UserCircle className="w-5 h-5 mt-1 text-muted-foreground" />
                         <div>
                             <p className="text-muted-foreground">Primary Contact</p>
-                            <p className="font-medium">{primaryContact?.name || deal.contactName}</p>
+                            <p className="font-medium">{primaryContact?.name || opportunity.contactName}</p>
                              <p className="text-muted-foreground text-xs">{primaryContact?.email}</p>
                         </div>
                     </div>
@@ -194,13 +194,13 @@ export default function DealDetailPage() {
                     <FilePlus className="mr-2"/> Add Quote
                 </Button>
                 <div className="space-y-4">
-                  {deal.quotes.length > 0 ? (
-                    deal.quotes.map(quote => (
+                  {opportunity.quotes.length > 0 ? (
+                    opportunity.quotes.map(quote => (
                       <QuoteCard key={quote.id} quote={quote} onDelete={handleQuoteDeleted} />
                     ))
                   ) : (
                     <div className="text-center text-sm text-muted-foreground p-8 border-dashed border-2 rounded-lg">
-                        <p>No quotes have been added to this deal yet.</p>
+                        <p>No quotes have been added to this opportunity yet.</p>
                     </div>
                   )}
                 </div>
@@ -216,19 +216,19 @@ export default function DealDetailPage() {
       <AddQuoteDialog 
         isOpen={isAddQuoteOpen} 
         setIsOpen={setIsAddQuoteOpen} 
-        deal={deal} 
+        opportunity={opportunity} 
         onQuoteAdded={handleQuoteAdded}
       />
       <LogActivityDialog
         isOpen={isLogActivityOpen}
         setIsOpen={setIsLogActivityOpen}
-        deal={deal}
+        opportunity={opportunity}
         contacts={associatedContacts}
       />
-      <EditDealDialog
-        isOpen={isEditDealOpen}
-        setIsOpen={setIsEditDealOpen}
-        deal={deal}
+      <EditOpportunityDialog
+        isOpen={isEditOpportunityOpen}
+        setIsOpen={setIsEditOpportunityOpen}
+        opportunity={opportunity}
       />
     </div>
   );

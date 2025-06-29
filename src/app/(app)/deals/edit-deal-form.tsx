@@ -31,7 +31,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar } from "@/components/ui/calendar";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { companies as staticCompanies, contacts, products, Deal, Company } from "@/lib/data";
+import { companies as staticCompanies, contacts, products, Opportunity, Company } from "@/lib/data";
 import {
   Select,
   SelectContent,
@@ -43,8 +43,8 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Badge } from "@/components/ui/badge";
 import { AddCompanyDialog } from "../companies/add-company-dialog";
 
-const editDealSchema = z.object({
-  name: z.string().min(1, "Deal name is required."),
+const editOpportunitySchema = z.object({
+  name: z.string().min(1, "Opportunity name is required."),
   value: z.coerce.number().min(0, "Value must be a positive number."),
   stage: z.string().min(1, "Stage is required."),
   closeDate: z.string().min(1, "Close date is required"),
@@ -69,15 +69,15 @@ const editDealSchema = z.object({
   }
 );
 
-export type EditDealFormValues = z.infer<typeof editDealSchema>;
+export type EditOpportunityFormValues = z.infer<typeof editOpportunitySchema>;
 
-export function EditDealForm({
-  deal,
+export function EditOpportunityForm({
+  opportunity,
   onSave,
   onCancel,
 }: {
-  deal: Deal;
-  onSave: (data: EditDealFormValues) => void;
+  opportunity: Opportunity;
+  onSave: (data: EditOpportunityFormValues) => void;
   onCancel: () => void;
 }) {
   const [companyOpen, setCompanyOpen] = useState(false);
@@ -87,32 +87,30 @@ export function EditDealForm({
   const [productSearch, setProductSearch] = useState("");
 
   const defaultValues = useMemo(() => {
-    const company = companies.find(c => c.name === deal.companyName);
-    const primaryContact = contacts.find(c => c.name === deal.contactName && c.companyId === company?.id);
-    const associatedProducts = products.filter(p => p.associatedId === deal.id);
+    const company = companies.find(c => c.name === opportunity.companyName);
+    const primaryContact = contacts.find(c => c.name === opportunity.contactName && c.companyId === company?.id);
+    const associatedProducts = products.filter(p => p.associatedId === opportunity.id);
     
-    // For deals, there might be multiple contacts, but our simple data only has one name.
-    // In a real app, a deal would have a list of contact IDs. We simulate this here.
+    // In a real app, an opportunity would have a list of contact IDs. We simulate this here.
     const associatedContacts = company ? contacts.filter(c => c.companyId === company.id) : [];
-    // For this mock, let's assume all contacts at the company could be associated.
-    // We'll just pre-select the primary one.
+    // For this mock, we'll just pre-select the primary one.
     const contactIds = primaryContact ? [primaryContact.id] : [];
 
 
     return {
-      name: deal.name,
-      value: deal.value,
-      stage: deal.stage,
-      closeDate: deal.closeDate, // This needs to be a string in 'YYYY-MM-DD' format if not already
+      name: opportunity.name,
+      value: opportunity.value,
+      stage: opportunity.stage,
+      closeDate: opportunity.closeDate, // This needs to be a string in 'YYYY-MM-DD' format if not already
       companyId: company?.id || "",
       contactIds: contactIds,
       primaryContactId: primaryContact?.id || "",
       productIds: associatedProducts.map(p => p.id),
     };
-  }, [deal, companies]);
+  }, [opportunity, companies]);
 
-  const form = useForm<EditDealFormValues>({
-    resolver: zodResolver(editDealSchema),
+  const form = useForm<EditOpportunityFormValues>({
+    resolver: zodResolver(editOpportunitySchema),
     defaultValues,
   });
 
@@ -162,7 +160,7 @@ export function EditDealForm({
     setCompanyOpen(false);
   };
 
-  const onSubmit = (values: EditDealFormValues) => {
+  const onSubmit = (values: EditOpportunityFormValues) => {
     onSave(values);
   };
 
@@ -175,7 +173,7 @@ export function EditDealForm({
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Deal Name</FormLabel>
+                <FormLabel>Opportunity Name</FormLabel>
                 <FormControl>
                   <Input placeholder="e.g., Q4 Sensor Contract" {...field} />
                 </FormControl>

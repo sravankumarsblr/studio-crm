@@ -45,8 +45,8 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { AddCompanyDialog } from "../companies/add-company-dialog";
 
-const addDealSchema = z.object({
-  name: z.string().min(1, "Deal name is required."),
+const addOpportunitySchema = z.object({
+  name: z.string().min(1, "Opportunity name is required."),
   stage: z.string().min(1, "Stage is required."),
   closeDate: z.string().min(1, "Close date is required"),
   companyId: z.string().min(1, "Company is required."),
@@ -84,13 +84,13 @@ const addDealSchema = z.object({
     path: ["discountValue"],
 });
 
-export type AddDealFormValues = z.infer<typeof addDealSchema>;
+export type AddOpportunityFormValues = z.infer<typeof addOpportunitySchema>;
 
-export function AddDealForm({
+export function AddOpportunityForm({
   onSave,
   onCancel,
 }: {
-  onSave: (data: AddDealFormValues) => void;
+  onSave: (data: AddOpportunityFormValues) => void;
   onCancel: () => void;
 }) {
   const [companyOpen, setCompanyOpen] = useState(false);
@@ -99,8 +99,8 @@ export function AddDealForm({
   const [contactSearch, setContactSearch] = useState("");
   const [productSearch, setProductSearch] = useState("");
 
-  const form = useForm<AddDealFormValues>({
-    resolver: zodResolver(addDealSchema),
+  const form = useForm<AddOpportunityFormValues>({
+    resolver: zodResolver(addOpportunitySchema),
     defaultValues: {
       name: "",
       stage: "Qualification",
@@ -159,7 +159,7 @@ export function AddDealForm({
     setCompanyOpen(false);
   };
 
-  const onSubmit = (values: AddDealFormValues) => {
+  const onSubmit = (values: AddOpportunityFormValues) => {
     onSave(values);
   };
 
@@ -172,7 +172,7 @@ export function AddDealForm({
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Deal Name</FormLabel>
+                <FormLabel>Opportunity Name</FormLabel>
                 <FormControl>
                   <Input placeholder="e.g., Q4 Sensor Contract" {...field} />
                 </FormControl>
@@ -587,7 +587,7 @@ export function AddDealForm({
             <Button type="button" variant="outline" onClick={onCancel}>
               Cancel
             </Button>
-            <Button type="submit">Save Deal</Button>
+            <Button type="submit">Save Opportunity</Button>
           </div>
         </form>
       </Form>
