@@ -12,7 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { opportunities, contacts, companies, products, Quote } from '@/lib/data';
 import { QuoteCard } from '../quote-card';
-import { AddQuoteDialog } from '../add-quote-dialog';
+import { GenerateQuoteDialog } from '../add-quote-dialog';
 import { LogActivityDialog } from '../log-activity-dialog';
 import { EditOpportunityDialog } from '../edit-deal-dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -37,7 +37,7 @@ export default function OpportunityDetailPage() {
   const opportunityId = params.id as string;
   
   const [opportunity, setOpportunity] = useState(() => opportunities.find((d) => d.id === opportunityId));
-  const [isAddQuoteOpen, setIsAddQuoteOpen] = useState(false);
+  const [isGenerateQuoteOpen, setIsGenerateQuoteOpen] = useState(false);
   const [isLogActivityOpen, setIsLogActivityOpen] = useState(false);
   const [isEditOpportunityOpen, setIsEditOpportunityOpen] = useState(false);
 
@@ -51,7 +51,6 @@ export default function OpportunityDetailPage() {
       const updatedOpportunity = {
         ...opportunity,
         quotes: [...opportunity.quotes, newQuote],
-        value: opportunity.quotes.reduce((acc, q) => acc + q.value, 0) + newQuote.value
       };
       setOpportunity(updatedOpportunity);
     }
@@ -63,7 +62,6 @@ export default function OpportunityDetailPage() {
       const updatedOpportunity = {
         ...opportunity,
         quotes: updatedQuotes,
-        value: updatedQuotes.reduce((acc, q) => acc + q.value, 0)
       };
       setOpportunity(updatedOpportunity);
     }
@@ -211,8 +209,8 @@ export default function OpportunityDetailPage() {
               </TabsContent>
 
               <TabsContent value="quotes" className="mt-4 space-y-4">
-                <Button className="w-full" onClick={() => setIsAddQuoteOpen(true)}>
-                    <FilePlus className="mr-2"/> Add Quote
+                <Button className="w-full" onClick={() => setIsGenerateQuoteOpen(true)}>
+                    <FilePlus className="mr-2"/> Generate Quote
                 </Button>
                 <div className="space-y-4">
                   {opportunity.quotes.length > 0 ? (
@@ -221,7 +219,7 @@ export default function OpportunityDetailPage() {
                     ))
                   ) : (
                     <div className="text-center text-sm text-muted-foreground p-8 border-dashed border-2 rounded-lg">
-                        <p>No quotes have been added to this opportunity yet.</p>
+                        <p>No quotes have been generated for this opportunity yet.</p>
                     </div>
                   )}
                 </div>
@@ -234,9 +232,9 @@ export default function OpportunityDetailPage() {
           </div>
         </div>
       </main>
-      <AddQuoteDialog
-        isOpen={isAddQuoteOpen}
-        setIsOpen={setIsAddQuoteOpen}
+      <GenerateQuoteDialog
+        isOpen={isGenerateQuoteOpen}
+        setIsOpen={setIsGenerateQuoteOpen}
         opportunity={opportunity}
         onQuoteAdded={handleQuoteAdded}
       />
