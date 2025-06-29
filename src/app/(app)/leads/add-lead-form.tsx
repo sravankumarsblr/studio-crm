@@ -19,6 +19,7 @@ import {
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -28,6 +29,7 @@ import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Switch } from "@/components/ui/switch";
 import { companies, contacts, products } from "@/lib/data";
 
 const addLeadSchema = z.object({
@@ -45,6 +47,7 @@ const addLeadSchema = z.object({
     .refine((value) => value.length > 0, {
       message: "You have to select at least one product.",
     }),
+  convertToDeal: z.boolean().default(false),
 });
 
 export type AddLeadFormValues = z.infer<typeof addLeadSchema>;
@@ -69,6 +72,7 @@ export function AddLeadForm({
       companyId: "",
       contactIds: [],
       productIds: [],
+      convertToDeal: false,
     },
   });
 
@@ -191,6 +195,27 @@ export function AddLeadForm({
                 </PopoverContent>
               </Popover>
               <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="convertToDeal"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm bg-secondary/50">
+              <div className="space-y-0.5">
+                <FormLabel>Create a Deal</FormLabel>
+                <FormDescription>
+                  Also create a new deal for this lead in the pipeline.
+                </FormDescription>
+              </div>
+              <FormControl>
+                <Switch
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
+              </FormControl>
             </FormItem>
           )}
         />
@@ -325,7 +350,7 @@ export function AddLeadForm({
           <Button type="button" variant="outline" onClick={onCancel}>
             Cancel
           </Button>
-          <Button type="submit">Save Lead</Button>
+          <Button type="submit">Save</Button>
         </div>
       </form>
     </Form>
