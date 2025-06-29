@@ -3,6 +3,7 @@
 
 import { useState } from "react";
 import Link from 'next/link';
+import { MoreHorizontal } from "lucide-react";
 import { Header } from "@/components/header";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { leads } from "@/lib/data";
@@ -10,9 +11,17 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { AiLeadScorer } from "./ai-lead-scorer";
 import { AddLeadDialog } from "./add-lead-dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useToast } from "@/hooks/use-toast";
 
 export default function LeadsPage() {
   const [isAddLeadOpen, setIsAddLeadOpen] = useState(false);
+  const { toast } = useToast();
 
   const getStatusVariant = (status: string) => {
     switch (status) {
@@ -22,6 +31,15 @@ export default function LeadsPage() {
       case 'Lost': return 'destructive';
       default: return 'outline';
     }
+  };
+  
+  const handleConvertToDeal = (leadName: string) => {
+    // In a real app, this would trigger a server action
+    console.log(`Converting ${leadName} to a deal.`);
+    toast({
+      title: "Lead Converted",
+      description: `A new deal has been created for "${leadName}".`,
+    });
   };
 
   return (
@@ -53,9 +71,21 @@ export default function LeadsPage() {
                     <AiLeadScorer lead={lead} />
                   </TableCell>
                   <TableCell className="text-right">
-                    <Button asChild variant="ghost" size="sm">
-                      <Link href={`/leads/${lead.id}`}>View</Link>
-                    </Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem asChild>
+                           <Link href={`/leads/${lead.id}`}>View Details</Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleConvertToDeal(lead.name)}>
+                          Convert to Deal
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </TableCell>
                 </TableRow>
               ))}

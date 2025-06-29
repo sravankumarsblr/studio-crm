@@ -82,7 +82,8 @@ export default function LeadDetailPage() {
             </div>
         </div>
         <Button variant="outline" onClick={() => setIsEditOpen(true)}><Edit className="mr-2"/> Edit</Button>
-        <Button onClick={() => setIsLogActivityOpen(true)}>Log Activity</Button>
+        <Button variant="outline" onClick={() => setIsLogActivityOpen(true)}>Log Activity</Button>
+        <Button><Briefcase className="mr-2 h-4 w-4" /> Convert to Deal</Button>
       </Header>
 
       <main className="flex-1 overflow-y-auto p-4 sm:p-6">

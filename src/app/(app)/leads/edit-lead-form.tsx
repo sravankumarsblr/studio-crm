@@ -20,6 +20,7 @@ import {
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -39,6 +40,7 @@ import {
 } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
 
 const editLeadSchema = z.object({
   name: z.string().min(1, "Lead name is required."),
@@ -53,6 +55,7 @@ const editLeadSchema = z.object({
   productIds: z
     .array(z.string())
     .min(1, "You have to select at least one product."),
+  convertToDeal: z.boolean().default(false),
 }).refine(
   (data) => {
     if (data.contactIds.length > 0) {
@@ -95,6 +98,7 @@ export function EditLeadForm({
       contactIds: primaryContact ? [primaryContact.id] : [],
       primaryContactId: primaryContact?.id || "",
       productIds: associatedProducts.map(p => p.id),
+      convertToDeal: false,
     };
   }, [lead]);
 
@@ -402,6 +406,27 @@ export function EditLeadForm({
                 </div>
               </FormControl>
               <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="convertToDeal"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm bg-secondary/50">
+              <div className="space-y-0.5">
+                <FormLabel>Create a Deal</FormLabel>
+                <FormDescription>
+                  Also create a new deal for this lead in the pipeline.
+                </FormDescription>
+              </div>
+              <FormControl>
+                <Switch
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
+              </FormControl>
             </FormItem>
           )}
         />
