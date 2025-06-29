@@ -31,7 +31,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar } from "@/components/ui/calendar";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { companies as staticCompanies, contacts, products, Company } from "@/lib/data";
+import { companies as staticCompanies, contacts, products, users, Company } from "@/lib/data";
 import {
   Select,
   SelectContent,
@@ -47,6 +47,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 
 const addOpportunitySchema = z.object({
   name: z.string().min(1, "Opportunity name is required."),
+  ownerId: z.string().min(1, "Deal owner is required."),
   stage: z.string().min(1, "Stage is required."),
   closeDate: z.string().min(1, "Close date is required"),
   companyId: z.string().min(1, "Company is required."),
@@ -81,6 +82,7 @@ export function AddOpportunityForm({
   onCancel: () => void;
 }) {
   const [companyOpen, setCompanyOpen] = useState(false);
+  const [ownerOpen, setOwnerOpen] = useState(false);
   const [isAddCompanyOpen, setIsAddCompanyOpen] = useState(false);
   const [companies, setCompanies] = useState<Company[]>(staticCompanies);
   const [contactSearch, setContactSearch] = useState("");
@@ -92,6 +94,7 @@ export function AddOpportunityForm({
     defaultValues: {
       name: "",
       stage: "Qualification",
+      ownerId: "",
       closeDate: "",
       companyId: "",
       contactIds: [],
@@ -176,6 +179,63 @@ export function AddOpportunityForm({
             )}
           />
           <div className="grid grid-cols-2 gap-4">
+             <FormField
+              control={form.control}
+              name="ownerId"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel>Deal Owner</FormLabel>
+                   <Popover open={ownerOpen} onOpenChange={setOwnerOpen}>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          className={cn(
+                            "w-full justify-between",
+                            !field.value && "text-muted-foreground"
+                          )}
+                        >
+                          {field.value
+                            ? users.find((user) => user.id === field.value)?.name
+                            : "Select owner"}
+                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                      <Command>
+                        <CommandInput placeholder="Search owner..." />
+                        <CommandList>
+                          <CommandEmpty>No owner found.</CommandEmpty>
+                          <CommandGroup>
+                            {users.map((user) => (
+                              <CommandItem
+                                value={user.name}
+                                key={user.id}
+                                onSelect={() => {
+                                  form.setValue("ownerId", user.id, { shouldValidate: true });
+                                  setOwnerOpen(false);
+                                }}
+                              >
+                                <Check
+                                  className={cn(
+                                    "mr-2 h-4 w-4",
+                                    user.id === field.value ? "opacity-100" : "opacity-0"
+                                  )}
+                                />
+                                {user.name}
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="stage"
@@ -200,46 +260,9 @@ export function AddOpportunityForm({
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="closeDate"
-              render={({ field }) => (
-                <FormItem className="flex flex-col">
-                  <FormLabel>Expected Close Date</FormLabel>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant={"outline"}
-                          className={cn(
-                            "w-full text-left font-normal",
-                            !field.value && "text-muted-foreground"
-                          )}
-                        >
-                          {field.value ? (
-                            format(field.value, "PPP")
-                          ) : (
-                            <span>Pick a date</span>
-                          )}
-                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={field.value ? new Date(field.value) : undefined}
-                        onSelect={(date) => field.onChange(date?.toISOString().split('T')[0])}
-                        initialFocus
-                      />
-                    </PopoverContent>
-                  </Popover>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
           </div>
-          <FormField
+          <div className="grid grid-cols-2 gap-4">
+            <FormField
             control={form.control}
             name="companyId"
             render={({ field }) => (
@@ -308,6 +331,46 @@ export function AddOpportunityForm({
               </FormItem>
             )}
           />
+            <FormField
+              control={form.control}
+              name="closeDate"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel>Expected Close Date</FormLabel>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant={"outline"}
+                          className={cn(
+                            "w-full text-left font-normal",
+                            !field.value && "text-muted-foreground"
+                          )}
+                        >
+                          {field.value ? (
+                            format(field.value, "PPP")
+                          ) : (
+                            <span>Pick a date</span>
+                          )}
+                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={field.value ? new Date(field.value) : undefined}
+                        onSelect={(date) => field.onChange(date?.toISOString().split('T')[0])}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+          
 
           <FormField
             control={form.control}
@@ -486,3 +549,5 @@ export function AddOpportunityForm({
     </>
   );
 }
+
+    

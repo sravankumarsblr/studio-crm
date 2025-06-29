@@ -1,4 +1,18 @@
 
+export type Role = {
+  id: string;
+  name: 'Admin' | 'Sales Manager' | 'Sales Rep';
+  description: string;
+};
+
+export type User = {
+  id: string;
+  name: string;
+  email: string;
+  avatar: string;
+  role: Role['name'];
+};
+
 export type Company = {
   id: string;
   name: string;
@@ -22,6 +36,7 @@ export type Contact = {
 export type Lead = {
   id: string;
   name: string;
+  ownerId: string;
   companyName: string;
   contactName: string;
   value: number;
@@ -60,6 +75,7 @@ export type LineItem = {
 export type Opportunity = {
   id: string;
   name: string;
+  ownerId: string;
   companyName: string;
   contactName: string;
   stage: 'Qualification' | 'Proposal' | 'Negotiation' | 'Closed Won' | 'Closed Lost';
@@ -102,6 +118,18 @@ export type Product = {
   status: 'active' | 'inactive';
 };
 
+export const roles: Role[] = [
+  { id: 'role1', name: 'Admin', description: 'Has access to all features, including the admin section.' },
+  { id: 'role2', name: 'Sales Manager', description: 'Can view and manage all leads, opportunities, and contracts.' },
+  { id: 'role3', name: 'Sales Rep', description: 'Can only access and manage their own assigned records.' },
+];
+
+export const users: User[] = [
+  { id: 'user1', name: 'Alex Green', email: 'alex.green@crm.com', avatar: 'https://placehold.co/32x32.png', role: 'Admin' },
+  { id: 'user2', name: 'Samantha Blue', email: 'samantha.blue@crm.com', avatar: 'https://placehold.co/32x32.png', role: 'Sales Manager' },
+  { id: 'user3', name: 'Tom Brown', email: 'tom.brown@crm.com', avatar: 'https://placehold.co/32x32.png', role: 'Sales Rep' },
+  { id: 'user4', name: 'Olivia White', email: 'olivia.white@crm.com', avatar: 'https://placehold.co/32x32.png', role: 'Sales Rep' },
+];
 
 export const companies: Company[] = [
   { id: 'com1', name: 'Precision Instruments Inc.', industry: 'Manufacturing', logo: 'https://placehold.co/40x40.png', numberOfEmployees: 250, website: 'https://precisioninstruments.com', address: '123 Innovation Dr, Tech Park, TX 75001', status: 'active' },
@@ -122,16 +150,17 @@ export const contacts: Contact[] = [
 ];
 
 export const leads: Lead[] = [
-  { id: 'lead1', name: 'Sensor Calibration Service', companyName: 'FutureGadget Labs', contactName: 'Alex Ray', value: 15000, status: 'New', source: 'Web Form', createdDate: '2024-05-01', productIds: ['prod1'], leadData: { industry: 'R&D', companySize: 50, pastPurchases: 0, websiteVisits: 5 } },
-  { id: 'lead2', name: 'Pressure Gauge Batch Test', companyName: 'Global Petro', contactName: 'Maria Garcia', value: 75000, status: 'Qualified', source: 'Referral', createdDate: '2024-05-10', productIds: ['prod1', 'prod3'], leadData: { industry: 'Oil & Gas', companySize: 1500, pastPurchases: 3, websiteVisits: 2, referredBy: 'AeroCal Labs' } },
-  { id: 'lead3', name: 'Annual Pipette Calibration', companyName: 'BioHealth Corp', contactName: 'Sam Chen', value: 25000, status: 'Contacted', source: 'Trade Show', createdDate: '2024-05-20', productIds: ['prod4'], leadData: { industry: 'Biotechnology', companySize: 200, pastPurchases: 1, websiteVisits: 1 } },
-  { id: 'lead4', name: 'Legacy System Upgrade Inquiry', companyName: 'FutureGadget Labs', contactName: 'Alex Ray', value: 5000, status: 'Junk', source: 'Cold Call', createdDate: '2024-05-22', productIds: [], leadData: { industry: 'R&D', companySize: 50, pastPurchases: 0, websiteVisits: 0, reason: 'Out of budget' } },
+  { id: 'lead1', name: 'Sensor Calibration Service', ownerId: 'user3', companyName: 'FutureGadget Labs', contactName: 'Alex Ray', value: 15000, status: 'New', source: 'Web Form', createdDate: '2024-05-01', productIds: ['prod1'], leadData: { industry: 'R&D', companySize: 50, pastPurchases: 0, websiteVisits: 5 } },
+  { id: 'lead2', name: 'Pressure Gauge Batch Test', ownerId: 'user4', companyName: 'Global Petro', contactName: 'Maria Garcia', value: 75000, status: 'Qualified', source: 'Referral', createdDate: '2024-05-10', productIds: ['prod1', 'prod3'], leadData: { industry: 'Oil & Gas', companySize: 1500, pastPurchases: 3, websiteVisits: 2, referredBy: 'AeroCal Labs' } },
+  { id: 'lead3', name: 'Annual Pipette Calibration', ownerId: 'user3', companyName: 'BioHealth Corp', contactName: 'Sam Chen', value: 25000, status: 'Contacted', source: 'Trade Show', createdDate: '2024-05-20', productIds: ['prod4'], leadData: { industry: 'Biotechnology', companySize: 200, pastPurchases: 1, websiteVisits: 1 } },
+  { id: 'lead4', name: 'Legacy System Upgrade Inquiry', ownerId: 'user4', companyName: 'FutureGadget Labs', contactName: 'Alex Ray', value: 5000, status: 'Junk', source: 'Cold Call', createdDate: '2024-05-22', productIds: [], leadData: { industry: 'R&D', companySize: 50, pastPurchases: 0, websiteVisits: 0, reason: 'Out of budget' } },
 ];
 
 export const opportunities: Opportunity[] = [
   { 
     id: 'deal1', 
     name: 'Q3 Pressure Sensor Contract', 
+    ownerId: 'user3',
     companyName: 'AeroCal Labs', 
     contactName: 'Jane Smith', 
     stage: 'Proposal', 
@@ -147,6 +176,7 @@ export const opportunities: Opportunity[] = [
   { 
     id: 'deal2', 
     name: 'Medical Scale Fleet Calibration', 
+    ownerId: 'user4',
     companyName: 'MediTech Solutions', 
     contactName: 'Peter Jones', 
     stage: 'Negotiation', 
@@ -163,6 +193,7 @@ export const opportunities: Opportunity[] = [
   { 
     id: 'deal3', 
     name: 'Torque Wrench Verification', 
+    ownerId: 'user3',
     companyName: 'Precision Instruments Inc.', 
     contactName: 'John Doe', 
     stage: 'Closed Won', 
@@ -178,6 +209,7 @@ export const opportunities: Opportunity[] = [
   { 
     id: 'deal4', 
     name: 'Software Suite License', 
+    ownerId: 'user3',
     companyName: 'FutureGadget Labs', 
     contactName: 'Alex Ray', 
     stage: 'Qualification', 
@@ -191,6 +223,7 @@ export const opportunities: Opportunity[] = [
   { 
     id: 'deal5', 
     name: 'Sensor Batch Order', 
+    ownerId: 'user4',
     companyName: 'Global Petro', 
     contactName: 'Maria Garcia', 
     stage: 'Closed Lost', 
@@ -230,3 +263,5 @@ export const products: Product[] = [
   { id: 'prod4', name: 'Digital Pipette P4', category: 'Lab Equipment', price: 600, status: 'active' },
   { id: 'prod5', name: 'Calibration Software Suite', category: 'Software', price: 2500, status: 'active' },
 ];
+
+    

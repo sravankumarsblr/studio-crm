@@ -31,7 +31,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Switch } from "@/components/ui/switch";
-import { companies as staticCompanies, contacts, products, Company } from "@/lib/data";
+import { companies as staticCompanies, contacts, products, users, Company } from "@/lib/data";
 import {
   Select,
   SelectContent,
@@ -45,6 +45,7 @@ import { AddCompanyDialog } from "../companies/add-company-dialog";
 
 const addLeadSchema = z.object({
   name: z.string().min(1, "Lead name is required."),
+  ownerId: z.string().min(1, "Lead owner is required."),
   value: z.coerce.number().min(0, "Value must be a positive number."),
   status: z.string().min(1, "Status is required."),
   source: z.string().min(1, "Source is required."),
@@ -81,6 +82,7 @@ export function AddLeadForm({
   onCancel: () => void;
 }) {
   const [companyOpen, setCompanyOpen] = useState(false);
+  const [ownerOpen, setOwnerOpen] = useState(false);
   const [isAddCompanyOpen, setIsAddCompanyOpen] = useState(false);
   const [companies, setCompanies] = useState<Company[]>(staticCompanies);
   const [contactSearch, setContactSearch] = useState("");
@@ -91,6 +93,7 @@ export function AddLeadForm({
     defaultValues: {
       name: "",
       value: 0,
+      ownerId: "",
       status: "New",
       source: "",
       companyId: "",
@@ -167,19 +170,78 @@ export function AddLeadForm({
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="value"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Value ($)</FormLabel>
-                <FormControl>
-                  <Input type="number" placeholder="e.g., 50000" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className="grid grid-cols-2 gap-4">
+            <FormField
+              control={form.control}
+              name="value"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Value ($)</FormLabel>
+                  <FormControl>
+                    <Input type="number" placeholder="e.g., 50000" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+             <FormField
+              control={form.control}
+              name="ownerId"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel>Lead Owner</FormLabel>
+                   <Popover open={ownerOpen} onOpenChange={setOwnerOpen}>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          className={cn(
+                            "w-full justify-between",
+                            !field.value && "text-muted-foreground"
+                          )}
+                        >
+                          {field.value
+                            ? users.find((user) => user.id === field.value)?.name
+                            : "Select owner"}
+                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                      <Command>
+                        <CommandInput placeholder="Search owner..." />
+                        <CommandList>
+                          <CommandEmpty>No owner found.</CommandEmpty>
+                          <CommandGroup>
+                            {users.map((user) => (
+                              <CommandItem
+                                value={user.name}
+                                key={user.id}
+                                onSelect={() => {
+                                  form.setValue("ownerId", user.id, { shouldValidate: true });
+                                  setOwnerOpen(false);
+                                }}
+                              >
+                                <Check
+                                  className={cn(
+                                    "mr-2 h-4 w-4",
+                                    user.id === field.value ? "opacity-100" : "opacity-0"
+                                  )}
+                                />
+                                {user.name}
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
           <div className="grid grid-cols-2 gap-4">
             <FormField
               control={form.control}
@@ -456,3 +518,5 @@ export function AddLeadForm({
     </>
   );
 }
+
+    

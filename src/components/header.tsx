@@ -1,6 +1,8 @@
+
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { UserNav } from "@/components/user-nav";
 
 type HeaderProps = {
   title: string;
@@ -13,12 +15,15 @@ export function Header({ title, actionText, onActionClick, children }: HeaderPro
   return (
     <header className="flex items-center justify-between p-4 sm:p-6 border-b bg-card">
       <h1 className="text-2xl font-headline font-bold text-foreground">{title}</h1>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-4">
         {children}
         {actionText && onActionClick && (
           <Button onClick={onActionClick}>{actionText}</Button>
         )}
+        <UserNav />
       </div>
     </header>
   );
 }
+
+    
