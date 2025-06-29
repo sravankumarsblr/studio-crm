@@ -167,7 +167,8 @@ export function AddDealForm({
               </FormItem>
             )}
           />
-           <FormField
+          <div className="grid grid-cols-2 gap-4">
+            <FormField
               control={form.control}
               name="stage"
               render={({ field }) => (
@@ -191,7 +192,7 @@ export function AddDealForm({
                 </FormItem>
               )}
             />
-           <FormField
+            <FormField
               control={form.control}
               name="closeDate"
               render={({ field }) => (
@@ -229,6 +230,7 @@ export function AddDealForm({
                 </FormItem>
               )}
             />
+          </div>
           <FormField
             control={form.control}
             name="companyId"
@@ -433,57 +435,59 @@ export function AddDealForm({
 
           <div className="space-y-4">
             <h3 className="text-lg font-medium text-foreground">Initial Quote Details</h3>
-             <FormField
-              control={form.control}
-              name="quoteValue"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Quote Value ($)</FormLabel>
-                  <FormControl>
-                    <Input type="number" placeholder="e.g., 50000" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="quoteExpiryDate"
-              render={({ field }) => (
-                <FormItem className="flex flex-col">
-                  <FormLabel>Expiry Date</FormLabel>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant={"outline"}
-                          className={cn(
-                            "w-full text-left font-normal",
-                            !field.value && "text-muted-foreground"
-                          )}
-                        >
-                          {field.value ? (
-                            format(field.value, "PPP")
-                          ) : (
-                            <span>Pick an expiry date</span>
-                          )}
-                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={field.value ? new Date(field.value) : undefined}
-                        onSelect={(date) => field.onChange(date?.toISOString().split('T')[0])}
-                        initialFocus
-                      />
-                    </PopoverContent>
-                  </Popover>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="quoteValue"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Quote Value ($)</FormLabel>
+                    <FormControl>
+                      <Input type="number" placeholder="e.g., 50000" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="quoteExpiryDate"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
+                    <FormLabel>Expiry Date</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant={"outline"}
+                            className={cn(
+                              "w-full text-left font-normal",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            {field.value ? (
+                              format(field.value, "PPP")
+                            ) : (
+                              <span>Pick an expiry date</span>
+                            )}
+                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={field.value ? new Date(field.value) : undefined}
+                          onSelect={(date) => field.onChange(date?.toISOString().split('T')[0])}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
              <FormField
               control={form.control}
               name="quoteDocument"
