@@ -7,7 +7,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { products as initialProducts, type Product } from "@/lib/data";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { Badge } from "@/components/ui/badge";
 import { MoreHorizontal } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { AddProductDialog } from "./add-product-dialog";
@@ -66,17 +65,12 @@ export default function ProductsPage() {
                     <TableCell>{product.category}</TableCell>
                     <TableCell>₹{product.price.toLocaleString('en-IN')}</TableCell>
                     <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Switch
-                          id={`status-${product.id}`}
-                          checked={product.status === 'active'}
-                          onCheckedChange={(checked) => handleStatusChange(product.id, checked)}
-                          aria-label="Product Status"
-                        />
-                         <Badge variant={product.status === 'active' ? 'default' : 'secondary'}>
-                            {product.status === 'active' ? 'Active' : 'Inactive'}
-                         </Badge>
-                      </div>
+                      <Switch
+                        id={`status-${product.id}`}
+                        checked={product.status === 'active'}
+                        onCheckedChange={(checked) => handleStatusChange(product.id, checked)}
+                        aria-label="Product Status"
+                      />
                     </TableCell>
                     <TableCell className="text-right">
                        <DropdownMenu>

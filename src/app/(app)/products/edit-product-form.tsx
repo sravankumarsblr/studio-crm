@@ -16,6 +16,13 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import type { Product } from "@/lib/data";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const editProductSchema = z.object({
   name: z.string().min(1, "Product name is required."),
@@ -24,6 +31,8 @@ const editProductSchema = z.object({
 });
 
 export type EditProductFormValues = z.infer<typeof editProductSchema>;
+
+const productCategories = ["Sensors", "Scales", "Tools", "Lab Equipment", "Software"];
 
 export function EditProductForm({
   product,
@@ -69,9 +78,20 @@ export function EditProductForm({
           render={({ field }) => (
             <FormItem>
               <FormLabel>Category</FormLabel>
-              <FormControl>
-                <Input placeholder="e.g., Sensors" {...field} />
-              </FormControl>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a category" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {productCategories.map((category) => (
+                    <SelectItem key={category} value={category}>
+                      {category}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               <FormMessage />
             </FormItem>
           )}
