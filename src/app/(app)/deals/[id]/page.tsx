@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { ArrowLeft, Edit, FileText, DollarSign, Building2, UserCircle, Briefcase, FilePlus } from 'lucide-react';
+import { ArrowLeft, Edit, FileText, DollarSign, Building2, UserCircle, Briefcase, FilePlus, StickyNote, Mail, Phone } from 'lucide-react';
 
 import { Header } from '@/components/header';
 import { Button } from '@/components/ui/button';
@@ -13,6 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { deals, contacts, companies, products, Quote } from '@/lib/data';
 import { QuoteCard } from '../quote-card';
 import { AddQuoteDialog } from '../add-quote-dialog';
+import { LogActivityDialog } from '../log-activity-dialog';
 
 const stageVariant: { [key: string]: "default" | "secondary" | "destructive" | "outline" } = {
   'Qualification': 'outline',
@@ -22,6 +23,12 @@ const stageVariant: { [key: string]: "default" | "secondary" | "destructive" | "
   'Closed Lost': 'destructive',
 };
 
+const dummyActivity = [
+    { type: 'note', content: 'Sent over the latest quote for negotiation.', user: 'Alex Green', time: '4 hours ago', icon: StickyNote },
+    { type: 'email', content: 'Followed up on quote QT-2024-002.', user: 'Alex Green', time: '2 days ago', icon: Mail },
+    { type: 'call', content: 'Discussed terms with primary contact, they are reviewing internally.', user: 'Alex Green', time: '4 days ago', icon: Phone },
+];
+
 export default function DealDetailPage() {
   const router = useRouter();
   const params = useParams();
@@ -29,11 +36,13 @@ export default function DealDetailPage() {
   
   const [deal, setDeal] = useState(() => deals.find((d) => d.id === dealId));
   const [isAddQuoteOpen, setIsAddQuoteOpen] = useState(false);
+  const [isLogActivityOpen, setIsLogActivityOpen] = useState(false);
 
   // In a real app, this data would be fetched together. Here we simulate joins.
   const company = companies.find(c => c.name === deal?.companyName);
   const primaryContact = contacts.find(c => c.name === deal?.contactName);
   const associatedProducts = products.filter(p => p.associatedId === dealId);
+  const associatedContacts = company ? contacts.filter(c => c.companyId === company.id) : [];
 
   const handleQuoteAdded = (newQuote: Quote) => {
     if (deal) {
@@ -78,6 +87,7 @@ export default function DealDetailPage() {
                 <p className="text-sm text-muted-foreground">{deal.companyName}</p>
             </div>
         </div>
+        <Button variant="outline" onClick={() => setIsLogActivityOpen(true)}>Log Activity</Button>
         <Button variant="outline"><Edit className="mr-2"/> Edit</Button>
         <Button>Convert to Contract</Button>
       </Header>
@@ -161,7 +171,19 @@ export default function DealDetailPage() {
               </TabsList>
 
               <TabsContent value="activity" className="mt-4">
-                 <p className="text-sm text-muted-foreground p-4 text-center">Activity timeline coming soon.</p>
+                 <div className="space-y-6">
+                    {dummyActivity.map((item, index) => (
+                        <div key={index} className="flex gap-3">
+                            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-secondary">
+                                <item.icon className="w-4 h-4 text-muted-foreground" />
+                            </div>
+                            <div className="flex-1">
+                                <p className="text-sm">{item.content}</p>
+                                <p className="text-xs text-muted-foreground">{item.user} &middot; {item.time}</p>
+                            </div>
+                        </div>
+                    ))}
+                 </div>
               </TabsContent>
 
               <TabsContent value="quotes" className="mt-4 space-y-4">
@@ -193,6 +215,12 @@ export default function DealDetailPage() {
         setIsOpen={setIsAddQuoteOpen} 
         deal={deal} 
         onQuoteAdded={handleQuoteAdded}
+      />
+      <LogActivityDialog
+        isOpen={isLogActivityOpen}
+        setIsOpen={setIsLogActivityOpen}
+        deal={deal}
+        contacts={associatedContacts}
       />
     </div>
   );
