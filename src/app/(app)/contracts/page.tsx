@@ -1,4 +1,5 @@
 
+import Link from "next/link";
 import { Header } from "@/components/header";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { contracts } from "@/lib/data";
@@ -38,7 +39,11 @@ export default function ContractsPage() {
             <TableBody>
               {contracts.map((contract) => (
                 <TableRow key={contract.id}>
-                  <TableCell className="font-medium">{contract.contractTitle}</TableCell>
+                  <TableCell className="font-medium">
+                    <Link href={`/contracts/${contract.id}`} className="hover:underline text-primary">
+                      {contract.contractTitle}
+                    </Link>
+                  </TableCell>
                   <TableCell>{contract.companyName}</TableCell>
                   <TableCell>{contract.type}</TableCell>
                   <TableCell>₹{contract.value.toLocaleString('en-IN')}</TableCell>
@@ -48,7 +53,9 @@ export default function ContractsPage() {
                     <Badge variant={getStatusVariant(contract.status) as any}>{contract.status}</Badge>
                   </TableCell>
                   <TableCell className="text-right">
-                    <Button variant="ghost" size="sm">View Details</Button>
+                    <Button variant="ghost" size="sm" asChild>
+                      <Link href={`/contracts/${contract.id}`}>View Details</Link>
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))}
