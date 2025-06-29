@@ -25,6 +25,7 @@ export type Lead = {
   source: string;
   createdDate: string;
   leadData: Record<string, any>;
+  productIds: string[];
 };
 
 export type Quote = {
@@ -52,6 +53,7 @@ export type Opportunity = {
   value: number;
   closeDate: string;
   quotes: Quote[];
+  productIds: string[];
 };
 
 export type Milestone = {
@@ -78,9 +80,10 @@ export type Product = {
   id: string;
   name: string;
   category: string;
-  lifecycleStage: 'Lead' | 'Opportunity' | 'Contract' | 'Inactive';
-  associatedId: string; // leadId, opportunityId, or contractId
-}
+  price: number;
+  status: 'active' | 'inactive';
+};
+
 
 export const companies: Company[] = [
   { id: 'com1', name: 'Precision Instruments Inc.', industry: 'Manufacturing', logo: 'https://placehold.co/40x40.png' },
@@ -101,33 +104,33 @@ export const contacts: Contact[] = [
 ];
 
 export const leads: Lead[] = [
-  { id: 'lead1', name: 'Sensor Calibration Service', companyName: 'FutureGadget Labs', contactName: 'Alex Ray', value: 15000, status: 'New', source: 'Web Form', createdDate: '2024-05-01', leadData: { industry: 'R&D', companySize: 50, pastPurchases: 0, websiteVisits: 5 } },
-  { id: 'lead2', name: 'Pressure Gauge Batch Test', companyName: 'Global Petro', contactName: 'Maria Garcia', value: 75000, status: 'Qualified', source: 'Referral', createdDate: '2024-05-10', leadData: { industry: 'Oil & Gas', companySize: 1500, pastPurchases: 3, websiteVisits: 2, referredBy: 'AeroCal Labs' } },
-  { id: 'lead3', name: 'Annual Pipette Calibration', companyName: 'BioHealth Corp', contactName: 'Sam Chen', value: 25000, status: 'Contacted', source: 'Trade Show', createdDate: '2024-05-20', leadData: { industry: 'Biotechnology', companySize: 200, pastPurchases: 1, websiteVisits: 1 } },
-  { id: 'lead4', name: 'Legacy System Upgrade Inquiry', companyName: 'FutureGadget Labs', contactName: 'Alex Ray', value: 5000, status: 'Junk', source: 'Cold Call', createdDate: '2024-05-22', leadData: { industry: 'R&D', companySize: 50, pastPurchases: 0, websiteVisits: 0, reason: 'Out of budget' } },
+  { id: 'lead1', name: 'Sensor Calibration Service', companyName: 'FutureGadget Labs', contactName: 'Alex Ray', value: 15000, status: 'New', source: 'Web Form', createdDate: '2024-05-01', productIds: ['prod1'], leadData: { industry: 'R&D', companySize: 50, pastPurchases: 0, websiteVisits: 5 } },
+  { id: 'lead2', name: 'Pressure Gauge Batch Test', companyName: 'Global Petro', contactName: 'Maria Garcia', value: 75000, status: 'Qualified', source: 'Referral', createdDate: '2024-05-10', productIds: ['prod1', 'prod3'], leadData: { industry: 'Oil & Gas', companySize: 1500, pastPurchases: 3, websiteVisits: 2, referredBy: 'AeroCal Labs' } },
+  { id: 'lead3', name: 'Annual Pipette Calibration', companyName: 'BioHealth Corp', contactName: 'Sam Chen', value: 25000, status: 'Contacted', source: 'Trade Show', createdDate: '2024-05-20', productIds: ['prod4'], leadData: { industry: 'Biotechnology', companySize: 200, pastPurchases: 1, websiteVisits: 1 } },
+  { id: 'lead4', name: 'Legacy System Upgrade Inquiry', companyName: 'FutureGadget Labs', contactName: 'Alex Ray', value: 5000, status: 'Junk', source: 'Cold Call', createdDate: '2024-05-22', productIds: [], leadData: { industry: 'R&D', companySize: 50, pastPurchases: 0, websiteVisits: 0, reason: 'Out of budget' } },
 ];
 
 export const opportunities: Opportunity[] = [
-  { id: 'deal1', name: 'Q3 Pressure Sensor Contract', companyName: 'AeroCal Labs', contactName: 'Jane Smith', stage: 'Proposal', value: 50000, closeDate: '2024-08-30', quotes: [
+  { id: 'deal1', name: 'Q3 Pressure Sensor Contract', companyName: 'AeroCal Labs', contactName: 'Jane Smith', stage: 'Proposal', value: 50000, closeDate: '2024-08-30', productIds: ['prod1'], quotes: [
     { id: 'qt1', opportunityId: 'deal1', quoteNumber: 'QT-2024-001', date: '2024-06-10', expiryDate: '2024-07-10', preparedBy: 'Alex Green', value: 50000, status: 'Sent', documentName: 'AeroCal_Quote_v1.pdf' }
   ] },
-  { id: 'deal2', name: 'Medical Scale Fleet Calibration', companyName: 'MediTech Solutions', contactName: 'Peter Jones', stage: 'Negotiation', value: 120000, closeDate: '2024-07-25', quotes: [
+  { id: 'deal2', name: 'Medical Scale Fleet Calibration', companyName: 'MediTech Solutions', contactName: 'Peter Jones', stage: 'Negotiation', value: 120000, closeDate: '2024-07-25', productIds: ['prod2'], quotes: [
      { id: 'qt2', opportunityId: 'deal2', quoteNumber: 'QT-2024-002', date: '2024-06-15', expiryDate: '2024-07-15', preparedBy: 'Alex Green', value: 125000, status: 'Sent' },
      { id: 'qt3', opportunityId: 'deal2', quoteNumber: 'QT-2024-003', date: '2024-06-20', expiryDate: '2024-07-20', preparedBy: 'Alex Green', value: 120000, status: 'Draft', discount: { type: 'fixed', value: 5000 } }
   ] },
-  { id: 'deal3', name: 'Torque Wrench Verification', companyName: 'Precision Instruments Inc.', contactName: 'John Doe', stage: 'Closed Won', value: 22000, closeDate: '2024-06-15', quotes: [
+  { id: 'deal3', name: 'Torque Wrench Verification', companyName: 'Precision Instruments Inc.', contactName: 'John Doe', stage: 'Closed Won', value: 22000, closeDate: '2024-06-15', productIds: ['prod3'], quotes: [
     { id: 'qt4', opportunityId: 'deal3', quoteNumber: 'QT-2024-004', date: '2024-06-01', expiryDate: '2024-07-01', preparedBy: 'Alex Green', value: 22000, status: 'Accepted', documentName: 'PO-PINC-1138.pdf' }
   ] },
 ];
 
 export const contracts: Contract[] = [
-  { 
-    id: 'cont1', 
-    opportunityId: 'deal3', 
-    companyName: 'Precision Instruments Inc.', 
-    value: 22000, 
-    startDate: '2024-07-01', 
-    endDate: '2025-06-30', 
+  {
+    id: 'cont1',
+    opportunityId: 'deal3',
+    companyName: 'Precision Instruments Inc.',
+    value: 22000,
+    startDate: '2024-07-01',
+    endDate: '2025-06-30',
     status: 'Active',
     milestones: [
       { id: 'm1', name: 'Initial Setup', dueDate: '2024-07-15', status: 'Completed', poNumber: 'PO12345', invoiceStatus: 'Paid' },
@@ -137,8 +140,9 @@ export const contracts: Contract[] = [
 ];
 
 export const products: Product[] = [
-  { id: 'prod1', name: 'Pressure Sensor X1', category: 'Sensors', lifecycleStage: 'Opportunity', associatedId: 'deal1' },
-  { id: 'prod2', name: 'Medical Scale M2', category: 'Scales', lifecycleStage: 'Opportunity', associatedId: 'deal2' },
-  { id: 'prod3', name: 'Torque Wrench T3', category: 'Tools', lifecycleStage: 'Contract', associatedId: 'cont1' },
-  { id: 'prod4', name: 'Pipette P4', category: 'Lab Equipment', lifecycleStage: 'Lead', associatedId: 'lead3' },
+  { id: 'prod1', name: 'Pressure Sensor X1', category: 'Sensors', price: 499, status: 'active' },
+  { id: 'prod2', name: 'Medical Scale M2', category: 'Scales', price: 1299, status: 'active' },
+  { id: 'prod3', name: 'Torque Wrench T3', category: 'Tools', price: 850, status: 'inactive' },
+  { id: 'prod4', name: 'Digital Pipette P4', category: 'Lab Equipment', price: 600, status: 'active' },
+  { id: 'prod5', name: 'Calibration Software Suite', category: 'Software', price: 2500, status: 'active' },
 ];

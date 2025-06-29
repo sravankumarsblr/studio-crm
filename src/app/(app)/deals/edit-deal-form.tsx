@@ -89,7 +89,6 @@ export function EditOpportunityForm({
   const defaultValues = useMemo(() => {
     const company = companies.find(c => c.name === opportunity.companyName);
     const primaryContact = contacts.find(c => c.name === opportunity.contactName && c.companyId === company?.id);
-    const associatedProducts = products.filter(p => p.associatedId === opportunity.id);
     
     // In a real app, an opportunity would have a list of contact IDs. We simulate this here.
     const associatedContacts = company ? contacts.filter(c => c.companyId === company.id) : [];
@@ -105,7 +104,7 @@ export function EditOpportunityForm({
       companyId: company?.id || "",
       contactIds: contactIds,
       primaryContactId: primaryContact?.id || "",
-      productIds: associatedProducts.map(p => p.id),
+      productIds: opportunity.productIds || [],
     };
   }, [opportunity, companies]);
 

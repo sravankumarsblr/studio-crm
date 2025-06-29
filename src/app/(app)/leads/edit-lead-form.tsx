@@ -90,7 +90,6 @@ export function EditLeadForm({
   const defaultValues = useMemo(() => {
     const company = companies.find(c => c.name === lead.companyName);
     const primaryContact = contacts.find(c => c.name === lead.contactName && c.companyId === company?.id);
-    const associatedProducts = products.filter(p => p.associatedId === lead.id);
 
     return {
       name: lead.name,
@@ -100,7 +99,7 @@ export function EditLeadForm({
       companyId: company?.id || "",
       contactIds: primaryContact ? [primaryContact.id] : [],
       primaryContactId: primaryContact?.id || "",
-      productIds: associatedProducts.map(p => p.id),
+      productIds: lead.productIds || [],
       convertToDeal: false,
     };
   }, [lead, companies]);

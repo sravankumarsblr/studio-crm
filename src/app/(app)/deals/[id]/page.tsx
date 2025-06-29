@@ -1,5 +1,4 @@
 
-
 "use client";
 
 import { useState } from 'react';
@@ -44,7 +43,7 @@ export default function OpportunityDetailPage() {
   // In a real app, this data would be fetched together. Here we simulate joins.
   const company = companies.find(c => c.name === opportunity?.companyName);
   const primaryContact = contacts.find(c => c.name === opportunity?.contactName);
-  const associatedProducts = products.filter(p => p.associatedId === opportunityId);
+  const associatedProducts = opportunity ? products.filter(p => opportunity.productIds.includes(p.id)) : [];
   const associatedContacts = company ? contacts.filter(c => c.companyId === company.id) : [];
 
   const handleQuoteAdded = (newQuote: Quote) => {
@@ -213,10 +212,10 @@ export default function OpportunityDetailPage() {
           </div>
         </div>
       </main>
-      <AddQuoteDialog 
-        isOpen={isAddQuoteOpen} 
-        setIsOpen={setIsAddQuoteOpen} 
-        opportunity={opportunity} 
+      <AddQuoteDialog
+        isOpen={isAddQuoteOpen}
+        setIsOpen={setIsAddQuoteOpen}
+        opportunity={opportunity}
         onQuoteAdded={handleQuoteAdded}
       />
       <LogActivityDialog

@@ -48,7 +48,7 @@ export default function LeadDetailPage() {
   // In a real app, this data would be fetched together. Here we simulate joins.
   const company = companies.find(c => c.name === lead?.companyName);
   const primaryContact = contacts.find(c => c.name === lead?.contactName);
-  const associatedProducts = products.filter(p => p.associatedId === leadId);
+  const associatedProducts = lead ? products.filter(p => lead.productIds.includes(p.id)) : [];
   const associatedContacts = company ? contacts.filter(c => c.companyId === company.id) : [];
 
   const getStatusVariant = (status?: string) => {

@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Header } from "@/components/header";
@@ -13,27 +14,24 @@ import {
 } from "@/components/ui/chart";
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
 
-const chartData = [
-  { stage: 'Lead', count: products.filter(p => p.lifecycleStage === 'Lead').length, fill: "var(--color-lead)" },
-  { stage: 'Opportunity', count: products.filter(p => p.lifecycleStage === 'Opportunity').length, fill: "var(--color-opportunity)" },
-  { stage: 'Contract', count: products.filter(p => p.lifecycleStage === 'Contract').length, fill: "var(--color-contract)" },
-];
+const productsByCategory = products.reduce((acc, product) => {
+  acc[product.category] = (acc[product.category] || 0) + 1;
+  return acc;
+}, {} as Record<string, number>);
+
+const categoryChartData = Object.keys(productsByCategory).map((category, index) => ({
+  category,
+  count: productsByCategory[category],
+  fill: `var(--chart-${(index % 5) + 1})`
+}));
+
 
 const chartConfig = {
   count: {
     label: "Products",
   },
-  lead: {
-    label: "Lead",
-    color: "hsl(var(--chart-1))",
-  },
-  opportunity: {
-    label: "Opportunity",
-    color: "hsl(var(--chart-2))",
-  },
-  contract: {
-    label: "Contract",
-    color: "hsl(var(--chart-3))",
+  category: {
+    label: "Category",
   },
 };
 
@@ -84,13 +82,13 @@ export default function DashboardPage() {
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Tracked Products</CardTitle>
+              <CardTitle className="text-sm font-medium">Products</CardTitle>
               <Package className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{products.length}</div>
               <p className="text-xs text-muted-foreground">
-                Across all stages
+                {products.filter(p => p.status === 'active').length} active
               </p>
             </CardContent>
           </Card>
@@ -99,15 +97,15 @@ export default function DashboardPage() {
         <div className="grid gap-6 lg:grid-cols-2">
           <Card>
             <CardHeader>
-              <CardTitle>Product Lifecycle Overview</CardTitle>
-              <CardDescription>Number of products in each stage of the sales lifecycle.</CardDescription>
+              <CardTitle>Products by Category</CardTitle>
+              <CardDescription>Distribution of products across different categories.</CardDescription>
             </CardHeader>
             <CardContent>
                <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
-                <BarChart accessibilityLayer data={chartData}>
+                <BarChart accessibilityLayer data={categoryChartData}>
                   <CartesianGrid vertical={false} />
                   <XAxis
-                    dataKey="stage"
+                    dataKey="category"
                     tickLine={false}
                     tickMargin={10}
                     axisLine={false}
