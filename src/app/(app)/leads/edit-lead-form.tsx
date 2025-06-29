@@ -198,6 +198,7 @@ export function EditLeadForm({
                     <SelectItem value="Contacted">Contacted</SelectItem>
                     <SelectItem value="Qualified">Qualified</SelectItem>
                     <SelectItem value="Lost">Lost</SelectItem>
+                    <SelectItem value="Junk">Junk</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />

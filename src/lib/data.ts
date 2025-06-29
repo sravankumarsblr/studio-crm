@@ -21,7 +21,7 @@ export type Lead = {
   companyName: string;
   contactName: string;
   value: number;
-  status: 'New' | 'Contacted' | 'Qualified' | 'Lost';
+  status: 'New' | 'Contacted' | 'Qualified' | 'Lost' | 'Junk';
   source: string;
   createdDate: string;
   leadData: Record<string, any>;
@@ -87,6 +87,7 @@ export const leads: Lead[] = [
   { id: 'lead1', name: 'Sensor Calibration Service', companyName: 'FutureGadget Labs', contactName: 'Alex Ray', value: 15000, status: 'New', source: 'Web Form', createdDate: '2024-05-01', leadData: { industry: 'R&D', companySize: 50, pastPurchases: 0, websiteVisits: 5 } },
   { id: 'lead2', name: 'Pressure Gauge Batch Test', companyName: 'Global Petro', contactName: 'Maria Garcia', value: 75000, status: 'Qualified', source: 'Referral', createdDate: '2024-05-10', leadData: { industry: 'Oil & Gas', companySize: 1500, pastPurchases: 3, websiteVisits: 2, referredBy: 'AeroCal Labs' } },
   { id: 'lead3', name: 'Annual Pipette Calibration', companyName: 'BioHealth Corp', contactName: 'Sam Chen', value: 25000, status: 'Contacted', source: 'Trade Show', createdDate: '2024-05-20', leadData: { industry: 'Biotechnology', companySize: 200, pastPurchases: 1, websiteVisits: 1 } },
+  { id: 'lead4', name: 'Legacy System Upgrade Inquiry', companyName: 'FutureGadget Labs', contactName: 'Alex Ray', value: 5000, status: 'Junk', source: 'Cold Call', createdDate: '2024-05-22', leadData: { industry: 'R&D', companySize: 50, pastPurchases: 0, websiteVisits: 0, reason: 'Out of budget' } },
 ];
 
 export const deals: Deal[] = [

@@ -29,6 +29,7 @@ export default function LeadsPage() {
       case 'New': return 'outline';
       case 'Contacted': return 'secondary';
       case 'Lost': return 'destructive';
+      case 'Junk': return 'destructive';
       default: return 'outline';
     }
   };
