@@ -26,9 +26,9 @@ const stageVariant: { [key: string]: "default" | "secondary" | "destructive" | "
 };
 
 const dummyActivity = [
-    { type: 'note', content: 'Sent over the latest quote for negotiation.', user: 'Alex Green', time: '4 hours ago', icon: StickyNote },
-    { type: 'email', content: 'Followed up on quote QT-2024-002.', user: 'Alex Green', time: '2 days ago', icon: Mail },
-    { type: 'call', content: 'Discussed terms with primary contact, they are reviewing internally.', user: 'Alex Green', time: '4 days ago', icon: Phone },
+    { type: 'note', content: 'Sent over the latest quote for negotiation.', user: 'Priya Singh', time: '4 hours ago', icon: StickyNote },
+    { type: 'email', content: 'Followed up on quote QT-2024-002.', user: 'Priya Singh', time: '2 days ago', icon: Mail },
+    { type: 'call', content: 'Discussed terms with primary contact, they are reviewing internally.', user: 'Priya Singh', time: '4 days ago', icon: Phone },
 ];
 
 export default function OpportunityDetailPage() {
@@ -257,3 +257,5 @@ export default function OpportunityDetailPage() {
     </div>
   );
 }
+
+    

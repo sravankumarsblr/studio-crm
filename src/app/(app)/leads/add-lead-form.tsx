@@ -176,7 +176,7 @@ export function AddLeadForm({
               name="value"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Value ($)</FormLabel>
+                  <FormLabel>Value (₹)</FormLabel>
                   <FormControl>
                     <Input type="number" placeholder="e.g., 50000" {...field} />
                   </FormControl>

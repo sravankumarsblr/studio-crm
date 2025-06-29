@@ -64,7 +64,7 @@ export default function LeadsPage() {
                 <TableRow key={lead.id}>
                   <TableCell className="font-medium">{lead.name}</TableCell>
                   <TableCell>{lead.companyName}</TableCell>
-                  <TableCell>${lead.value.toLocaleString()}</TableCell>
+                  <TableCell>₹{lead.value.toLocaleString('en-IN')}</TableCell>
                   <TableCell>
                     <Badge variant={getStatusVariant(lead.status) as any}>{lead.status}</Badge>
                   </TableCell>
@@ -98,3 +98,5 @@ export default function LeadsPage() {
     </div>
   );
 }
+
+    

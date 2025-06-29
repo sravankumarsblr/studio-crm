@@ -10,6 +10,8 @@ import {
 } from "@/components/ui/dialog";
 import { GenerateQuoteForm, type GenerateQuoteFormValues } from "./add-quote-form";
 import type { Opportunity, Quote } from "@/lib/data";
+import { users } from "@/lib/data";
+
 
 type GenerateQuoteDialogProps = {
   isOpen: boolean;
@@ -26,13 +28,16 @@ export function GenerateQuoteDialog({
 }: GenerateQuoteDialogProps) {
 
   const handleSave = (data: GenerateQuoteFormValues) => {
+    // In a real app, the current user would be derived from session
+    const currentUser = users.find(u => u.role === 'Admin') || users[0];
+
     const newQuote: Quote = {
       id: `qt${new Date().getTime()}`,
       quoteNumber: `QT-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 900) + 100).padStart(3, '0')}`,
       opportunityId: opportunity.id,
       date: new Date().toISOString().split("T")[0],
       expiryDate: data.expiryDate,
-      preparedBy: "Alex Green", // In a real app, this would be the current user
+      preparedBy: currentUser.name,
       value: data.value,
       status: data.attachPo ? "Accepted" : "Draft",
       documentName: data.document?.name,
@@ -69,3 +74,5 @@ export function GenerateQuoteDialog({
     </Dialog>
   );
 }
+
+    

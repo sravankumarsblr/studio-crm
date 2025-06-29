@@ -33,7 +33,7 @@ export function QuoteCard({ quote, onDelete }: QuoteCardProps) {
     const getDiscountDisplay = () => {
         if (!quote.discount) return null;
         return quote.discount.type === 'fixed' 
-            ? `$${quote.discount.value.toLocaleString()}` 
+            ? `₹${quote.discount.value.toLocaleString('en-IN')}` 
             : `${quote.discount.value}%`;
     };
 
@@ -56,10 +56,10 @@ export function QuoteCard({ quote, onDelete }: QuoteCardProps) {
           <CardDescription className="text-xs">
              {quote.discount ? (
                 <span>
-                    Value: <span className="line-through">${quote.value.toLocaleString()}</span> &rarr; ${getFinalValue().toLocaleString()}
+                    Value: <span className="line-through">₹{quote.value.toLocaleString('en-IN')}</span> &rarr; ₹{getFinalValue().toLocaleString('en-IN')}
                 </span>
             ) : (
-                <span>Value: ${quote.value.toLocaleString()}</span>
+                <span>Value: ₹{quote.value.toLocaleString('en-IN')}</span>
             )}
           </CardDescription>
         </div>
@@ -122,3 +122,5 @@ export function QuoteCard({ quote, onDelete }: QuoteCardProps) {
     </Card>
   );
 }
+
+    

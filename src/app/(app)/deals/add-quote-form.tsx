@@ -24,7 +24,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Switch } from "@/components/ui/switch";
 import type { Opportunity } from "@/lib/data";
-import { products } from "@/lib/data";
+import { products, users } from "@/lib/data";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Separator } from "@/components/ui/separator";
 
@@ -105,6 +105,7 @@ export function GenerateQuoteForm({
 
   const discountType = form.watch("discountType");
   const attachPo = form.watch("attachPo");
+  const dealOwner = users.find(u => u.id === opportunity.ownerId)?.name || 'N/A';
 
   return (
     <Form {...form}>
@@ -315,7 +316,7 @@ export function GenerateQuoteForm({
                   <FormItem>
                     <FormLabel>Purchase Order Number</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g., PO12345" {...field} />
+                      <Input placeholder="e.g., PO-ACPL-12345" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -405,3 +406,5 @@ export function GenerateQuoteForm({
     </Form>
   );
 }
+
+    

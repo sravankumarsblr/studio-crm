@@ -33,7 +33,7 @@ export function AddOpportunityDialog({
 
     toast({
       title: "Opportunity Created",
-      description: `The opportunity "${data.name}" has been successfully created with a value of $${totalValue.toLocaleString()}.`,
+      description: `The opportunity "${data.name}" has been successfully created with a value of ₹${totalValue.toLocaleString('en-IN')}.`,
     });
     setIsOpen(false);
   };
@@ -54,3 +54,5 @@ export function AddOpportunityDialog({
     </Dialog>
   );
 }
+
+    

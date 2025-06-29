@@ -2,6 +2,7 @@
 "use client";
 
 import React, { useState, useMemo } from 'react';
+import Link from 'next/link';
 import { Header } from "@/components/header";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -9,8 +10,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { opportunities as allOpportunities, contacts } from "@/lib/data";
-import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
+import { opportunities as allOpportunities, contacts, leads, contracts, products } from "@/lib/data";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { ThumbsUp, ThumbsDown, DollarSign, Target, Clock, Filter, ChevronsUpDown, Check } from 'lucide-react';
 import { format, differenceInDays, parseISO } from 'date-fns';
 import { cn } from '@/lib/utils';
@@ -18,6 +19,7 @@ import type { Opportunity } from '@/lib/data';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { Separator } from '@/components/ui/separator';
+import { LifecycleSummary } from '@/components/lifecycle-summary';
 
 const STAGES = ['Qualification', 'Proposal', 'Negotiation'];
 const STATUSES = ['Open', 'Won', 'Lost'];
@@ -124,6 +126,8 @@ export default function DashboardPage() {
     <div className="flex flex-col h-full bg-muted/30">
       <Header title="Sales Pipeline Tracker" />
       <main className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
+        
+        <LifecycleSummary />
         
         {/* Top Row KPIs */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -393,3 +397,5 @@ export default function DashboardPage() {
     </div>
   );
 }
+
+    

@@ -125,35 +125,35 @@ export const roles: Role[] = [
 ];
 
 export const users: User[] = [
-  { id: 'user1', name: 'Alex Green', email: 'alex.green@crm.com', avatar: 'https://placehold.co/32x32.png', role: 'Admin' },
-  { id: 'user2', name: 'Samantha Blue', email: 'samantha.blue@crm.com', avatar: 'https://placehold.co/32x32.png', role: 'Sales Manager' },
-  { id: 'user3', name: 'Tom Brown', email: 'tom.brown@crm.com', avatar: 'https://placehold.co/32x32.png', role: 'Sales Rep' },
-  { id: 'user4', name: 'Olivia White', email: 'olivia.white@crm.com', avatar: 'https://placehold.co/32x32.png', role: 'Sales Rep' },
+  { id: 'user1', name: 'Aryan Sharma', email: 'aryan.sharma@caltrack.com', avatar: 'https://placehold.co/32x32.png', role: 'Admin' },
+  { id: 'user2', name: 'Priya Singh', email: 'priya.singh@caltrack.com', avatar: 'https://placehold.co/32x32.png', role: 'Sales Manager' },
+  { id: 'user3', name: 'Rohan Gupta', email: 'rohan.gupta@caltrack.com', avatar: 'https://placehold.co/32x32.png', role: 'Sales Rep' },
+  { id: 'user4', name: 'Anjali Mehta', email: 'anjali.mehta@caltrack.com', avatar: 'https://placehold.co/32x32.png', role: 'Sales Rep' },
 ];
 
 export const companies: Company[] = [
-  { id: 'com1', name: 'Precision Instruments Inc.', industry: 'Manufacturing', logo: 'https://placehold.co/40x40.png', numberOfEmployees: 250, website: 'https://precisioninstruments.com', address: '123 Innovation Dr, Tech Park, TX 75001', status: 'active' },
-  { id: 'com2', name: 'AeroCal Labs', industry: 'Aerospace', logo: 'https://placehold.co/40x40.png', numberOfEmployees: 500, website: 'https://aerocallabs.com', address: '456 Skyway Blvd, Flight City, CA 90210', status: 'active' },
-  { id: 'com3', name: 'MediTech Solutions', industry: 'Medical Devices', logo: 'https://placehold.co/40x40.png', numberOfEmployees: 120, website: 'https://meditechsolutions.com', address: '789 Health Ave, Bio Town, MA 02110', status: 'inactive' },
-  { id: 'com4', name: 'FutureGadget Labs', industry: 'R&D', logo: 'https://placehold.co/40x40.png', numberOfEmployees: 75, website: 'https://futuregadget.com', address: '101 Future St, Vision City, NY 10001', status: 'active' },
-  { id: 'com5', name: 'Global Petro', industry: 'Oil & Gas', logo: 'https://placehold.co/40x40.png', numberOfEmployees: 2500, website: 'https://globalpetro.com', address: '202 Drill Rd, Energy Hub, TX 77002', status: 'active' },
-  { id: 'com6', name: 'BioHealth Corp', industry: 'Biotechnology', logo: 'https://placehold.co/40x40.png', numberOfEmployees: 180, website: 'https://biohealthcorp.com', address: '303 Gene St, Life Science, CA 94080', status: 'inactive' },
+  { id: 'com1', name: 'Accurate Calibration Pvt. Ltd.', industry: 'Manufacturing', logo: 'https://placehold.co/40x40.png', numberOfEmployees: 250, website: 'https://acpl.co.in', address: 'A-123, MIDC, Pune, Maharashtra 411026', status: 'active' },
+  { id: 'com2', name: 'Vimaan Aerospace Solutions', industry: 'Aerospace', logo: 'https://placehold.co/40x40.png', numberOfEmployees: 500, website: 'https://vimaanaero.com', address: 'Plot 45, KIADB, Bengaluru, Karnataka 560067', status: 'active' },
+  { id: 'com3', name: 'Sanjeevani MedTech', industry: 'Medical Devices', logo: 'https://placehold.co/40x40.png', numberOfEmployees: 120, website: 'https://sanjeevanimed.com', address: '789, Health City, Hyderabad, Telangana 500081', status: 'inactive' },
+  { id: 'com4', name: 'Navachar Tech Labs', industry: 'R&D', logo: 'https://placehold.co/40x40.png', numberOfEmployees: 75, website: 'https://navacharlabs.com', address: '101, GIDC, Ahmedabad, Gujarat 380015', status: 'active' },
+  { id: 'com5', name: 'Bharat Petrochem', industry: 'Oil & Gas', logo: 'https://placehold.co/40x40.png', numberOfEmployees: 2500, website: 'https://bharatpetro.com', address: '202, Energy Estate, Jamnagar, Gujarat 361001', status: 'active' },
+  { id: 'com6', name: 'Jiva Bio-Sciences', industry: 'Biotechnology', logo: 'https://placehold.co/40x40.png', numberOfEmployees: 180, website: 'https://jivabio.com', address: '303, Genome Valley, Hyderabad, Telangana 500078', status: 'inactive' },
 ];
 
 export const contacts: Contact[] = [
-  { id: 'con1', name: 'John Doe', email: 'john.d@precision.com', phone: '123-456-7890', companyId: 'com1', avatar: 'https://placehold.co/32x32.png' },
-  { id: 'con2', name: 'Jane Smith', email: 'jane.s@aerocal.com', phone: '234-567-8901', companyId: 'com2', avatar: 'https://placehold.co/32x32.png' },
-  { id: 'con3', name: 'Peter Jones', email: 'peter.j@meditech.com', phone: '345-678-9012', companyId: 'com3', avatar: 'https://placehold.co/32x32.png' },
-  { id: 'con4', name: 'Alex Ray', email: 'alex.r@futuregadget.com', phone: '456-789-0123', companyId: 'com4', avatar: 'https://placehold.co/32x32.png' },
-  { id: 'con5', name: 'Maria Garcia', email: 'maria.g@globalpetro.com', phone: '567-890-1234', companyId: 'com5', avatar: 'https://placehold.co/32x32.png' },
-  { id: 'con6', name: 'Sam Chen', email: 'sam.c@biohealth.com', phone: '678-901-2345', companyId: 'com6', avatar: 'https://placehold.co/32x32.png' },
+  { id: 'con1', name: 'Vikram Patel', email: 'vikram.p@acpl.co.in', phone: '9820098200', companyId: 'com1', avatar: 'https://placehold.co/32x32.png' },
+  { id: 'con2', name: 'Sneha Reddy', email: 'sneha.r@vimaanaero.com', phone: '9848098480', companyId: 'com2', avatar: 'https://placehold.co/32x32.png' },
+  { id: 'con3', name: 'Deepak Kumar', email: 'deepak.k@sanjeevanimed.com', phone: '9811098110', companyId: 'com3', avatar: 'https://placehold.co/32x32.png' },
+  { id: 'con4', name: 'Isha Singh', email: 'isha.s@navacharlabs.com', phone: '9890098900', companyId: 'com4', avatar: 'https://placehold.co/32x32.png' },
+  { id: 'con5', name: 'Amit Desai', email: 'amit.d@bharatpetro.com', phone: '9821098210', companyId: 'com5', avatar: 'https://placehold.co/32x32.png' },
+  { id: 'con6', name: 'Neha Rao', email: 'neha.r@jivabio.com', phone: '9885098850', companyId: 'com6', avatar: 'https://placehold.co/32x32.png' },
 ];
 
 export const leads: Lead[] = [
-  { id: 'lead1', name: 'Sensor Calibration Service', ownerId: 'user3', companyName: 'FutureGadget Labs', contactName: 'Alex Ray', value: 15000, status: 'New', source: 'Web Form', createdDate: '2024-05-01', productIds: ['prod1'], leadData: { industry: 'R&D', companySize: 50, pastPurchases: 0, websiteVisits: 5 } },
-  { id: 'lead2', name: 'Pressure Gauge Batch Test', ownerId: 'user4', companyName: 'Global Petro', contactName: 'Maria Garcia', value: 75000, status: 'Qualified', source: 'Referral', createdDate: '2024-05-10', productIds: ['prod1', 'prod3'], leadData: { industry: 'Oil & Gas', companySize: 1500, pastPurchases: 3, websiteVisits: 2, referredBy: 'AeroCal Labs' } },
-  { id: 'lead3', name: 'Annual Pipette Calibration', ownerId: 'user3', companyName: 'BioHealth Corp', contactName: 'Sam Chen', value: 25000, status: 'Contacted', source: 'Trade Show', createdDate: '2024-05-20', productIds: ['prod4'], leadData: { industry: 'Biotechnology', companySize: 200, pastPurchases: 1, websiteVisits: 1 } },
-  { id: 'lead4', name: 'Legacy System Upgrade Inquiry', ownerId: 'user4', companyName: 'FutureGadget Labs', contactName: 'Alex Ray', value: 5000, status: 'Junk', source: 'Cold Call', createdDate: '2024-05-22', productIds: [], leadData: { industry: 'R&D', companySize: 50, pastPurchases: 0, websiteVisits: 0, reason: 'Out of budget' } },
+  { id: 'lead1', name: 'Sensor Calibration Service Inquiry', ownerId: 'user3', companyName: 'Navachar Tech Labs', contactName: 'Isha Singh', value: 1500000, status: 'New', source: 'Web Form', createdDate: '2024-05-01', productIds: ['prod1'], leadData: { industry: 'R&D', companySize: 75, pastPurchases: 0, websiteVisits: 5 } },
+  { id: 'lead2', name: 'Pressure Gauge Batch Testing', ownerId: 'user4', companyName: 'Bharat Petrochem', contactName: 'Amit Desai', value: 7500000, status: 'Qualified', source: 'Referral', createdDate: '2024-05-10', productIds: ['prod1', 'prod3'], leadData: { industry: 'Oil & Gas', companySize: 2500, pastPurchases: 3, websiteVisits: 2, referredBy: 'Vimaan Aerospace' } },
+  { id: 'lead3', name: 'Annual Pipette Calibration Contract', ownerId: 'user3', companyName: 'Jiva Bio-Sciences', contactName: 'Neha Rao', value: 2500000, status: 'Contacted', source: 'Trade Show', createdDate: '2024-05-20', productIds: ['prod4'], leadData: { industry: 'Biotechnology', companySize: 180, pastPurchases: 1, websiteVisits: 1 } },
+  { id: 'lead4', name: 'Enquiry for Old System Upgrade', ownerId: 'user4', companyName: 'Navachar Tech Labs', contactName: 'Isha Singh', value: 500000, status: 'Junk', source: 'Cold Call', createdDate: '2024-05-22', productIds: [], leadData: { industry: 'R&D', companySize: 75, pastPurchases: 0, websiteVisits: 0, reason: 'Budget constraints' } },
 ];
 
 export const opportunities: Opportunity[] = [
@@ -161,59 +161,59 @@ export const opportunities: Opportunity[] = [
     id: 'deal1', 
     name: 'Q3 Pressure Sensor Contract', 
     ownerId: 'user3',
-    companyName: 'AeroCal Labs', 
-    contactName: 'Jane Smith', 
+    companyName: 'Vimaan Aerospace Solutions', 
+    contactName: 'Sneha Reddy', 
     stage: 'Proposal', 
-    value: 49900, 
+    value: 4990000, 
     createdDate: '2024-06-01',
     closeDate: '2024-08-30', 
     winProbability: 0.5,
     lineItems: [{ productId: 'prod1', quantity: 100 }], 
     quotes: [
-      { id: 'qt1', opportunityId: 'deal1', quoteNumber: 'QT-2024-001', date: '2024-06-10', expiryDate: '2024-07-10', preparedBy: 'Alex Green', value: 50000, status: 'Sent', documentName: 'AeroCal_Quote_v1.pdf' }
+      { id: 'qt1', opportunityId: 'deal1', quoteNumber: 'QT-2024-001', date: '2024-06-10', expiryDate: '2024-07-10', preparedBy: 'Aryan Sharma', value: 5000000, status: 'Sent', documentName: 'Vimaan_Quote_v1.pdf' }
     ] 
   },
   { 
     id: 'deal2', 
     name: 'Medical Scale Fleet Calibration', 
     ownerId: 'user4',
-    companyName: 'MediTech Solutions', 
-    contactName: 'Peter Jones', 
+    companyName: 'Sanjeevani MedTech', 
+    contactName: 'Deepak Kumar', 
     stage: 'Negotiation', 
-    value: 119508, 
+    value: 11950800, 
     createdDate: '2024-05-15',
     closeDate: '2024-07-25', 
     winProbability: 0.75,
     lineItems: [{ productId: 'prod2', quantity: 92 }], 
     quotes: [
-       { id: 'qt2', opportunityId: 'deal2', quoteNumber: 'QT-2024-002', date: '2024-06-15', expiryDate: '2024-07-15', preparedBy: 'Alex Green', value: 125000, status: 'Sent' },
-       { id: 'qt3', opportunityId: 'deal2', quoteNumber: 'QT-2024-003', date: '2024-06-20', expiryDate: '2024-07-20', preparedBy: 'Alex Green', value: 120000, status: 'Draft', discount: { type: 'fixed', value: 5000 } }
+       { id: 'qt2', opportunityId: 'deal2', quoteNumber: 'QT-2024-002', date: '2024-06-15', expiryDate: '2024-07-15', preparedBy: 'Aryan Sharma', value: 12500000, status: 'Sent' },
+       { id: 'qt3', opportunityId: 'deal2', quoteNumber: 'QT-2024-003', date: '2024-06-20', expiryDate: '2024-07-20', preparedBy: 'Aryan Sharma', value: 12000000, status: 'Draft', discount: { type: 'fixed', value: 500000 } }
     ] 
   },
   { 
     id: 'deal3', 
-    name: 'Torque Wrench Verification', 
+    name: 'Torque Wrench Verification AMC', 
     ownerId: 'user3',
-    companyName: 'Precision Instruments Inc.', 
-    contactName: 'John Doe', 
+    companyName: 'Accurate Calibration Pvt. Ltd.', 
+    contactName: 'Vikram Patel', 
     stage: 'Closed Won', 
-    value: 22100, 
+    value: 2210000, 
     createdDate: '2024-05-20',
     closeDate: '2024-06-15', 
     winProbability: 1,
     lineItems: [{ productId: 'prod3', quantity: 26 }], 
     quotes: [
-      { id: 'qt4', opportunityId: 'deal3', quoteNumber: 'QT-2024-004', date: '2024-06-01', expiryDate: '2024-07-01', preparedBy: 'Alex Green', value: 22000, status: 'Accepted', poNumber: 'PO-PINC-1138', poValue: 22000, poDate: '2024-06-14', poDocumentName: 'PO-PINC-1138.pdf' }
+      { id: 'qt4', opportunityId: 'deal3', quoteNumber: 'QT-2024-004', date: '2024-06-01', expiryDate: '2024-07-01', preparedBy: 'Aryan Sharma', value: 2200000, status: 'Accepted', poNumber: 'PO-ACPL-1138', poValue: 2200000, poDate: '2024-06-14', poDocumentName: 'PO-ACPL-1138.pdf' }
     ] 
   },
   { 
     id: 'deal4', 
-    name: 'Software Suite License', 
+    name: 'Calibration Software Suite License', 
     ownerId: 'user3',
-    companyName: 'FutureGadget Labs', 
-    contactName: 'Alex Ray', 
+    companyName: 'Navachar Tech Labs', 
+    contactName: 'Isha Singh', 
     stage: 'Qualification', 
-    value: 25000, 
+    value: 2500000, 
     createdDate: '2024-06-10', 
     closeDate: '2024-09-15', 
     winProbability: 0.2, 
@@ -222,12 +222,12 @@ export const opportunities: Opportunity[] = [
   },
   { 
     id: 'deal5', 
-    name: 'Sensor Batch Order', 
+    name: 'Bulk Sensor Batch Order', 
     ownerId: 'user4',
-    companyName: 'Global Petro', 
-    contactName: 'Maria Garcia', 
+    companyName: 'Bharat Petrochem', 
+    contactName: 'Amit Desai', 
     stage: 'Closed Lost', 
-    value: 9980, 
+    value: 998000, 
     createdDate: '2024-05-01', 
     closeDate: '2024-06-20', 
     winProbability: 0, 
@@ -240,28 +240,28 @@ export const contracts: Contract[] = [
   {
     id: 'CT-2024-001',
     opportunityId: 'deal3',
-    contractTitle: 'Service Agreement with Precision Instruments Inc.',
-    companyName: 'Precision Instruments Inc.',
-    value: 22000,
+    contractTitle: 'Service Agreement with Accurate Calibration Pvt. Ltd.',
+    companyName: 'Accurate Calibration Pvt. Ltd.',
+    value: 2200000,
     contractDate: '2024-07-01',
     expiryDate: '2025-06-30',
     status: 'Active',
     type: 'Retainer',
     scopeOfWork: 'Annual calibration and verification for all torque wrenches at the main facility. Includes two on-site visits and unlimited remote support.',
     milestones: [
-      { id: 'm1', name: 'Initial On-site Calibration', dueDate: '2024-07-15', status: 'Completed', poNumber: 'PO-PINC-1138', invoiceStatus: 'Paid' },
-      { id: 'm2', name: 'Mid-term Review & Report', dueDate: '2025-01-15', status: 'Pending', poNumber: 'PO-PINC-1138', invoiceStatus: 'Not Invoiced' },
-      { id: 'm3', name: 'Final On-site Calibration', dueDate: '2025-06-15', status: 'Pending', poNumber: 'PO-PINC-1138', invoiceStatus: 'Not Invoiced' }
+      { id: 'm1', name: 'Initial On-site Calibration', dueDate: '2024-07-15', status: 'Completed', poNumber: 'PO-ACPL-1138', invoiceStatus: 'Paid' },
+      { id: 'm2', name: 'Mid-term Review & Report', dueDate: '2025-01-15', status: 'Pending', poNumber: 'PO-ACPL-1138', invoiceStatus: 'Not Invoiced' },
+      { id: 'm3', name: 'Final On-site Calibration', dueDate: '2025-06-15', status: 'Pending', poNumber: 'PO-ACPL-1138', invoiceStatus: 'Not Invoiced' }
     ]
   }
 ];
 
 export const products: Product[] = [
-  { id: 'prod1', name: 'Pressure Sensor X1', category: 'Sensors', price: 499, status: 'active' },
-  { id: 'prod2', name: 'Medical Scale M2', category: 'Scales', price: 1299, status: 'active' },
-  { id: 'prod3', name: 'Torque Wrench T3', category: 'Tools', price: 850, status: 'inactive' },
-  { id: 'prod4', name: 'Digital Pipette P4', category: 'Lab Equipment', price: 600, status: 'active' },
-  { id: 'prod5', name: 'Calibration Software Suite', category: 'Software', price: 2500, status: 'active' },
+  { id: 'prod1', name: 'Pressure Sensor XL-100', category: 'Sensors', price: 49900, status: 'active' },
+  { id: 'prod2', name: 'Precision Medical Scale MS-2', category: 'Scales', price: 129900, status: 'active' },
+  { id: 'prod3', name: 'Digital Torque Wrench TW-30', category: 'Tools', price: 85000, status: 'inactive' },
+  { id: 'prod4', name: 'Automated Digital Pipette P-4A', category: 'Lab Equipment', price: 60000, status: 'active' },
+  { id: 'prod5', name: 'CalTrack Software Suite', category: 'Software', price: 250000, status: 'active' },
 ];
 
     

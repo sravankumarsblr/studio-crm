@@ -26,9 +26,9 @@ import { LogActivityDialog } from '../log-activity-dialog';
 import { EditLeadDialog } from '../edit-lead-dialog';
 
 const dummyActivity = [
-    { type: 'note', content: 'Initial contact made, sent follow-up email with brochure.', user: 'Alex Green', time: '2 hours ago', icon: StickyNote },
-    { type: 'email', content: 'Sent brochure and pricing information.', user: 'Alex Green', time: 'Yesterday', icon: Mail },
-    { type: 'call', content: 'Called to qualify. Spoke with the primary contact, they are interested in Sensor Calibration.', user: 'Alex Green', time: '3 days ago', icon: Phone },
+    { type: 'note', content: 'Initial contact made, sent follow-up email with brochure.', user: 'Aryan Sharma', time: '2 hours ago', icon: StickyNote },
+    { type: 'email', content: 'Sent brochure and pricing information.', user: 'Aryan Sharma', time: 'Yesterday', icon: Mail },
+    { type: 'call', content: 'Called to qualify. Spoke with the primary contact, they are interested in Sensor Calibration.', user: 'Aryan Sharma', time: '3 days ago', icon: Phone },
     { type: 'status', content: 'Status changed to Contacted.', user: 'System', time: '3 days ago', icon: List }
 ];
 
@@ -97,7 +97,7 @@ export default function LeadDetailPage() {
                         <DollarSign className="w-4 h-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">${lead.value.toLocaleString()}</div>
+                        <div className="text-2xl font-bold">₹{lead.value.toLocaleString('en-IN')}</div>
                     </CardContent>
                 </Card>
                  <Card>
@@ -249,3 +249,5 @@ export default function LeadDetailPage() {
     </div>
   );
 }
+
+    
