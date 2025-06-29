@@ -15,7 +15,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { roles, type User } from "@/lib/data";
+import { roles, departments, type User } from "@/lib/data";
 import {
   Select,
   SelectContent,
@@ -27,6 +27,7 @@ import {
 const addUserSchema = z.object({
   name: z.string().min(1, "Full name is required."),
   email: z.string().email("Please enter a valid email address."),
+  department: z.string().min(1, "Department is required."),
   role: z.string().min(1, "Role is required.") as z.ZodSchema<User['role']>,
   avatar: z.string().optional(),
 });
@@ -45,6 +46,7 @@ export function AddUserForm({
     defaultValues: {
       name: "",
       email: "",
+      department: "",
       role: undefined,
     },
   });
@@ -84,6 +86,28 @@ export function AddUserForm({
         />
         <FormField
           control={form.control}
+          name="department"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Department</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a department" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {departments.map(department => (
+                    <SelectItem key={department} value={department}>{department}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
           name="role"
           render={({ field }) => (
             <FormItem>
@@ -114,5 +138,3 @@ export function AddUserForm({
     </Form>
   );
 }
-
-    

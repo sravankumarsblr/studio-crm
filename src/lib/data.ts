@@ -11,6 +11,7 @@ export type User = {
   email: string;
   avatar: string;
   role: Role['name'];
+  department: string;
 };
 
 export type Company = {
@@ -118,6 +119,14 @@ export type Product = {
   status: 'active' | 'inactive';
 };
 
+export const departments = [
+    'Sales',
+    'Marketing',
+    'Technical Support',
+    'Management',
+    'Operations'
+];
+
 export const roles: Role[] = [
   { id: 'role1', name: 'Admin', description: 'Has access to all features, including the admin section.' },
   { id: 'role2', name: 'Sales Manager', description: 'Can view and manage all leads, opportunities, and contracts.' },
@@ -125,10 +134,10 @@ export const roles: Role[] = [
 ];
 
 export const users: User[] = [
-  { id: 'user1', name: 'Aryan Sharma', email: 'aryan.sharma@caltrack.com', avatar: 'https://placehold.co/32x32.png', role: 'Admin' },
-  { id: 'user2', name: 'Priya Singh', email: 'priya.singh@caltrack.com', avatar: 'https://placehold.co/32x32.png', role: 'Sales Manager' },
-  { id: 'user3', name: 'Rohan Gupta', email: 'rohan.gupta@caltrack.com', avatar: 'https://placehold.co/32x32.png', role: 'Sales Rep' },
-  { id: 'user4', name: 'Anjali Mehta', email: 'anjali.mehta@caltrack.com', avatar: 'https://placehold.co/32x32.png', role: 'Sales Rep' },
+  { id: 'user1', name: 'Aryan Sharma', email: 'aryan.sharma@caltrack.com', avatar: 'https://placehold.co/32x32.png', role: 'Admin', department: 'Management' },
+  { id: 'user2', name: 'Priya Singh', email: 'priya.singh@caltrack.com', avatar: 'https://placehold.co/32x32.png', role: 'Sales Manager', department: 'Sales' },
+  { id: 'user3', name: 'Rohan Gupta', email: 'rohan.gupta@caltrack.com', avatar: 'https://placehold.co/32x32.png', role: 'Sales Rep', department: 'Sales' },
+  { id: 'user4', name: 'Anjali Mehta', email: 'anjali.mehta@caltrack.com', avatar: 'https://placehold.co/32x32.png', role: 'Sales Rep', department: 'Sales' },
 ];
 
 export const companies: Company[] = [
@@ -263,5 +272,3 @@ export const products: Product[] = [
   { id: 'prod4', name: 'Automated Digital Pipette P-4A', category: 'Lab Equipment', price: 60000, status: 'active' },
   { id: 'prod5', name: 'CalTrack Software Suite', category: 'Software', price: 250000, status: 'active' },
 ];
-
-    

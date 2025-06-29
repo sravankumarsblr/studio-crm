@@ -54,6 +54,7 @@ export default function UsersPage() {
                   <TableHead className="w-[80px]">Avatar</TableHead>
                   <TableHead>Name</TableHead>
                   <TableHead>Email</TableHead>
+                  <TableHead>Department</TableHead>
                   <TableHead>Role</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
@@ -69,6 +70,7 @@ export default function UsersPage() {
                     </TableCell>
                     <TableCell className="font-medium">{user.name}</TableCell>
                     <TableCell>{user.email}</TableCell>
+                    <TableCell>{user.department}</TableCell>
                     <TableCell>
                       <Badge variant={user.role === 'Admin' ? 'destructive' : 'secondary'}>
                         {user.role}
@@ -114,5 +116,3 @@ export default function UsersPage() {
     </>
   );
 }
-
-    
