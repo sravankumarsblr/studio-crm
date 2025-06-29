@@ -22,6 +22,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { LogActivityDialog } from '../log-activity-dialog';
 
 const dummyActivity = [
     { type: 'note', content: 'Initial contact made, sent follow-up email with brochure.', user: 'Alex Green', time: '2 hours ago', icon: StickyNote },
@@ -40,11 +41,13 @@ export default function LeadDetailPage() {
   const params = useParams();
   const leadId = params.id as string;
   const lead = leads.find((l) => l.id === leadId);
+  const [isLogActivityOpen, setIsLogActivityOpen] = useState(false);
 
   // In a real app, this data would be fetched together. Here we simulate joins.
   const company = companies.find(c => c.name === lead?.companyName);
   const primaryContact = contacts.find(c => c.name === lead?.contactName);
   const associatedProducts = products.filter(p => p.associatedId === leadId);
+  const associatedContacts = company ? contacts.filter(c => c.companyId === company.id) : [];
 
   const getStatusVariant = (status?: string) => {
     switch (status) {
@@ -77,7 +80,7 @@ export default function LeadDetailPage() {
             </div>
         </div>
         <Button variant="outline"><Edit className="mr-2"/> Edit</Button>
-        <Button>Log Activity</Button>
+        <Button onClick={() => setIsLogActivityOpen(true)}>Log Activity</Button>
       </Header>
 
       <main className="flex-1 overflow-y-auto p-4 sm:p-6">
@@ -228,6 +231,12 @@ export default function LeadDetailPage() {
           </div>
         </div>
       </main>
+      <LogActivityDialog 
+        isOpen={isLogActivityOpen} 
+        setIsOpen={setIsLogActivityOpen} 
+        lead={lead} 
+        contacts={associatedContacts}
+      />
     </div>
   );
 }
