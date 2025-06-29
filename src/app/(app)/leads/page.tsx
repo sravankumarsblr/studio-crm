@@ -1,13 +1,17 @@
 "use client";
 
+import { useState } from "react";
 import { Header } from "@/components/header";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { leads } from "@/lib/data";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { AiLeadScorer } from "./ai-lead-scorer";
+import { AddLeadDialog } from "./add-lead-dialog";
 
 export default function LeadsPage() {
+  const [isAddLeadOpen, setIsAddLeadOpen] = useState(false);
+
   const getStatusVariant = (status: string) => {
     switch (status) {
       case 'Qualified': return 'default';
@@ -20,7 +24,7 @@ export default function LeadsPage() {
 
   return (
     <div className="flex flex-col h-full">
-      <Header title="Leads" actionText="Add Lead" onActionClick={() => {}} />
+      <Header title="Leads" actionText="Add Lead" onActionClick={() => setIsAddLeadOpen(true)} />
       <main className="flex-1 overflow-y-auto p-4 sm:p-6">
         <div className="bg-card rounded-lg shadow-sm border">
           <Table>
@@ -55,6 +59,7 @@ export default function LeadsPage() {
           </Table>
         </div>
       </main>
+      <AddLeadDialog isOpen={isAddLeadOpen} setIsOpen={setIsAddLeadOpen} />
     </div>
   );
 }
