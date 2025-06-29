@@ -28,6 +28,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
+import type { Company } from "@/lib/data";
+
 
 const companyIndustries = [
   "Aerospace",
@@ -44,7 +46,7 @@ const companyIndustries = [
   "Construction",
 ];
 
-const addCompanySchema = z.object({
+const editCompanySchema = z.object({
   name: z.string().min(1, "Company name is required."),
   industry: z.string().min(1, "Industry is required."),
   numberOfEmployees: z.coerce.number().int().positive("Number of employees must be positive.").min(1, "Required"),
@@ -52,30 +54,31 @@ const addCompanySchema = z.object({
   address: z.string().min(1, "Address is required."),
 });
 
+export type EditCompanyFormValues = z.infer<typeof editCompanySchema>;
 
-export type AddCompanyFormValues = z.infer<typeof addCompanySchema>;
-
-export function AddCompanyForm({
+export function EditCompanyForm({
+  company,
   onSave,
   onCancel,
 }: {
-  onSave: (data: AddCompanyFormValues) => void;
+  company: Company,
+  onSave: (data: EditCompanyFormValues) => void;
   onCancel: () => void;
 }) {
   const [industryOpen, setIndustryOpen] = useState(false);
   
-  const form = useForm<AddCompanyFormValues>({
-    resolver: zodResolver(addCompanySchema),
+  const form = useForm<EditCompanyFormValues>({
+    resolver: zodResolver(editCompanySchema),
     defaultValues: {
-      name: "",
-      industry: "",
-      numberOfEmployees: undefined,
-      website: "",
-      address: "",
+      name: company.name,
+      industry: company.industry,
+      numberOfEmployees: company.numberOfEmployees,
+      website: company.website,
+      address: company.address,
     },
   });
 
-  const onSubmit = (values: AddCompanyFormValues) => {
+  const onSubmit = (values: EditCompanyFormValues) => {
     onSave(values);
   };
 
@@ -195,7 +198,7 @@ export function AddCompanyForm({
           <Button type="button" variant="outline" onClick={onCancel}>
             Cancel
           </Button>
-          <Button type="submit">Save Company</Button>
+          <Button type="submit">Save Changes</Button>
         </div>
       </form>
     </Form>

@@ -1,3 +1,4 @@
+
 "use client";
 
 import {
@@ -21,12 +22,11 @@ export function AddCompanyDialog({
   onCompanyCreated: (newCompany: Company) => void;
 }) {
   const handleSave = (data: AddCompanyFormValues) => {
-    // In a real app, this would be saved to a database and we'd get an ID back.
-    // For now, we'll generate a random one for the mock data.
     const newCompany: Company = {
       ...data,
       id: `com${new Date().getTime()}`,
       logo: 'https://placehold.co/40x40.png',
+      status: 'active',
     };
     onCompanyCreated(newCompany);
     setIsOpen(false);
@@ -34,7 +34,7 @@ export function AddCompanyDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Add New Company</DialogTitle>
           <DialogDescription>

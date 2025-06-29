@@ -4,6 +4,10 @@ export type Company = {
   name: string;
   industry: string;
   logo: string;
+  numberOfEmployees: number;
+  website: string;
+  address: string;
+  status: 'active' | 'inactive';
 };
 
 export type Contact = {
@@ -86,12 +90,12 @@ export type Product = {
 
 
 export const companies: Company[] = [
-  { id: 'com1', name: 'Precision Instruments Inc.', industry: 'Manufacturing', logo: 'https://placehold.co/40x40.png' },
-  { id: 'com2', name: 'AeroCal Labs', industry: 'Aerospace', logo: 'https://placehold.co/40x40.png' },
-  { id: 'com3', name: 'MediTech Solutions', industry: 'Medical Devices', logo: 'https://placehold.co/40x40.png' },
-  { id: 'com4', name: 'FutureGadget Labs', industry: 'R&D', logo: 'https://placehold.co/40x40.png' },
-  { id: 'com5', name: 'Global Petro', industry: 'Oil & Gas', logo: 'https://placehold.co/40x40.png' },
-  { id: 'com6', name: 'BioHealth Corp', industry: 'Biotechnology', logo: 'https://placehold.co/40x40.png' },
+  { id: 'com1', name: 'Precision Instruments Inc.', industry: 'Manufacturing', logo: 'https://placehold.co/40x40.png', numberOfEmployees: 250, website: 'https://precisioninstruments.com', address: '123 Innovation Dr, Tech Park, TX 75001', status: 'active' },
+  { id: 'com2', name: 'AeroCal Labs', industry: 'Aerospace', logo: 'https://placehold.co/40x40.png', numberOfEmployees: 500, website: 'https://aerocallabs.com', address: '456 Skyway Blvd, Flight City, CA 90210', status: 'active' },
+  { id: 'com3', name: 'MediTech Solutions', industry: 'Medical Devices', logo: 'https://placehold.co/40x40.png', numberOfEmployees: 120, website: 'https://meditechsolutions.com', address: '789 Health Ave, Bio Town, MA 02110', status: 'inactive' },
+  { id: 'com4', name: 'FutureGadget Labs', industry: 'R&D', logo: 'https://placehold.co/40x40.png', numberOfEmployees: 75, website: 'https://futuregadget.com', address: '101 Future St, Vision City, NY 10001', status: 'active' },
+  { id: 'com5', name: 'Global Petro', industry: 'Oil & Gas', logo: 'https://placehold.co/40x40.png', numberOfEmployees: 2500, website: 'https://globalpetro.com', address: '202 Drill Rd, Energy Hub, TX 77002', status: 'active' },
+  { id: 'com6', name: 'BioHealth Corp', industry: 'Biotechnology', logo: 'https://placehold.co/40x40.png', numberOfEmployees: 180, website: 'https://biohealthcorp.com', address: '303 Gene St, Life Science, CA 94080', status: 'inactive' },
 ];
 
 export const contacts: Contact[] = [
