@@ -1,0 +1,54 @@
+import { Header } from "@/components/header";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { contracts } from "@/lib/data";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+
+export default function ContractsPage() {
+  const getStatusVariant = (status: string) => {
+    switch (status) {
+      case 'Active': return 'default';
+      case 'Completed': return 'secondary';
+      case 'Terminated': return 'destructive';
+      default: return 'outline';
+    }
+  }
+
+  return (
+    <div className="flex flex-col h-full">
+      <Header title="Contracts" />
+      <main className="flex-1 overflow-y-auto p-4 sm:p-6">
+        <div className="bg-card rounded-lg shadow-sm border">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Company</TableHead>
+                <TableHead>Value</TableHead>
+                <TableHead>Start Date</TableHead>
+                <TableHead>End Date</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {contracts.map((contract) => (
+                <TableRow key={contract.id}>
+                  <TableCell className="font-medium">{contract.companyName}</TableCell>
+                  <TableCell>${contract.value.toLocaleString()}</TableCell>
+                  <TableCell>{contract.startDate}</TableCell>
+                  <TableCell>{contract.endDate}</TableCell>
+                  <TableCell>
+                    <Badge variant={getStatusVariant(contract.status) as any}>{contract.status}</Badge>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <Button variant="ghost" size="sm">View Details</Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      </main>
+    </div>
+  );
+}
