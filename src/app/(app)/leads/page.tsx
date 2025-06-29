@@ -1,6 +1,8 @@
+
 "use client";
 
 import { useState } from "react";
+import Link from 'next/link';
 import { Header } from "@/components/header";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { leads } from "@/lib/data";
@@ -51,7 +53,9 @@ export default function LeadsPage() {
                     <AiLeadScorer lead={lead} />
                   </TableCell>
                   <TableCell className="text-right">
-                    <Button variant="ghost" size="sm">View</Button>
+                    <Button asChild variant="ghost" size="sm">
+                      <Link href={`/leads/${lead.id}`}>View</Link>
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))}

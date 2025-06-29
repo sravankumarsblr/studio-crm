@@ -1,3 +1,4 @@
+
 export type Company = {
   id: string;
   name: string;
@@ -68,12 +69,18 @@ export const companies: Company[] = [
   { id: 'com1', name: 'Precision Instruments Inc.', industry: 'Manufacturing', logo: 'https://placehold.co/40x40.png' },
   { id: 'com2', name: 'AeroCal Labs', industry: 'Aerospace', logo: 'https://placehold.co/40x40.png' },
   { id: 'com3', name: 'MediTech Solutions', industry: 'Medical Devices', logo: 'https://placehold.co/40x40.png' },
+  { id: 'com4', name: 'FutureGadget Labs', industry: 'R&D', logo: 'https://placehold.co/40x40.png' },
+  { id: 'com5', name: 'Global Petro', industry: 'Oil & Gas', logo: 'https://placehold.co/40x40.png' },
+  { id: 'com6', name: 'BioHealth Corp', industry: 'Biotechnology', logo: 'https://placehold.co/40x40.png' },
 ];
 
 export const contacts: Contact[] = [
   { id: 'con1', name: 'John Doe', email: 'john.d@precision.com', phone: '123-456-7890', companyId: 'com1', avatar: 'https://placehold.co/32x32.png' },
   { id: 'con2', name: 'Jane Smith', email: 'jane.s@aerocal.com', phone: '234-567-8901', companyId: 'com2', avatar: 'https://placehold.co/32x32.png' },
   { id: 'con3', name: 'Peter Jones', email: 'peter.j@meditech.com', phone: '345-678-9012', companyId: 'com3', avatar: 'https://placehold.co/32x32.png' },
+  { id: 'con4', name: 'Alex Ray', email: 'alex.r@futuregadget.com', phone: '456-789-0123', companyId: 'com4', avatar: 'https://placehold.co/32x32.png' },
+  { id: 'con5', name: 'Maria Garcia', email: 'maria.g@globalpetro.com', phone: '567-890-1234', companyId: 'com5', avatar: 'https://placehold.co/32x32.png' },
+  { id: 'con6', name: 'Sam Chen', email: 'sam.c@biohealth.com', phone: '678-901-2345', companyId: 'com6', avatar: 'https://placehold.co/32x32.png' },
 ];
 
 export const leads: Lead[] = [
