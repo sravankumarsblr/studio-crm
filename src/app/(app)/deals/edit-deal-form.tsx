@@ -183,20 +183,20 @@ export function EditDealForm({
               </FormItem>
             )}
           />
+          <FormField
+            control={form.control}
+            name="value"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Value ($)</FormLabel>
+                <FormControl>
+                  <Input type="number" placeholder="e.g., 100000" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <div className="grid grid-cols-2 gap-4">
-            <FormField
-              control={form.control}
-              name="value"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Value ($)</FormLabel>
-                  <FormControl>
-                    <Input type="number" placeholder="e.g., 100000" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
             <FormField
               control={form.control}
               name="stage"
@@ -221,8 +221,7 @@ export function EditDealForm({
                 </FormItem>
               )}
             />
-          </div>
-           <FormField
+            <FormField
               control={form.control}
               name="closeDate"
               render={({ field }) => (
@@ -260,6 +259,7 @@ export function EditDealForm({
                 </FormItem>
               )}
             />
+          </div>
           <FormField
             control={form.control}
             name="companyId"
