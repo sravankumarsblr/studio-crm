@@ -55,6 +55,7 @@ export function AddQuoteForm({
       value: 0,
       expiryDate: "",
       discountType: 'none',
+      discountValue: undefined,
     },
   });
 
@@ -93,6 +94,7 @@ export function AddQuoteForm({
                     field.onChange(value);
                     if (value === 'none') {
                       form.setValue('discountValue', undefined);
+                      form.clearErrors('discountValue');
                     }
                   }}
                   defaultValue={field.value}
@@ -131,7 +133,12 @@ export function AddQuoteForm({
                 <FormItem>
                   <FormLabel>Discount Value</FormLabel>
                   <FormControl>
-                    <Input type="number" placeholder={discountType === 'percentage' ? "e.g., 10" : "e.g., 500"} {...field} />
+                    <Input 
+                        type="number" 
+                        placeholder={discountType === 'percentage' ? "e.g., 10" : "e.g., 500"} 
+                        {...field}
+                        value={field.value ?? ""} 
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
