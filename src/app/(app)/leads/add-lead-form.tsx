@@ -4,8 +4,18 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { Check, ChevronsUpDown } from "lucide-react";
 
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
 import {
   Form,
   FormControl,
@@ -15,13 +25,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { companies, contacts, products } from "@/lib/data";
@@ -52,9 +56,9 @@ export function AddLeadForm({
   onSave: (data: AddLeadFormValues) => void;
   onCancel: () => void;
 }) {
-  const [selectedCompanyId, setSelectedCompanyId] = useState<string | null>(
-    null
-  );
+  const [companyOpen, setCompanyOpen] = useState(false);
+  const [contactSearch, setContactSearch] = useState("");
+  const [productSearch, setProductSearch] = useState("");
 
   const form = useForm<AddLeadFormValues>({
     resolver: zodResolver(addLeadSchema),
@@ -68,9 +72,21 @@ export function AddLeadForm({
     },
   });
 
+  const selectedCompanyId = form.watch("companyId");
+
   const availableContacts = selectedCompanyId
     ? contacts.filter((c) => c.companyId === selectedCompanyId)
     : [];
+
+  const filteredContacts = availableContacts.filter(c => 
+    c.name.toLowerCase().includes(contactSearch.toLowerCase()) || 
+    c.email.toLowerCase().includes(contactSearch.toLowerCase())
+  );
+
+  const filteredProducts = products.filter(p => 
+    p.name.toLowerCase().includes(productSearch.toLowerCase()) ||
+    p.category.toLowerCase().includes(productSearch.toLowerCase())
+  );
 
   const onSubmit = (values: AddLeadFormValues) => {
     onSave(values);
@@ -124,29 +140,56 @@ export function AddLeadForm({
           control={form.control}
           name="companyId"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="flex flex-col">
               <FormLabel>Company</FormLabel>
-              <Select
-                onValueChange={(value) => {
-                  field.onChange(value);
-                  setSelectedCompanyId(value);
-                  form.setValue("contactIds", []);
-                }}
-                defaultValue={field.value}
-              >
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a company" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {companies.map((c) => (
-                    <SelectItem key={c.id} value={c.id}>
-                      {c.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Popover open={companyOpen} onOpenChange={setCompanyOpen}>
+                <PopoverTrigger asChild>
+                  <FormControl>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      aria-expanded={companyOpen}
+                      className="w-full justify-between"
+                    >
+                      {field.value
+                        ? companies.find((c) => c.id === field.value)?.name
+                        : "Select a company"}
+                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </FormControl>
+                </PopoverTrigger>
+                <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                  <Command>
+                    <CommandInput placeholder="Search company..." />
+                    <CommandEmpty>No company found.</CommandEmpty>
+                    <CommandList>
+                      <CommandGroup>
+                        {companies.map((c) => (
+                          <CommandItem
+                            value={c.name}
+                            key={c.id}
+                            onSelect={() => {
+                              form.setValue("companyId", c.id);
+                              form.setValue("contactIds", []);
+                              setCompanyOpen(false);
+                            }}
+                          >
+                            <Check
+                              className={cn(
+                                "mr-2 h-4 w-4",
+                                c.id === field.value
+                                  ? "opacity-100"
+                                  : "opacity-0"
+                              )}
+                            />
+                            {c.name}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
               <FormMessage />
             </FormItem>
           )}
@@ -160,49 +203,58 @@ export function AddLeadForm({
               <FormItem>
                 <FormLabel>Contacts</FormLabel>
                 <FormControl>
-                  <ScrollArea className="h-32 rounded-md border">
-                    <div className="p-2">
-                      {availableContacts.length > 0 ? (
-                        availableContacts.map((contact) => (
-                          <FormField
-                            key={contact.id}
-                            control={form.control}
-                            name="contactIds"
-                            render={({ field }) => {
-                              return (
-                                <FormItem
-                                  key={contact.id}
-                                  className="flex flex-row items-center space-x-3 space-y-0 p-2 rounded-md hover:bg-secondary"
-                                >
-                                  <FormControl>
-                                    <Checkbox
-                                      checked={field.value?.includes(contact.id)}
-                                      onCheckedChange={(checked) => {
-                                        const newValues = checked
-                                          ? [...(field.value || []), contact.id]
-                                          : field.value?.filter(
-                                              (value) => value !== contact.id
-                                            ) || [];
-                                        field.onChange(newValues);
-                                      }}
-                                    />
-                                  </FormControl>
-                                  <FormLabel className="font-normal w-full cursor-pointer">
-                                    {contact.name}
-                                    <span className="text-muted-foreground ml-2">({contact.email})</span>
-                                  </FormLabel>
-                                </FormItem>
-                              );
-                            }}
-                          />
-                        ))
-                      ) : (
-                        <p className="text-sm text-muted-foreground p-2">
-                          No contacts found for this company.
-                        </p>
-                      )}
+                   <div className="rounded-md border">
+                    <div className="p-2 border-b">
+                       <Input 
+                        placeholder="Search contacts..."
+                        value={contactSearch}
+                        onChange={(e) => setContactSearch(e.target.value)}
+                       />
                     </div>
-                  </ScrollArea>
+                    <ScrollArea className="h-32">
+                      <div className="p-2">
+                        {filteredContacts.length > 0 ? (
+                          filteredContacts.map((contact) => (
+                            <FormField
+                              key={contact.id}
+                              control={form.control}
+                              name="contactIds"
+                              render={({ field }) => {
+                                return (
+                                  <FormItem
+                                    key={contact.id}
+                                    className="flex flex-row items-center space-x-3 space-y-0 p-2 rounded-md hover:bg-secondary"
+                                  >
+                                    <FormControl>
+                                      <Checkbox
+                                        checked={field.value?.includes(contact.id)}
+                                        onCheckedChange={(checked) => {
+                                          const newValues = checked
+                                            ? [...(field.value || []), contact.id]
+                                            : field.value?.filter(
+                                                (value) => value !== contact.id
+                                              ) || [];
+                                          field.onChange(newValues);
+                                        }}
+                                      />
+                                    </FormControl>
+                                    <FormLabel className="font-normal w-full cursor-pointer">
+                                      {contact.name}
+                                      <span className="text-muted-foreground ml-2">({contact.email})</span>
+                                    </FormLabel>
+                                  </FormItem>
+                                );
+                              }}
+                            />
+                          ))
+                        ) : (
+                          <p className="text-sm text-muted-foreground p-2">
+                            No contacts found.
+                          </p>
+                        )}
+                      </div>
+                    </ScrollArea>
+                   </div>
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -217,43 +269,52 @@ export function AddLeadForm({
             <FormItem>
               <FormLabel>Products & Services</FormLabel>
               <FormControl>
-                <ScrollArea className="h-32 rounded-md border">
-                  <div className="p-2">
-                    {products.map((product) => (
-                      <FormField
-                        key={product.id}
-                        control={form.control}
-                        name="productIds"
-                        render={({ field }) => {
-                          return (
-                            <FormItem
-                              key={product.id}
-                              className="flex flex-row items-center space-x-3 space-y-0 p-2 rounded-md hover:bg-secondary"
-                            >
-                              <FormControl>
-                                <Checkbox
-                                  checked={field.value?.includes(product.id)}
-                                  onCheckedChange={(checked) => {
-                                      const newValues = checked
-                                        ? [...(field.value || []), product.id]
-                                        : field.value?.filter(
-                                            (value) => value !== product.id
-                                          ) || [];
-                                      field.onChange(newValues);
-                                  }}
-                                />
-                              </FormControl>
-                              <FormLabel className="font-normal w-full cursor-pointer">
-                                {product.name}
-                                <span className="text-muted-foreground ml-2">({product.category})</span>
-                              </FormLabel>
-                            </FormItem>
-                          );
-                        }}
-                      />
-                    ))}
-                  </div>
-                </ScrollArea>
+                <div className="rounded-md border">
+                    <div className="p-2 border-b">
+                       <Input 
+                        placeholder="Search products..."
+                        value={productSearch}
+                        onChange={(e) => setProductSearch(e.target.value)}
+                       />
+                    </div>
+                  <ScrollArea className="h-32">
+                    <div className="p-2">
+                      {filteredProducts.map((product) => (
+                        <FormField
+                          key={product.id}
+                          control={form.control}
+                          name="productIds"
+                          render={({ field }) => {
+                            return (
+                              <FormItem
+                                key={product.id}
+                                className="flex flex-row items-center space-x-3 space-y-0 p-2 rounded-md hover:bg-secondary"
+                              >
+                                <FormControl>
+                                  <Checkbox
+                                    checked={field.value?.includes(product.id)}
+                                    onCheckedChange={(checked) => {
+                                        const newValues = checked
+                                          ? [...(field.value || []), product.id]
+                                          : field.value?.filter(
+                                              (value) => value !== product.id
+                                            ) || [];
+                                        field.onChange(newValues);
+                                    }}
+                                  />
+                                </FormControl>
+                                <FormLabel className="font-normal w-full cursor-pointer">
+                                  {product.name}
+                                  <span className="text-muted-foreground ml-2">({product.category})</span>
+                                </FormLabel>
+                              </FormItem>
+                            );
+                          }}
+                        />
+                      ))}
+                    </div>
+                  </ScrollArea>
+                </div>
               </FormControl>
               <FormMessage />
             </FormItem>
