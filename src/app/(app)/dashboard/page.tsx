@@ -55,7 +55,7 @@ export default function DashboardPage() {
     const totalWonValue = wonOpportunities.reduce((sum, o) => sum + o.value, 0);
     const totalLostValue = lostOpportunities.reduce((sum, o) => sum + o.value, 0);
 
-    const conversionRate = allOpportunities.length > 0 
+    const conversionRate = allOpportunities.length > 0 && (wonOpportunities.length + lostOpportunities.length > 0)
       ? wonOpportunities.length / (wonOpportunities.length + lostOpportunities.length)
       : 0;
 
@@ -130,7 +130,7 @@ export default function DashboardPage() {
         <LifecycleSummary />
         
         {/* Top Row KPIs */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
             <Card>
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
                     <CardTitle className="text-sm font-medium">Pipeline Value</CardTitle>
@@ -168,7 +168,17 @@ export default function DashboardPage() {
                 </CardHeader>
                 <CardContent>
                     <div className="text-2xl font-bold">{(dashboardData.conversionRate * 100).toFixed(1)}%</div>
-                    <p className="text-xs text-muted-foreground">Avg. {dashboardData.timeTuWinDays} days to win</p>
+                    <p className="text-xs text-muted-foreground">Based on won & lost deals</p>
+                </CardContent>
+            </Card>
+            <Card>
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                    <CardTitle className="text-sm font-medium">Avg. Time to Win</CardTitle>
+                    <Clock className="w-4 h-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                    <div className="text-2xl font-bold">{dashboardData.timeTuWinDays}</div>
+                    <p className="text-xs text-muted-foreground">days</p>
                 </CardContent>
             </Card>
         </div>
