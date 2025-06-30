@@ -14,8 +14,8 @@ import {
 export function LifecycleSummary() {
   const stages = [
     { name: "Leads", description: "Initial interest from potential customers.", icon: Users },
-    { name: "Deals", description: "Qualified leads become active sales opportunities.", icon: Briefcase },
-    { name: "Contracts", description: "Won deals are converted into formal contracts.", icon: FileText },
+    { name: "Opportunities", description: "Qualified leads become active sales opportunities.", icon: Briefcase },
+    { name: "Contracts", description: "Won opportunities are converted into formal contracts.", icon: FileText },
   ];
 
   return (
@@ -23,7 +23,7 @@ export function LifecycleSummary() {
       <CardHeader>
         <CardTitle>Sales Lifecycle at a Glance</CardTitle>
         <CardDescription>
-          Follow the journey from initial lead, through the sales deal, to a finalized contract.
+          Follow the journey from initial lead, through the sales opportunity, to a finalized contract.
         </CardDescription>
       </CardHeader>
       <CardContent className="p-6 pt-2">
