@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -87,6 +87,8 @@ export function AddLeadForm({
   const [companies, setCompanies] = useState<Company[]>(staticCompanies);
   const [contactSearch, setContactSearch] = useState("");
   const [productSearch, setProductSearch] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [categoryOpen, setCategoryOpen] = useState(false);
 
   const form = useForm<AddLeadFormValues>({
     resolver: zodResolver(addLeadSchema),
@@ -115,11 +117,20 @@ export function AddLeadForm({
     c.name.toLowerCase().includes(contactSearch.toLowerCase()) || 
     c.email.toLowerCase().includes(contactSearch.toLowerCase())
   );
+  
+  const productCategories = useMemo(() => {
+    const categories = new Set(products.map(p => p.category));
+    return ["All", ...Array.from(categories)];
+  }, []);
 
-  const filteredProducts = products.filter(p => 
-    p.name.toLowerCase().includes(productSearch.toLowerCase()) ||
-    p.category.toLowerCase().includes(productSearch.toLowerCase())
-  );
+  const filteredProducts = useMemo(() => {
+    return products.filter(p => {
+        const categoryMatch = selectedCategory === "All" || p.category === selectedCategory;
+        const searchMatch = !productSearch || p.name.toLowerCase().includes(productSearch.toLowerCase());
+        return categoryMatch && searchMatch;
+    });
+  }, [selectedCategory, productSearch]);
+
 
   const handleContactCheckedChange = (checked: boolean, contactId: string) => {
     const currentContactIds = form.getValues("contactIds") || [];
@@ -430,9 +441,51 @@ export function AddLeadForm({
                 <FormLabel>Products & Services</FormLabel>
                 <FormControl>
                   <div className="rounded-md border">
-                      <div className="p-2 border-b">
+                      <div className="p-2 border-b grid grid-cols-1 md:grid-cols-2 gap-2">
+                        <Popover open={categoryOpen} onOpenChange={setCategoryOpen}>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="outline"
+                              role="combobox"
+                              className="w-full justify-between"
+                            >
+                              {selectedCategory === "All" ? "All Categories" : selectedCategory}
+                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                            <Command>
+                              <CommandInput placeholder="Search category..." />
+                              <CommandList>
+                                <CommandEmpty>No category found.</CommandEmpty>
+                                <CommandGroup>
+                                  {productCategories.map((category) => (
+                                    <CommandItem
+                                      key={category}
+                                      value={category}
+                                      onSelect={() => {
+                                        setSelectedCategory(category);
+                                        setCategoryOpen(false);
+                                      }}
+                                    >
+                                      <Check
+                                        className={cn(
+                                          "mr-2 h-4 w-4",
+                                          selectedCategory === category
+                                            ? "opacity-100"
+                                            : "opacity-0"
+                                        )}
+                                      />
+                                      {category}
+                                    </CommandItem>
+                                  ))}
+                                </CommandGroup>
+                              </CommandList>
+                            </Command>
+                          </PopoverContent>
+                        </Popover>
                         <Input 
-                          placeholder="Search products..."
+                          placeholder="Search products in category..."
                           value={productSearch}
                           onChange={(e) => setProductSearch(e.target.value)}
                         />
@@ -465,7 +518,6 @@ export function AddLeadForm({
                                   </FormControl>
                                   <FormLabel className="font-normal w-full cursor-pointer">
                                     {product.name}
-                                    <span className="text-muted-foreground ml-2">({product.category})</span>
                                   </FormLabel>
                                 </FormItem>
                               );
@@ -518,7 +570,3 @@ export function AddLeadForm({
     </>
   );
 }
-
-    
-
-    
