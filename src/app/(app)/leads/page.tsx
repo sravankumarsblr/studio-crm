@@ -132,11 +132,11 @@ export default function LeadsPage() {
             const Icon = statusIcons[status];
             return (
               <Card key={status}>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 p-3">
                   <CardTitle className="text-sm font-medium">{status}</CardTitle>
                   <Icon className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
-                <CardContent>
+                <CardContent className="p-3 pt-0">
                   <div className="text-2xl font-bold">{leadStatusCounts[status]}</div>
                 </CardContent>
               </Card>
