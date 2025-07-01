@@ -184,7 +184,7 @@ export function AddOpportunityForm({
               name="ownerId"
               render={({ field }) => (
                 <FormItem className="flex flex-col">
-                  <FormLabel>Deal Owner</FormLabel>
+                  <FormLabel>Assigned to</FormLabel>
                    <Popover open={ownerOpen} onOpenChange={setOwnerOpen}>
                     <PopoverTrigger asChild>
                       <FormControl>
@@ -549,5 +549,3 @@ export function AddOpportunityForm({
     </>
   );
 }
-
-    
