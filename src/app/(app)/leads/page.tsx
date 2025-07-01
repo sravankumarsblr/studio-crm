@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useMemo } from "react";
@@ -123,7 +122,7 @@ export default function LeadsPage() {
   };
   
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full w-full">
       <Header title="Leads" actionText="Add Lead" onActionClick={() => setIsAddLeadOpen(true)} />
       <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
 
@@ -132,11 +131,11 @@ export default function LeadsPage() {
             const Icon = statusIcons[status];
             return (
               <Card key={status}>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 p-2">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 p-1">
                   <CardTitle className="text-sm font-medium">{status}</CardTitle>
                   <Icon className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
-                <CardContent className="p-2 pt-0">
+                <CardContent className="p-1 pt-0">
                   <div className="text-2xl font-bold">{leadStatusCounts[status]}</div>
                 </CardContent>
               </Card>
