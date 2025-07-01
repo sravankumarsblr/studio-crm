@@ -23,6 +23,7 @@ import { LogActivityDialog } from '@/app/(app)/leads/log-activity-dialog';
 import { EditLeadDialog } from '@/app/(app)/leads/edit-lead-dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { ProductSelectorDialog } from '@/app/(app)/products/product-selector-dialog';
+import { Textarea } from '@/components/ui/textarea';
 
 const dummyActivity = [
     { type: 'note', content: 'Initial contact made, sent follow-up email with brochure.', user: 'Aryan Sharma', time: '2 hours ago', icon: StickyNote },
