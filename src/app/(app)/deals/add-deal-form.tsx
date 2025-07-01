@@ -44,8 +44,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { AddCompanyDialog } from "../companies/add-company-dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
+import { ProductSelectorDialog } from "../products/product-selector-dialog";
 
 const addOpportunitySchema = z.object({
   name: z.string().min(1, "Opportunity name is required."),
@@ -75,128 +74,6 @@ const addOpportunitySchema = z.object({
 );
 
 export type AddOpportunityFormValues = z.infer<typeof addOpportunitySchema>;
-
-function ProductSelectorDialog({
-  isOpen,
-  setIsOpen,
-  onProductsAdded
-}: {
-  isOpen: boolean,
-  setIsOpen: (open: boolean) => void,
-  onProductsAdded: (productIds: string[]) => void
-}) {
-  const [stagedProductIds, setStagedProductIds] = useState<string[]>([]);
-  const [productSearch, setProductSearch] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("All");
-  const [currentPage, setCurrentPage] = useState(1);
-  const productsPerPage = 10;
-
-  const productCategories = useMemo(() => {
-    const categories = new Set(products.map(p => p.category));
-    return ["All", ...Array.from(categories)];
-  }, []);
-
-  const availableProducts = useMemo(() => {
-    return products.filter(p => {
-        const categoryMatch = selectedCategory === "All" || p.category === selectedCategory;
-        const searchMatch = !productSearch || p.name.toLowerCase().includes(productSearch.toLowerCase());
-        return categoryMatch && searchMatch;
-    });
-  }, [selectedCategory, productSearch]);
-
-  const paginatedProducts = useMemo(() => {
-    const startIndex = (currentPage - 1) * productsPerPage;
-    return availableProducts.slice(startIndex, startIndex + productsPerPage);
-  }, [availableProducts, currentPage, productsPerPage]);
-
-  const totalPages = Math.ceil(availableProducts.length / productsPerPage);
-
-  const handleToggleStagedProduct = (productId: string) => {
-    setStagedProductIds(prev =>
-      prev.includes(productId)
-        ? prev.filter(id => id !== productId)
-        : [...prev, productId]
-    );
-  };
-  
-  const handleAddProducts = () => {
-    onProductsAdded(stagedProductIds);
-    setIsOpen(false);
-    setStagedProductIds([]);
-    setProductSearch("");
-    setSelectedCategory("All");
-    setCurrentPage(1);
-  };
-
-  return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="sm:max-w-4xl h-[80vh] flex flex-col">
-        <DialogHeader>
-          <DialogTitle>Add Products</DialogTitle>
-          <DialogDescription>
-            Select products to add to the opportunity. You can filter by category and search by name.
-          </DialogDescription>
-        </DialogHeader>
-        <div className="grid grid-cols-4 gap-6 flex-1 overflow-hidden">
-          <div className="col-span-1 border-r pr-4 overflow-y-auto">
-            <h4 className="text-sm font-medium mb-2">Categories</h4>
-            <RadioGroup value={selectedCategory} onValueChange={setSelectedCategory} className="space-y-1">
-              {productCategories.map(category => (
-                <div key={category} className="flex items-center">
-                  <RadioGroupItem value={category} id={`cat-${category}`} />
-                  <Label htmlFor={`cat-${category}`} className="ml-2 text-sm font-normal">{category}</Label>
-                </div>
-              ))}
-            </RadioGroup>
-          </div>
-          <div className="col-span-3 flex flex-col gap-4 overflow-hidden">
-            <Input 
-              placeholder="Search products..."
-              value={productSearch}
-              onChange={(e) => setProductSearch(e.target.value)}
-            />
-            <div className="flex-1 overflow-y-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-[50px]"></TableHead>
-                    <TableHead>Product</TableHead>
-                    <TableHead>Category</TableHead>
-                    <TableHead className="text-right">Price</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {paginatedProducts.map(product => (
-                    <TableRow key={product.id}>
-                      <TableCell>
-                        <Checkbox 
-                          checked={stagedProductIds.includes(product.id)}
-                          onCheckedChange={() => handleToggleStagedProduct(product.id)}
-                        />
-                      </TableCell>
-                      <TableCell className="font-medium">{product.name}</TableCell>
-                      <TableCell>{product.category}</TableCell>
-                      <TableCell className="text-right">₹{product.price.toLocaleString('en-IN')}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-             <div className="flex items-center justify-end space-x-2">
-                <Button variant="outline" size="sm" onClick={() => setCurrentPage(p => p - 1)} disabled={currentPage === 1}>Previous</Button>
-                <span className="text-sm">Page {currentPage} of {totalPages > 0 ? totalPages : 1}</span>
-                <Button variant="outline" size="sm" onClick={() => setCurrentPage(p => p + 1)} disabled={currentPage === totalPages}>Next</Button>
-            </div>
-          </div>
-        </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={() => setIsOpen(false)}>Cancel</Button>
-          <Button onClick={handleAddProducts}>Add {stagedProductIds.length} Products</Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  )
-}
 
 export function AddOpportunityForm({
   onSave,
@@ -228,7 +105,7 @@ export function AddOpportunityForm({
     },
   });
 
-  const { fields, append, remove } = useFieldArray({
+  const { fields, append, remove, update } = useFieldArray({
     control: form.control,
     name: "lineItems"
   });
@@ -280,11 +157,35 @@ export function AddOpportunityForm({
   };
 
   const handleProductsAddedFromSelector = (newProductIds: string[]) => {
-    const currentProductIds = fields.map(f => f.productId);
-    const productsToAdd = newProductIds.filter(id => !currentProductIds.includes(id));
-    productsToAdd.forEach(id => {
-      append({ productId: id, quantity: 1 });
+    const fieldProductIds = fields.map(f => f.productId);
+    
+    const productsToUpdate = new Map<number, number>(); // Map index to new quantity
+    const productsToAdd: { productId: string; quantity: number }[] = [];
+
+    newProductIds.forEach(id => {
+      const existingIndex = fieldProductIds.indexOf(id);
+      if (existingIndex > -1) {
+        // This logic could be to increment quantity, but for now we just ensure it exists
+      } else {
+        productsToAdd.push({ productId: id, quantity: 1 });
+      }
     });
+
+    if (productsToAdd.length > 0) {
+      append(productsToAdd);
+    }
+    
+    // Logic to handle removed products (if any)
+    const productsToRemove = fieldProductIds.reduce((acc, id, index) => {
+      if (!newProductIds.includes(id)) {
+        acc.push(index);
+      }
+      return acc;
+    }, [] as number[]);
+    
+    if(productsToRemove.length > 0) {
+       remove(productsToRemove);
+    }
   };
 
   const onSubmit = (values: AddOpportunityFormValues) => {
@@ -624,7 +525,7 @@ export function AddOpportunityForm({
                                 })}
                             </TableBody>
                         </Table>
-                         <div className="p-2 flex items-center justify-between">
+                         <div className="p-2 flex items-center justify-between border-t">
                             <Button variant="outline" size="sm" type="button" onClick={() => setIsProductSelectorOpen(true)}>
                                 <PlusCircle className="mr-2 h-4 w-4" />
                                 Add Product
@@ -658,6 +559,7 @@ export function AddOpportunityForm({
         isOpen={isProductSelectorOpen}
         setIsOpen={setIsProductSelectorOpen}
         onProductsAdded={handleProductsAddedFromSelector}
+        initialSelectedIds={fields.map(f => f.productId)}
       />
     </>
   );

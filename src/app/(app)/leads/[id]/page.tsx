@@ -8,22 +8,21 @@ import { ArrowLeft, Edit, Phone, Mail, Building2, IndianRupee, List, Paperclip, 
 import { Header } from '@/components/header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { AiLeadScorer } from '../ai-lead-scorer';
-import { leads, contacts, companies, products } from '@/lib/data';
+import { leads as allLeads, contacts, companies, products, type Lead } from '@/lib/data';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { LogActivityDialog } from '../log-activity-dialog';
-import { EditLeadDialog } from '../edit-lead-dialog';
+import { LogActivityDialog } from '../../(app)/leads/log-activity-dialog';
+import { EditLeadDialog } from './edit-lead-dialog';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { ProductSelectorDialog } from '../../products/product-selector-dialog';
 
 const dummyActivity = [
     { type: 'note', content: 'Initial contact made, sent follow-up email with brochure.', user: 'Aryan Sharma', time: '2 hours ago', icon: StickyNote },
@@ -41,9 +40,11 @@ export default function LeadDetailPage() {
   const router = useRouter();
   const params = useParams();
   const leadId = params.id as string;
-  const lead = leads.find((l) => l.id === leadId);
+  
+  const [lead, setLead] = useState<Lead | undefined>(() => allLeads.find((l) => l.id === leadId));
   const [isLogActivityOpen, setIsLogActivityOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
+  const [isAddProductOpen, setIsAddProductOpen] = useState(false);
 
   // In a real app, this data would be fetched together. Here we simulate joins.
   const company = companies.find(c => c.name === lead?.companyName);
@@ -59,6 +60,16 @@ export default function LeadDetailPage() {
       case 'Lost': return 'destructive';
       case 'Junk': return 'destructive';
       default: return 'outline';
+    }
+  };
+
+  const handleProductsAdded = (newProductIds: string[]) => {
+    if (lead) {
+      const updatedLead = {
+        ...lead,
+        productIds: Array.from(new Set(newProductIds)),
+      };
+      setLead(updatedLead);
     }
   };
 
@@ -140,18 +151,40 @@ export default function LeadDetailPage() {
                              <p className="text-muted-foreground text-xs">{primaryContact?.email}</p>
                         </div>
                     </div>
-                    <div className="flex items-start gap-3">
-                        <Briefcase className="w-5 h-5 mt-1 text-muted-foreground" />
-                        <div>
-                            <p className="text-muted-foreground">Interested Products</p>
-                            {associatedProducts.length > 0 ? (
-                                <div className="flex flex-wrap gap-2 mt-1">
-                                    {associatedProducts.map(p => <Badge key={p.id} variant="secondary">{p.name}</Badge>)}
-                                </div>
-                            ) : <p className="font-medium">N/A</p>}
-                        </div>
-                    </div>
                 </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between">
+                  <CardTitle>Products & Services</CardTitle>
+                  <Button variant="outline" size="sm" onClick={() => setIsAddProductOpen(true)}>
+                      <PlusCircle className="mr-2 h-4 w-4" />
+                      Add Product
+                  </Button>
+              </CardHeader>
+              <CardContent>
+                  <Table>
+                      <TableHeader>
+                          <TableRow>
+                              <TableHead>Product</TableHead>
+                              <TableHead>Category</TableHead>
+                              <TableHead className="text-right">Price</TableHead>
+                          </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                          {associatedProducts.length === 0 && (
+                              <TableRow><TableCell colSpan={3} className="text-center h-24">No products associated with this lead.</TableCell></TableRow>
+                          )}
+                          {associatedProducts.map(product => (
+                              <TableRow key={product.id}>
+                                  <TableCell className="font-medium">{product.name}</TableCell>
+                                  <TableCell>{product.category}</TableCell>
+                                  <TableCell className="text-right">₹{product.price.toLocaleString('en-IN')}</TableCell>
+                              </TableRow>
+                          ))}
+                      </TableBody>
+                  </Table>
+              </CardContent>
             </Card>
 
           </div>
@@ -191,7 +224,6 @@ export default function LeadDetailPage() {
                             <label htmlFor="file-upload" className="sr-only">Choose file</label>
                             <Input id="file-upload" type="file" className="text-sm" />
                         </div>
-                        <Separator />
                         <div className="space-y-3">
                            {dummyDocuments.map(doc => (
                             <div key={doc.id} className="flex items-center justify-between text-sm p-2 rounded-md bg-secondary/50">
@@ -245,6 +277,12 @@ export default function LeadDetailPage() {
         isOpen={isEditOpen}
         setIsOpen={setIsEditOpen}
         lead={lead}
+      />
+      <ProductSelectorDialog
+        isOpen={isAddProductOpen}
+        setIsOpen={setIsAddProductOpen}
+        onProductsAdded={handleProductsAdded}
+        initialSelectedIds={lead.productIds}
       />
     </div>
   );
