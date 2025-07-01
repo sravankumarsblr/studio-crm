@@ -20,13 +20,13 @@ export function LifecycleSummary() {
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Sales Lifecycle at a Glance</CardTitle>
-        <CardDescription>
+      <CardHeader className="p-4 pb-2">
+        <CardTitle className="text-base font-semibold">Sales Lifecycle at a Glance</CardTitle>
+        <CardDescription className="text-xs">
           Follow the journey from initial lead, through the sales opportunity, to a finalized contract.
         </CardDescription>
       </CardHeader>
-      <CardContent className="p-6 pt-2">
+      <CardContent className="p-4 pt-2">
         <TooltipProvider>
           <div className="flex items-center justify-center gap-4 md:gap-8">
             {stages.map((stage, index) => (
@@ -34,8 +34,8 @@ export function LifecycleSummary() {
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <div className="flex flex-col items-center gap-1 text-center cursor-default">
-                      <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 text-primary">
-                        <stage.icon className="w-5 h-5" />
+                      <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary">
+                        <stage.icon className="w-4 h-4" />
                       </div>
                       <h3 className="text-xs font-medium">{stage.name}</h3>
                     </div>
@@ -46,7 +46,7 @@ export function LifecycleSummary() {
                 </Tooltip>
 
                 {index < stages.length - 1 && (
-                  <ChevronRight className="w-5 h-5 text-muted-foreground shrink-0 hidden sm:block" />
+                  <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0 hidden sm:block" />
                 )}
               </React.Fragment>
             ))}
