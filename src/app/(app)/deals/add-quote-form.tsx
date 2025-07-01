@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect } from "react";
@@ -28,6 +27,7 @@ import type { Opportunity } from "@/lib/data";
 import { products, users } from "@/lib/data";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Separator } from "@/components/ui/separator";
+import { Label } from "@/components/ui/label";
 
 const generateQuoteSchema = z.object({
   expiryDate: z.string().min(1, "Expiry date is required."),
@@ -431,5 +431,3 @@ export function GenerateQuoteForm({
     </Form>
   );
 }
-
-    
