@@ -5,7 +5,7 @@ import { useState, useMemo, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Check, ChevronsUpDown, PlusCircle } from "lucide-react";
+import { Check, ChevronsUpDown, PlusCircle, Trash2 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -42,6 +42,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { AddCompanyDialog } from "../companies/add-company-dialog";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 const editLeadSchema = z.object({
   name: z.string().min(1, "Lead name is required."),
@@ -90,6 +91,7 @@ export function EditLeadForm({
   const [productSearch, setProductSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [categoryOpen, setCategoryOpen] = useState(false);
+  const [productPopoverOpen, setProductPopoverOpen] = useState(false);
 
 
   const defaultValues = useMemo(() => {
@@ -121,6 +123,7 @@ export function EditLeadForm({
 
   const selectedCompanyId = form.watch("companyId");
   const selectedContactIds = form.watch("contactIds");
+  const selectedProductIds = form.watch("productIds");
 
   const availableContacts = selectedCompanyId
     ? contacts.filter((c) => c.companyId === selectedCompanyId)
@@ -136,13 +139,15 @@ export function EditLeadForm({
     return ["All", ...Array.from(categories)];
   }, []);
 
-  const filteredProducts = useMemo(() => {
-    return products.filter(p => {
+  const availableProducts = products.filter(p => !selectedProductIds.includes(p.id));
+
+  const filteredAvailableProducts = useMemo(() => {
+    return availableProducts.filter(p => {
         const categoryMatch = selectedCategory === "All" || p.category === selectedCategory;
         const searchMatch = !productSearch || p.name.toLowerCase().includes(productSearch.toLowerCase());
         return categoryMatch && searchMatch;
     });
-  }, [selectedCategory, productSearch]);
+  }, [availableProducts, selectedCategory, productSearch]);
 
 
   const handleContactCheckedChange = (checked: boolean, contactId: string) => {
@@ -168,6 +173,22 @@ export function EditLeadForm({
     setCompanies(prev => [...prev, newCompany]);
     form.setValue("companyId", newCompany.id, { shouldValidate: true });
     setCompanyOpen(false);
+  };
+  
+  const handleProductRemove = (productId: string) => {
+    const currentProductIds = form.getValues("productIds");
+    form.setValue(
+        "productIds",
+        currentProductIds.filter(id => id !== productId),
+        { shouldValidate: true }
+    );
+  };
+
+  const handleProductSelect = (productId: string) => {
+    const currentProductIds = form.getValues("productIds");
+    if (!currentProductIds.includes(productId)) {
+        form.setValue("productIds", [...currentProductIds, productId], { shouldValidate: true });
+    }
   };
 
   const onSubmit = (values: EditLeadFormValues) => {
@@ -447,99 +468,130 @@ export function EditLeadForm({
             control={form.control}
             name="productIds"
             render={() => (
-              <FormItem>
-                <FormLabel>Products & Services</FormLabel>
-                <FormControl>
-                  <div className="rounded-md border">
-                      <div className="p-2 border-b grid grid-cols-1 md:grid-cols-2 gap-2">
-                        <Popover open={categoryOpen} onOpenChange={setCategoryOpen}>
-                          <PopoverTrigger asChild>
-                            <Button
-                              variant="outline"
-                              role="combobox"
-                              className="w-full justify-between"
-                            >
-                              {selectedCategory === "All" ? "All Categories" : selectedCategory}
-                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
-                            <Command>
-                              <CommandInput placeholder="Search category..." />
-                              <CommandList>
-                                <CommandEmpty>No category found.</CommandEmpty>
-                                <CommandGroup>
-                                  {productCategories.map((category) => (
-                                    <CommandItem
-                                      key={category}
-                                      value={category}
-                                      onSelect={() => {
-                                        setSelectedCategory(category);
-                                        setCategoryOpen(false);
-                                      }}
-                                    >
-                                      <Check
-                                        className={cn(
-                                          "mr-2 h-4 w-4",
-                                          selectedCategory === category
-                                            ? "opacity-100"
-                                            : "opacity-0"
-                                        )}
+                <FormItem>
+                    <FormLabel>Products & Services</FormLabel>
+                    <div className="rounded-md border bg-card">
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Product Name</TableHead>
+                                    <TableHead>Category</TableHead>
+                                    <TableHead className="w-[50px]"></TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {selectedProductIds.length > 0 ? (
+                                    selectedProductIds.map((id) => {
+                                        const product = products.find(p => p.id === id);
+                                        if (!product) return null;
+                                        return (
+                                            <TableRow key={id}>
+                                                <TableCell className="font-medium">{product.name}</TableCell>
+                                                <TableCell>{product.category}</TableCell>
+                                                <TableCell>
+                                                    <Button variant="ghost" size="icon" onClick={() => handleProductRemove(id)}>
+                                                        <Trash2 className="h-4 w-4 text-destructive"/>
+                                                    </Button>
+                                                </TableCell>
+                                            </TableRow>
+                                        );
+                                    })
+                                ) : (
+                                    <TableRow>
+                                        <TableCell colSpan={3} className="h-24 text-center">
+                                        No products selected.
+                                        </TableCell>
+                                    </TableRow>
+                                )}
+                            </TableBody>
+                        </Table>
+                         <div className="p-2 flex items-center justify-between">
+                            <Popover open={productPopoverOpen} onOpenChange={setProductPopoverOpen}>
+                                <PopoverTrigger asChild>
+                                <Button variant="outline" size="sm">
+                                    <PlusCircle className="mr-2 h-4 w-4" />
+                                    Add Product
+                                </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-[450px] p-0">
+                                <Command>
+                                  <div className="p-2 border-b grid grid-cols-1 md:grid-cols-2 gap-2">
+                                      <Popover open={categoryOpen} onOpenChange={setCategoryOpen}>
+                                        <PopoverTrigger asChild>
+                                          <Button
+                                            variant="outline"
+                                            role="combobox"
+                                            className="w-full justify-between"
+                                          >
+                                            {selectedCategory === "All" ? "All Categories" : selectedCategory}
+                                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                          </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                                          <Command>
+                                            <CommandInput placeholder="Search category..." />
+                                            <CommandList>
+                                              <CommandEmpty>No category found.</CommandEmpty>
+                                              <CommandGroup>
+                                                {productCategories.map((category) => (
+                                                  <CommandItem
+                                                    key={category}
+                                                    value={category}
+                                                    onSelect={() => {
+                                                      setSelectedCategory(category);
+                                                      setCategoryOpen(false);
+                                                    }}
+                                                  >
+                                                    <Check
+                                                      className={cn(
+                                                        "mr-2 h-4 w-4",
+                                                        selectedCategory === category
+                                                          ? "opacity-100"
+                                                          : "opacity-0"
+                                                      )}
+                                                    />
+                                                    {category}
+                                                  </CommandItem>
+                                                ))}
+                                              </CommandGroup>
+                                            </CommandList>
+                                          </Command>
+                                        </PopoverContent>
+                                      </Popover>
+                                      <Input 
+                                        placeholder="Search products in category..."
+                                        value={productSearch}
+                                        onChange={(e) => setProductSearch(e.target.value)}
                                       />
-                                      {category}
-                                    </CommandItem>
-                                  ))}
-                                </CommandGroup>
-                              </CommandList>
-                            </Command>
-                          </PopoverContent>
-                        </Popover>
-                        <Input 
-                          placeholder="Search products in category..."
-                          value={productSearch}
-                          onChange={(e) => setProductSearch(e.target.value)}
-                        />
-                      </div>
-                    <ScrollArea className="h-32">
-                      <div className="p-2">
-                        {filteredProducts.map((product) => (
-                          <FormField
-                            key={product.id}
-                            control={form.control}
-                            name="productIds"
-                            render={({ field }) => {
-                              return (
-                                <FormItem
-                                  key={product.id}
-                                  className="flex flex-row items-center space-x-3 space-y-0 p-2 rounded-md hover:bg-secondary"
-                                >
-                                  <FormControl>
-                                    <Checkbox
-                                      checked={field.value?.includes(product.id)}
-                                      onCheckedChange={(checked) => {
-                                          const newValues = checked
-                                            ? [...(field.value || []), product.id]
-                                            : field.value?.filter(
-                                                (value) => value !== product.id
-                                              ) || [];
-                                          field.onChange(newValues);
-                                      }}
-                                    />
-                                  </FormControl>
-                                  <FormLabel className="font-normal w-full cursor-pointer">
-                                    {product.name}
-                                  </FormLabel>
-                                </FormItem>
-                              );
-                            }}
-                          />
-                        ))}
-                      </div>
-                    </ScrollArea>
-                  </div>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
+                                    </div>
+                                    <CommandList>
+                                        <CommandEmpty>No products found.</CommandEmpty>
+                                        <CommandGroup>
+                                            {filteredAvailableProducts.map((product) => (
+                                                <CommandItem
+                                                key={product.id}
+                                                onSelect={() => {
+                                                    handleProductSelect(product.id);
+                                                    setProductPopoverOpen(false);
+                                                    setProductSearch("");
+                                                    setSelectedCategory("All");
+                                                }}
+                                                >
+                                                <div className="flex justify-between w-full">
+                                                    <span>{product.name}</span>
+                                                    <span className="text-muted-foreground">{product.category}</span>
+                                                </div>
+                                                </CommandItem>
+                                            ))}
+                                        </CommandGroup>
+                                    </CommandList>
+                                </Command>
+                                </PopoverContent>
+                            </Popover>
+                         </div>
+                    </div>
+                    <FormMessage />
+                </FormItem>
             )}
           />
 
@@ -580,3 +632,5 @@ export function EditLeadForm({
     </>
   );
 }
+
+    
