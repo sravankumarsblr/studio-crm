@@ -43,7 +43,7 @@ const navItems = [
   { href: "/contracts", label: "Contracts", icon: FileText },
   { href: "/companies", label: "Companies", icon: Building2 },
   { href: "/contacts", label: "Contacts", icon: Phone },
-  { href: "/products", label: "Products", icon: Package },
+  { href: "/products", label: "Products & Services", icon: Package },
 ];
 
 const adminNavItems = [
