@@ -28,6 +28,7 @@ import { AddOpportunityDialog } from "./add-deal-dialog";
 import { useToast } from "@/hooks/use-toast";
 
 const OPPORTUNITY_STAGES = ['Qualification', 'Proposal', 'Negotiation', 'Closed Won', 'Closed Lost'] as const;
+const DEAL_STATUSES = ['Open', 'Won', 'Lost'];
 
 const stageIcons: { [key in typeof OPPORTUNITY_STAGES[number]]: React.ElementType } = {
   Qualification: BarChart,
@@ -53,6 +54,12 @@ const stageVariant: { [key: string]: "default" | "secondary" | "destructive" | "
   'Closed Lost': 'destructive',
 };
 
+const getStatus = (stage: Opportunity['stage']) => {
+  if (stage === 'Closed Won') return 'Won';
+  if (stage === 'Closed Lost') return 'Lost';
+  return 'Open';
+};
+
 export default function OpportunitiesPage() {
   const [opportunities, setOpportunities] = useState<Opportunity[]>(allOpportunities);
   const [isAddOpportunityOpen, setIsAddOpportunityOpen] = useState(false);
@@ -61,6 +68,7 @@ export default function OpportunitiesPage() {
   const [nameFilter, setNameFilter] = useState('');
   const [companyFilter, setCompanyFilter] = useState('');
   const [stageFilter, setStageFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
   const [valueFilter, setValueFilter] = useState({ min: "", max: "" });
   const [ownerFilter, setOwnerFilter] = useState('');
   
@@ -88,12 +96,13 @@ export default function OpportunitiesPage() {
       if (nameFilter && !opportunity.name.toLowerCase().includes(nameFilter.toLowerCase())) return false;
       if (companyFilter && !opportunity.companyName.toLowerCase().includes(companyFilter.toLowerCase())) return false;
       if (stageFilter && opportunity.stage !== stageFilter) return false;
+      if (statusFilter && getStatus(opportunity.stage) !== statusFilter) return false;
       if (valueFilter.min && opportunity.value < Number(valueFilter.min)) return false;
       if (valueFilter.max && opportunity.value > Number(valueFilter.max)) return false;
       if (ownerFilter && opportunity.ownerId !== ownerFilter) return false;
       return true;
     });
-  }, [opportunities, nameFilter, companyFilter, stageFilter, valueFilter, ownerFilter]);
+  }, [opportunities, nameFilter, companyFilter, stageFilter, statusFilter, valueFilter, ownerFilter]);
 
   const paginatedOpportunities = useMemo(() => {
     const startIndex = (currentPage - 1) * rowsPerPage;
@@ -106,6 +115,7 @@ export default function OpportunitiesPage() {
     setNameFilter('');
     setCompanyFilter('');
     setStageFilter('');
+    setStatusFilter('');
     setValueFilter({ min: "", max: "" });
     setOwnerFilter('');
     setCurrentPage(1);
@@ -137,11 +147,11 @@ export default function OpportunitiesPage() {
             const Icon = stageIcons[stage];
             return (
               <Card key={stage}>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 p-1">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 p-2">
                   <CardTitle className="text-sm font-medium">{stage}</CardTitle>
                   <Icon className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
-                <CardContent className="p-1 pt-0">
+                <CardContent className="p-2 pt-0">
                   <div className="text-2xl font-bold">{stageCounts[stage]}</div>
                 </CardContent>
               </Card>
@@ -165,13 +175,19 @@ export default function OpportunitiesPage() {
                 </div>
                 <CardDescription>Refine your opportunities list by the criteria below.</CardDescription>
               </CardHeader>
-              <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 <Input placeholder="Filter by opportunity name..." value={nameFilter} onChange={e => setNameFilter(e.target.value)} />
                 <Input placeholder="Filter by company..." value={companyFilter} onChange={e => setCompanyFilter(e.target.value)} />
                 <Select value={stageFilter} onValueChange={setStageFilter}>
                   <SelectTrigger><SelectValue placeholder="Filter by stage..." /></SelectTrigger>
                   <SelectContent>
                     {OPPORTUNITY_STAGES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+                 <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger><SelectValue placeholder="Filter by status..." /></SelectTrigger>
+                  <SelectContent>
+                    {DEAL_STATUSES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
                   </SelectContent>
                 </Select>
                  <Select value={ownerFilter} onValueChange={setOwnerFilter}>
@@ -198,6 +214,7 @@ export default function OpportunitiesPage() {
                   <TableHead>Company</TableHead>
                   <TableHead>Value</TableHead>
                   <TableHead>Stage</TableHead>
+                  <TableHead>Status</TableHead>
                   <TableHead className="w-[200px]">Progress</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
@@ -210,6 +227,11 @@ export default function OpportunitiesPage() {
                     <TableCell>₹{opportunity.value.toLocaleString('en-IN')}</TableCell>
                     <TableCell>
                       <Badge variant={stageVariant[opportunity.stage]}>{opportunity.stage}</Badge>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={getStatus(opportunity.stage) === 'Won' ? 'default' : getStatus(opportunity.stage) === 'Lost' ? 'destructive' : 'secondary'}>
+                        {getStatus(opportunity.stage)}
+                      </Badge>
                     </TableCell>
                     <TableCell>
                       <Progress value={stageProgress[opportunity.stage]} className="h-2" />
@@ -237,7 +259,7 @@ export default function OpportunitiesPage() {
                   </TableRow>
                 )) : (
                   <TableRow>
-                    <TableCell colSpan={6} className="h-24 text-center">
+                    <TableCell colSpan={7} className="h-24 text-center">
                       No results found.
                     </TableCell>
                   </TableRow>
@@ -278,3 +300,5 @@ export default function OpportunitiesPage() {
     </div>
   );
 }
+
+    

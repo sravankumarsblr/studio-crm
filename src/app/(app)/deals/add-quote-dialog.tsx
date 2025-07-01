@@ -9,7 +9,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { GenerateQuoteForm, type GenerateQuoteFormValues } from "./add-quote-form";
-import type { Opportunity, Quote } from "@/lib/data";
+import type { Opportunity, Quote, QuoteLineItem } from "@/lib/data";
 import { users } from "@/lib/data";
 
 
@@ -38,13 +38,17 @@ export function GenerateQuoteDialog({
       date: new Date().toISOString().split("T")[0],
       expiryDate: data.expiryDate,
       preparedBy: currentUser.name,
-      value: data.value,
       status: data.attachPo ? "Accepted" : "Draft",
       documentName: data.document?.name,
-      discount: (data.discountType && data.discountType !== 'none' && data.discountValue) ? {
-        type: data.discountType as 'percentage' | 'fixed',
-        value: data.discountValue
-      } : undefined,
+      lineItems: data.lineItems.map(item => ({
+        productId: item.productId,
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+        discount: item.discountType !== 'none' && item.discountValue ? {
+          type: item.discountType,
+          value: item.discountValue,
+        } : undefined,
+      })),
       poNumber: data.attachPo ? data.poNumber : undefined,
       poValue: data.attachPo ? data.poValue : undefined,
       poDate: data.attachPo ? data.poDate : undefined,

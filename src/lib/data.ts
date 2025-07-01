@@ -15,7 +15,7 @@ export type User = {
 };
 
 export type Company = {
-  id: string;
+  id:string;
   name: string;
   industry: string;
   logo: string;
@@ -48,6 +48,16 @@ export type Lead = {
   productIds: string[];
 };
 
+export type QuoteLineItem = {
+  productId: string;
+  quantity: number;
+  unitPrice: number;
+  discount?: {
+    type: 'percentage' | 'fixed';
+    value: number;
+  };
+};
+
 export type Quote = {
   id: string;
   quoteNumber: string;
@@ -55,13 +65,9 @@ export type Quote = {
   date: string;
   expiryDate: string;
   preparedBy: string;
-  value: number;
   status: 'Draft' | 'Sent' | 'Accepted' | 'Rejected';
   documentName?: string;
-  discount?: {
-    type: 'percentage' | 'fixed';
-    value: number;
-  };
+  lineItems: QuoteLineItem[];
   poNumber?: string;
   poValue?: number;
   poDate?: string;
@@ -179,7 +185,7 @@ export const opportunities: Opportunity[] = [
     winProbability: 0.5,
     lineItems: [{ productId: 'prod1', quantity: 100 }], 
     quotes: [
-      { id: 'qt1', opportunityId: 'deal1', quoteNumber: 'QT-2024-001', date: '2024-06-10', expiryDate: '2024-07-10', preparedBy: 'Aryan Sharma', value: 5000000, status: 'Sent', documentName: 'Vimaan_Quote_v1.pdf' }
+      { id: 'qt1', opportunityId: 'deal1', quoteNumber: 'QT-2024-001', date: '2024-06-10', expiryDate: '2024-07-10', preparedBy: 'Aryan Sharma', status: 'Sent', documentName: 'Vimaan_Quote_v1.pdf', lineItems: [{ productId: 'prod1', quantity: 100, unitPrice: 49900 }] }
     ] 
   },
   { 
@@ -195,8 +201,8 @@ export const opportunities: Opportunity[] = [
     winProbability: 0.75,
     lineItems: [{ productId: 'prod2', quantity: 92 }], 
     quotes: [
-       { id: 'qt2', opportunityId: 'deal2', quoteNumber: 'QT-2024-002', date: '2024-06-15', expiryDate: '2024-07-15', preparedBy: 'Aryan Sharma', value: 12500000, status: 'Sent' },
-       { id: 'qt3', opportunityId: 'deal2', quoteNumber: 'QT-2024-003', date: '2024-06-20', expiryDate: '2024-07-20', preparedBy: 'Aryan Sharma', value: 12000000, status: 'Draft', discount: { type: 'fixed', value: 500000 } }
+       { id: 'qt2', opportunityId: 'deal2', quoteNumber: 'QT-2024-002', date: '2024-06-15', expiryDate: '2024-07-15', preparedBy: 'Aryan Sharma', status: 'Sent', lineItems: [{ productId: 'prod2', quantity: 92, unitPrice: 129900 }] },
+       { id: 'qt3', opportunityId: 'deal2', quoteNumber: 'QT-2024-003', date: '2024-06-20', expiryDate: '2024-07-20', preparedBy: 'Aryan Sharma', status: 'Draft', lineItems: [{ productId: 'prod2', quantity: 92, unitPrice: 129900, discount: { type: 'fixed', value: 500000 } }] }
     ] 
   },
   { 
@@ -212,7 +218,7 @@ export const opportunities: Opportunity[] = [
     winProbability: 1,
     lineItems: [{ productId: 'prod3', quantity: 26 }], 
     quotes: [
-      { id: 'qt4', opportunityId: 'deal3', quoteNumber: 'QT-2024-004', date: '2024-06-01', expiryDate: '2024-07-01', preparedBy: 'Aryan Sharma', value: 2200000, status: 'Accepted', poNumber: 'PO-ACPL-1138', poValue: 2200000, poDate: '2024-06-14', poDocumentName: 'PO-ACPL-1138.pdf' }
+      { id: 'qt4', opportunityId: 'deal3', quoteNumber: 'QT-2024-004', date: '2024-06-01', expiryDate: '2024-07-01', preparedBy: 'Aryan Sharma', status: 'Accepted', poNumber: 'PO-ACPL-1138', poValue: 2200000, poDate: '2024-06-14', poDocumentName: 'PO-ACPL-1138.pdf', lineItems: [{ productId: 'prod3', quantity: 26, unitPrice: 85000, discount: { type: 'fixed', value: 10000 } }] }
     ] 
   },
   { 
@@ -272,3 +278,5 @@ export const products: Product[] = [
   { id: 'prod4', name: 'Automated Digital Pipette P-4A', category: 'Lab Equipment', price: 60000, status: 'active' },
   { id: 'prod5', name: 'CalTrack Software Suite', category: 'Software', price: 250000, status: 'active' },
 ];
+
+    

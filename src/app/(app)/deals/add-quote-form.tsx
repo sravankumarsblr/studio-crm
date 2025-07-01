@@ -1,10 +1,11 @@
 
 "use client";
 
-import { useForm } from "react-hook-form";
+import { useEffect } from "react";
+import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 
 import { cn } from "@/lib/utils";
@@ -29,24 +30,30 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Separator } from "@/components/ui/separator";
 
 const generateQuoteSchema = z.object({
-  value: z.coerce.number().min(1, "Quote value is required."),
   expiryDate: z.string().min(1, "Expiry date is required."),
   document: z.any().optional(),
-  discountType: z.enum(['none', 'percentage', 'fixed']).default('none'),
-  discountValue: z.coerce.number().optional(),
+  lineItems: z.array(z.object({
+    productId: z.string(),
+    quantity: z.coerce.number(),
+    unitPrice: z.coerce.number(),
+    discountType: z.enum(['none', 'percentage', 'fixed']).default('none'),
+    discountValue: z.coerce.number().optional(),
+  })).min(1, "A quote must have at least one product."),
   attachPo: z.boolean().default(false),
   poNumber: z.string().optional(),
   poValue: z.coerce.number().optional(),
   poDate: z.string().optional(),
   poDocument: z.any().optional(),
 }).refine(data => {
-    if (data.discountType !== 'none' && (!data.discountValue || data.discountValue <= 0)) {
-        return false;
+    for (const item of data.lineItems) {
+        if (item.discountType !== 'none' && (!item.discountValue || item.discountValue <= 0)) {
+            return false;
+        }
     }
     return true;
 }, {
-    message: "A positive discount value is required.",
-    path: ["discountValue"],
+    message: "A positive discount value is required for the selected discount type.",
+    path: ["lineItems"],
 }).refine(data => {
     if (data.attachPo && !data.poNumber) {
         return false;
@@ -88,10 +95,17 @@ export function GenerateQuoteForm({
   const form = useForm<GenerateQuoteFormValues>({
     resolver: zodResolver(generateQuoteSchema),
     defaultValues: {
-      value: opportunity.value,
       expiryDate: "",
-      discountType: 'none',
-      discountValue: 0,
+      lineItems: opportunity.lineItems.map(item => {
+        const product = products.find(p => p.id === item.productId);
+        return {
+          productId: item.productId,
+          quantity: item.quantity,
+          unitPrice: product?.price || 0,
+          discountType: 'none',
+          discountValue: 0,
+        }
+      }),
       attachPo: false,
       poNumber: "",
       poValue: undefined,
@@ -99,13 +113,31 @@ export function GenerateQuoteForm({
     },
   });
 
+  const { fields, remove } = useFieldArray({
+    control: form.control,
+    name: "lineItems"
+  });
+
   const onSubmit = (values: GenerateQuoteFormValues) => {
     onSave(values);
   };
 
-  const discountType = form.watch("discountType");
+  const lineItems = form.watch("lineItems");
   const attachPo = form.watch("attachPo");
-  const dealOwner = users.find(u => u.id === opportunity.ownerId)?.name || 'N/A';
+
+  const totals = lineItems.reduce((acc, item) => {
+    const lineTotal = item.unitPrice * item.quantity;
+    let discountAmount = 0;
+    if (item.discountType === 'percentage') {
+      discountAmount = lineTotal * ((item.discountValue || 0) / 100);
+    } else if (item.discountType === 'fixed') {
+      discountAmount = item.discountValue || 0;
+    }
+    acc.subtotal += lineTotal;
+    acc.discount += discountAmount;
+    acc.grandTotal += (lineTotal - discountAmount);
+    return acc;
+  }, { subtotal: 0, discount: 0, grandTotal: 0 });
 
   return (
     <Form {...form}>
@@ -117,29 +149,102 @@ export function GenerateQuoteForm({
                   <TableHeader>
                       <TableRow>
                           <TableHead>Product</TableHead>
-                          <TableHead className="w-[100px]">Quantity</TableHead>
-                          <TableHead className="w-[120px] text-right">Unit Price</TableHead>
-                          <TableHead className="w-[120px] text-right">Total</TableHead>
+                          <TableHead className="w-[180px]">Discount</TableHead>
+                          <TableHead className="w-[120px] text-right">Line Total</TableHead>
                       </TableRow>
                   </TableHeader>
                   <TableBody>
-                      {opportunity.lineItems.map(item => {
-                          const product = products.find(p => p.id === item.productId);
-                          if (!product) return null;
-                          const total = product.price * item.quantity;
+                      {fields.map((field, index) => {
+                          const product = products.find(p => p.id === field.productId);
+                          const lineItem = lineItems[index];
+                          const lineTotal = lineItem.unitPrice * lineItem.quantity;
+                          let finalLineTotal = lineTotal;
+                          if (lineItem.discountType === 'percentage') {
+                            finalLineTotal -= lineTotal * ((lineItem.discountValue || 0) / 100);
+                          } else if (lineItem.discountType === 'fixed') {
+                            finalLineTotal -= (lineItem.discountValue || 0);
+                          }
+
                           return (
-                              <TableRow key={item.productId} className="bg-muted/30">
-                                  <TableCell className="font-medium">{product.name}</TableCell>
-                                  <TableCell>{item.quantity}</TableCell>
-                                  <TableCell className="text-right">₹{product.price.toLocaleString('en-IN')}</TableCell>
-                                  <TableCell className="text-right">₹{total.toLocaleString('en-IN')}</TableCell>
+                              <TableRow key={field.id} className="align-top">
+                                  <TableCell className="font-medium pt-4">
+                                      <p>{product?.name}</p>
+                                      <p className="text-xs text-muted-foreground">{lineItem.quantity} x ₹{lineItem.unitPrice.toLocaleString('en-IN')}</p>
+                                  </TableCell>
+                                  <TableCell>
+                                      <FormField
+                                        control={form.control}
+                                        name={`lineItems.${index}.discountType`}
+                                        render={({ field }) => (
+                                          <FormItem>
+                                            <FormControl>
+                                                <RadioGroup
+                                                    onValueChange={field.onChange}
+                                                    defaultValue={field.value}
+                                                    className="flex items-center space-x-2"
+                                                  >
+                                                    <FormItem className="flex items-center space-x-1 space-y-0">
+                                                      <RadioGroupItem value="none" id={`none-${index}`}/>
+                                                      <Label htmlFor={`none-${index}`} className="font-normal text-xs">N/A</Label>
+                                                    </FormItem>
+                                                    <FormItem className="flex items-center space-x-1 space-y-0">
+                                                      <RadioGroupItem value="percentage" id={`percentage-${index}`}/>
+                                                      <Label htmlFor={`percentage-${index}`} className="font-normal text-xs">%</Label>
+                                                    </FormItem>
+                                                    <FormItem className="flex items-center space-x-1 space-y-0">
+                                                      <RadioGroupItem value="fixed" id={`fixed-${index}`}/>
+                                                      <Label htmlFor={`fixed-${index}`} className="font-normal text-xs">₹</Label>
+                                                    </FormItem>
+                                                  </RadioGroup>
+                                            </FormControl>
+                                          </FormItem>
+                                        )}
+                                      />
+                                       {lineItems[index].discountType !== 'none' && (
+                                          <FormField
+                                            control={form.control}
+                                            name={`lineItems.${index}.discountValue`}
+                                            render={({ field }) => (
+                                              <FormItem className="mt-1">
+                                                <FormControl>
+                                                  <Input 
+                                                    type="number" 
+                                                    className="h-8"
+                                                    placeholder="Value"
+                                                    {...field}
+                                                    value={field.value ?? ""}
+                                                  />
+                                                </FormControl>
+                                              </FormItem>
+                                            )}
+                                          />
+                                        )}
+                                  </TableCell>
+                                  <TableCell className="text-right pt-4">
+                                    {lineTotal !== finalLineTotal && (
+                                       <p className="text-xs line-through text-muted-foreground">₹{lineTotal.toLocaleString('en-IN')}</p>
+                                    )}
+                                    <p className="font-medium">₹{finalLineTotal.toLocaleString('en-IN')}</p>
+                                  </TableCell>
                               </TableRow>
                           );
                       })}
                   </TableBody>
               </Table>
-               <div className="p-2 text-right font-medium pr-4 border-t">
-                  List Price Total: <span className="text-lg font-bold">₹{opportunity.value.toLocaleString('en-IN')}</span>
+               <div className="p-4 space-y-2 text-sm border-t">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Subtotal</span>
+                    <span>₹{totals.subtotal.toLocaleString('en-IN')}</span>
+                  </div>
+                   <div className="flex justify-between text-destructive">
+                    <span className="text-muted-foreground">Discount</span>
+                    <span>- ₹{totals.discount.toLocaleString('en-IN')}</span>
+                  </div>
+                   <Separator />
+                   <div className="flex justify-between font-bold text-base">
+                    <span>Grand Total</span>
+                    <span>₹{totals.grandTotal.toLocaleString('en-IN')}</span>
+                  </div>
               </div>
           </div>
         </div>
@@ -147,21 +252,6 @@ export function GenerateQuoteForm({
         <Separator />
 
         <div className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormField
-              control={form.control}
-              name="value"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Quoted Value (₹)</FormLabel>
-                  <FormControl>
-                    <Input type="number" placeholder="e.g., 50000" {...field} />
-                  </FormControl>
-                  <FormDescription>This value can be adjusted from the line item total if needed.</FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
             <FormField
               control={form.control}
               name="expiryDate"
@@ -200,72 +290,7 @@ export function GenerateQuoteForm({
                 </FormItem>
               )}
             />
-          </div>
-
-          <FormField
-            control={form.control}
-            name="discountType"
-            render={({ field }) => (
-              <FormItem className="space-y-3">
-                <FormLabel>Discount</FormLabel>
-                <FormControl>
-                  <RadioGroup
-                    onValueChange={(value) => {
-                      field.onChange(value);
-                      if (value === 'none') {
-                        form.setValue('discountValue', 0);
-                        form.clearErrors('discountValue');
-                      }
-                    }}
-                    defaultValue={field.value}
-                    className="flex items-center space-x-4"
-                  >
-                    <FormItem className="flex items-center space-x-2 space-y-0">
-                      <FormControl>
-                        <RadioGroupItem value="none" />
-                      </FormControl>
-                      <FormLabel className="font-normal">None</FormLabel>
-                    </FormItem>
-                    <FormItem className="flex items-center space-x-2 space-y-0">
-                      <FormControl>
-                        <RadioGroupItem value="percentage" />
-                      </FormControl>
-                      <FormLabel className="font-normal">Percentage (%)</FormLabel>
-                    </FormItem>
-                    <FormItem className="flex items-center space-x-2 space-y-0">
-                      <FormControl>
-                        <RadioGroupItem value="fixed" />
-                      </FormControl>
-                      <FormLabel className="font-normal">Fixed (₹)</FormLabel>
-                    </FormItem>
-                  </RadioGroup>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {discountType && discountType !== 'none' && (
-            <FormField
-                control={form.control}
-                name="discountValue"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Discount Value</FormLabel>
-                    <FormControl>
-                      <Input 
-                          type="number" 
-                          placeholder={discountType === 'percentage' ? "e.g., 10" : "e.g., 500"} 
-                           {...field}
-                           value={field.value ?? ""}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-          )}
-
+          
           <FormField
             control={form.control}
             name="document"

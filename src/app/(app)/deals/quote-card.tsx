@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import type { Quote } from "@/lib/data";
+import type { Quote, QuoteLineItem } from "@/lib/data";
 import { MoreVertical, Trash2, Download, CheckCircle, XCircle, Clock } from "lucide-react";
 import {
   DropdownMenu,
@@ -30,23 +30,25 @@ const statusConfig = {
 export function QuoteCard({ quote, onDelete }: QuoteCardProps) {
     const {variant, icon: Icon, label} = statusConfig[quote.status];
 
-    const getDiscountDisplay = () => {
-        if (!quote.discount) return null;
-        return quote.discount.type === 'fixed' 
-            ? `₹${quote.discount.value.toLocaleString('en-IN')}` 
-            : `${quote.discount.value}%`;
+    const calculateTotals = (lineItems: QuoteLineItem[]) => {
+      return lineItems.reduce((acc, item) => {
+          const lineTotal = item.unitPrice * item.quantity;
+          let discountAmount = 0;
+          if (item.discount) {
+              if (item.discount.type === 'percentage') {
+                  discountAmount = lineTotal * (item.discount.value / 100);
+              } else { // fixed
+                  discountAmount = item.discount.value;
+              }
+          }
+          acc.subtotal += lineTotal;
+          acc.discount += discountAmount;
+          acc.grandTotal += (lineTotal - discountAmount);
+          return acc;
+      }, { subtotal: 0, discount: 0, grandTotal: 0 });
     };
 
-    const getFinalValue = () => {
-        if (!quote.discount) {
-            return quote.value;
-        }
-        if (quote.discount.type === 'fixed') {
-            return quote.value - quote.discount.value;
-        }
-        // Percentage
-        return quote.value * (1 - (quote.discount.value / 100));
-    };
+    const totals = calculateTotals(quote.lineItems);
 
   return (
     <Card>
@@ -54,12 +56,12 @@ export function QuoteCard({ quote, onDelete }: QuoteCardProps) {
         <div>
           <CardTitle className="text-base font-bold">{quote.quoteNumber}</CardTitle>
           <CardDescription className="text-xs">
-             {quote.discount ? (
+             {totals.discount > 0 ? (
                 <span>
-                    Value: <span className="line-through">₹{quote.value.toLocaleString('en-IN')}</span> &rarr; ₹{getFinalValue().toLocaleString('en-IN')}
+                    Value: <span className="line-through">₹{totals.subtotal.toLocaleString('en-IN')}</span> &rarr; ₹{totals.grandTotal.toLocaleString('en-IN')}
                 </span>
             ) : (
-                <span>Value: ₹{quote.value.toLocaleString('en-IN')}</span>
+                <span>Value: ₹{totals.grandTotal.toLocaleString('en-IN')}</span>
             )}
           </CardDescription>
         </div>
@@ -86,10 +88,10 @@ export function QuoteCard({ quote, onDelete }: QuoteCardProps) {
               {label}
             </Badge>
         </div>
-         {quote.discount && (
+         {totals.discount > 0 && (
             <div className="flex justify-between">
                 <span className="text-muted-foreground">Discount Applied</span>
-                <span className="font-medium text-destructive">{getDiscountDisplay()}</span>
+                <span className="font-medium text-destructive">₹{totals.discount.toLocaleString('en-IN')}</span>
             </div>
         )}
         <div className="flex justify-between">
