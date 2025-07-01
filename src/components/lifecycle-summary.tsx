@@ -20,13 +20,15 @@ export function LifecycleSummary() {
 
   return (
     <Card>
-      <CardHeader className="p-4 pb-2">
-        <CardTitle className="text-base font-semibold">Sales Lifecycle at a Glance</CardTitle>
-        <CardDescription className="text-xs">
-          Follow the journey from initial lead, through the sales opportunity, to a finalized contract.
-        </CardDescription>
+      <CardHeader className="p-3">
+        <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+          <CardTitle className="text-base font-semibold">Sales Lifecycle at a Glance</CardTitle>
+          <p className="text-xs text-muted-foreground">
+            Follow the journey from initial lead, through the sales opportunity, to a finalized contract.
+          </p>
+        </div>
       </CardHeader>
-      <CardContent className="p-4 pt-2">
+      <CardContent className="p-3 pt-0">
         <TooltipProvider>
           <div className="flex items-center justify-center gap-4 md:gap-8">
             {stages.map((stage, index) => (
