@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useMemo } from "react";
@@ -124,7 +125,7 @@ export default function LeadsPage() {
   return (
     <div className="flex flex-col h-full w-full">
       <Header title="Leads" actionText="Add Lead" onActionClick={() => setIsAddLeadOpen(true)} />
-      <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
+      <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 w-full max-w-screen-2xl mx-auto">
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
           {LEAD_STATUSES.map(status => {
