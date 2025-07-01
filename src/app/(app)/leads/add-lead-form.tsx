@@ -44,6 +44,7 @@ import { Badge } from "@/components/ui/badge";
 import { AddCompanyDialog } from "../companies/add-company-dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 
 const addLeadSchema = z.object({
   name: z.string().min(1, "Lead name is required."),
@@ -653,5 +654,3 @@ export function AddLeadForm({
     </>
   );
 }
-
-    
