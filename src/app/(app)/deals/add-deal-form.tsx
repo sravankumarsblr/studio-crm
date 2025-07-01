@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -89,6 +89,10 @@ export function AddOpportunityForm({
   const [productPopoverOpen, setProductPopoverOpen] = useState(false);
   const [totalValue, setTotalValue] = useState(0);
 
+  const [productSearch, setProductSearch] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [categoryOpen, setCategoryOpen] = useState(false);
+
   const form = useForm<AddOpportunityFormValues>({
     resolver: zodResolver(addOpportunitySchema),
     defaultValues: {
@@ -103,7 +107,7 @@ export function AddOpportunityForm({
     },
   });
 
-  const { fields, append, remove, update } = useFieldArray({
+  const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: "lineItems"
   });
@@ -120,13 +124,25 @@ export function AddOpportunityForm({
     setTotalValue(newTotal);
   }, [lineItems]);
 
+  const availableProducts = products.filter(p => !fields.some(field => field.productId === p.id));
+  
+  const productCategories = useMemo(() => {
+    const categories = new Set(products.map(p => p.category));
+    return ["All", ...Array.from(categories)];
+  }, []);
+
+  const filteredAvailableProducts = useMemo(() => {
+    return availableProducts.filter(p => {
+        const categoryMatch = selectedCategory === "All" || p.category === selectedCategory;
+        const searchMatch = !productSearch || p.name.toLowerCase().includes(productSearch.toLowerCase());
+        return categoryMatch && searchMatch;
+    });
+  }, [availableProducts, selectedCategory, productSearch]);
+
   const availableContacts = selectedCompanyId
     ? contacts.filter((c) => c.companyId === selectedCompanyId)
     : [];
   
-  const availableProducts = products.filter(p => !fields.some(field => field.productId === p.id));
-
-
   const filteredContacts = availableContacts.filter(c => 
     c.name.toLowerCase().includes(contactSearch.toLowerCase()) || 
     c.email.toLowerCase().includes(contactSearch.toLowerCase())
@@ -371,7 +387,6 @@ export function AddOpportunityForm({
             />
           </div>
           
-
           <FormField
             control={form.control}
             name="primaryContactId"
@@ -496,18 +511,68 @@ export function AddOpportunityForm({
                                     Add Product
                                 </Button>
                                 </PopoverTrigger>
-                                <PopoverContent className="w-[300px] p-0">
+                                <PopoverContent className="w-[450px] p-0">
                                 <Command>
-                                    <CommandInput placeholder="Search products..." />
+                                  <div className="p-2 border-b grid grid-cols-1 md:grid-cols-2 gap-2">
+                                      <Popover open={categoryOpen} onOpenChange={setCategoryOpen}>
+                                        <PopoverTrigger asChild>
+                                          <Button
+                                            variant="outline"
+                                            role="combobox"
+                                            className="w-full justify-between"
+                                          >
+                                            {selectedCategory === "All" ? "All Categories" : selectedCategory}
+                                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                          </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                                          <Command>
+                                            <CommandInput placeholder="Search category..." />
+                                            <CommandList>
+                                              <CommandEmpty>No category found.</CommandEmpty>
+                                              <CommandGroup>
+                                                {productCategories.map((category) => (
+                                                  <CommandItem
+                                                    key={category}
+                                                    value={category}
+                                                    onSelect={() => {
+                                                      setSelectedCategory(category);
+                                                      setCategoryOpen(false);
+                                                    }}
+                                                  >
+                                                    <Check
+                                                      className={cn(
+                                                        "mr-2 h-4 w-4",
+                                                        selectedCategory === category
+                                                          ? "opacity-100"
+                                                          : "opacity-0"
+                                                      )}
+                                                    />
+                                                    {category}
+                                                  </CommandItem>
+                                                ))}
+                                              </CommandGroup>
+                                            </CommandList>
+                                          </Command>
+                                        </PopoverContent>
+                                      </Popover>
+                                      <Input 
+                                        placeholder="Search products in category..."
+                                        value={productSearch}
+                                        onChange={(e) => setProductSearch(e.target.value)}
+                                      />
+                                    </div>
                                     <CommandList>
                                         <CommandEmpty>No products found.</CommandEmpty>
                                         <CommandGroup>
-                                            {availableProducts.map((product) => (
+                                            {filteredAvailableProducts.map((product) => (
                                                 <CommandItem
                                                 key={product.id}
                                                 onSelect={() => {
                                                     append({ productId: product.id, quantity: 1 });
                                                     setProductPopoverOpen(false);
+                                                    setProductSearch("");
+                                                    setSelectedCategory("All");
                                                 }}
                                                 >
                                                 <div className="flex justify-between w-full">
