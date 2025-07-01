@@ -171,7 +171,7 @@ export function EditLeadForm({
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Lead Name</FormLabel>
+                <FormLabel>Lead</FormLabel>
                 <FormControl>
                   <Input placeholder="e.g., Q3 Calibration Contract" {...field} />
                 </FormControl>
@@ -198,7 +198,7 @@ export function EditLeadForm({
               name="ownerId"
               render={({ field }) => (
                 <FormItem className="flex flex-col">
-                  <FormLabel>Lead Owner</FormLabel>
+                  <FormLabel>Assigned to</FormLabel>
                    <Popover open={ownerOpen} onOpenChange={setOwnerOpen}>
                     <PopoverTrigger asChild>
                       <FormControl>
@@ -527,3 +527,5 @@ export function EditLeadForm({
     </>
   );
 }
+
+    
