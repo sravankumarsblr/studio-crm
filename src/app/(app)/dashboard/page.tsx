@@ -132,7 +132,7 @@ export default function DashboardPage() {
         {/* Top Row KPIs */}
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
             <Card>
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardHeader className="flex flex-row items-baseline justify-between pb-2">
                     <CardTitle className="text-sm font-medium">Pipeline Value</CardTitle>
                     <DollarSign className="w-4 h-4 text-muted-foreground" />
                 </CardHeader>
@@ -142,7 +142,7 @@ export default function DashboardPage() {
                 </CardContent>
             </Card>
             <Card>
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardHeader className="flex flex-row items-baseline justify-between pb-2">
                     <CardTitle className="text-sm font-medium">Opportunities Won</CardTitle>
                     <ThumbsUp className="w-4 h-4 text-muted-foreground" />
                 </CardHeader>
@@ -152,7 +152,7 @@ export default function DashboardPage() {
                 </CardContent>
             </Card>
             <Card>
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardHeader className="flex flex-row items-baseline justify-between pb-2">
                     <CardTitle className="text-sm font-medium">Opportunities Lost</CardTitle>
                     <ThumbsDown className="w-4 h-4 text-muted-foreground" />
                 </CardHeader>
@@ -162,7 +162,7 @@ export default function DashboardPage() {
                 </CardContent>
             </Card>
             <Card>
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardHeader className="flex flex-row items-baseline justify-between pb-2">
                     <CardTitle className="text-sm font-medium">Conversion Rate</CardTitle>
                     <Target className="w-4 h-4 text-muted-foreground" />
                 </CardHeader>
@@ -172,7 +172,7 @@ export default function DashboardPage() {
                 </CardContent>
             </Card>
             <Card>
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardHeader className="flex flex-row items-baseline justify-between pb-2">
                     <CardTitle className="text-sm font-medium">Avg. Time to Win</CardTitle>
                     <Clock className="w-4 h-4 text-muted-foreground" />
                 </CardHeader>
@@ -291,7 +291,7 @@ export default function DashboardPage() {
 
           <div className="lg:col-span-3">
              <Card>
-                <CardHeader className="flex flex-row items-center gap-2 pb-4">
+                <CardHeader className="flex flex-row items-baseline gap-2 pb-4">
                     <Filter className="w-4 h-4" />
                     <CardTitle className="text-base">Filter & Search</CardTitle>
                 </CardHeader>
