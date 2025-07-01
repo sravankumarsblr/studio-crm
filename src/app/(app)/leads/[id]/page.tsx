@@ -11,7 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
-import { AiLeadScorer } from '../ai-lead-scorer';
+import { AiLeadScorer } from '@/app/(app)/leads/ai-lead-scorer';
 import { leads as allLeads, contacts, companies, products, type Lead } from '@/lib/data';
 import {
   DropdownMenu,
@@ -19,10 +19,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { LogActivityDialog } from '../../(app)/leads/log-activity-dialog';
-import { EditLeadDialog } from './edit-lead-dialog';
+import { LogActivityDialog } from '@/app/(app)/leads/log-activity-dialog';
+import { EditLeadDialog } from '@/app/(app)/leads/edit-lead-dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { ProductSelectorDialog } from '../../products/product-selector-dialog';
+import { ProductSelectorDialog } from '@/app/(app)/products/product-selector-dialog';
 
 const dummyActivity = [
     { type: 'note', content: 'Initial contact made, sent follow-up email with brochure.', user: 'Aryan Sharma', time: '2 hours ago', icon: StickyNote },
