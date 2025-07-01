@@ -5,8 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import type { Quote, QuoteLineItem } from "@/lib/data";
-import { MoreVertical, Trash2, Download, CheckCircle, XCircle, Clock } from "lucide-react";
+import type { Opportunity, Quote, QuoteLineItem } from "@/lib/data";
+import { MoreVertical, Trash2, Download, CheckCircle, XCircle, Clock, FileCheck2 } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,7 +16,9 @@ import {
 
 type QuoteCardProps = {
   quote: Quote;
+  opportunityStage: Opportunity['stage'];
   onDelete: (quoteId: string) => void;
+  onAttachPo: (quote: Quote) => void;
 };
 
 const statusConfig = {
@@ -27,7 +29,7 @@ const statusConfig = {
 } as const;
 
 
-export function QuoteCard({ quote, onDelete }: QuoteCardProps) {
+export function QuoteCard({ quote, opportunityStage, onDelete, onAttachPo }: QuoteCardProps) {
     const {variant, icon: Icon, label} = statusConfig[quote.status];
 
     const calculateTotals = (lineItems: QuoteLineItem[]) => {
@@ -73,6 +75,11 @@ export function QuoteCard({ quote, onDelete }: QuoteCardProps) {
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuItem><Download className="mr-2 h-4 w-4"/>Download</DropdownMenuItem>
+            {opportunityStage !== 'Closed Won' && quote.status !== 'Accepted' && (
+              <DropdownMenuItem onClick={() => onAttachPo(quote)}>
+                <FileCheck2 className="mr-2 h-4 w-4"/>Attach PO
+              </DropdownMenuItem>
+            )}
             <DropdownMenuItem className="text-destructive" onClick={() => onDelete(quote.id)}>
               <Trash2 className="mr-2 h-4 w-4"/>Delete
             </DropdownMenuItem>
