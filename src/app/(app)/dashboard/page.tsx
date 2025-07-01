@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { opportunities as allOpportunities, contacts, leads, contracts, products } from "@/lib/data";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
-import { ThumbsUp, ThumbsDown, DollarSign, Target, Clock, Filter, ChevronsUpDown, Check } from 'lucide-react';
+import { ThumbsUp, ThumbsDown, IndianRupee, Target, Clock, Filter, ChevronsUpDown, Check } from 'lucide-react';
 import { format, differenceInDays, parseISO } from 'date-fns';
 import { cn } from '@/lib/utils';
 import type { Opportunity } from '@/lib/data';
@@ -134,7 +134,7 @@ export default function DashboardPage() {
             <Card>
                 <CardHeader className="flex flex-row items-baseline justify-between pb-2">
                     <CardTitle className="text-sm font-medium">Pipeline Value</CardTitle>
-                    <DollarSign className="w-4 h-4 text-muted-foreground" />
+                    <IndianRupee className="w-4 h-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
                     <div className="text-2xl font-bold">₹{dashboardData.totalOpenValue.toLocaleString('en-IN')}</div>

@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { ArrowLeft, Edit, FileText, DollarSign, Building2, UserCircle, Briefcase, FilePlus, StickyNote, Mail, Phone } from 'lucide-react';
+import { ArrowLeft, Edit, FileText, IndianRupee, Building2, UserCircle, Briefcase, FilePlus, StickyNote, Mail, Phone } from 'lucide-react';
 
 import { Header } from '@/components/header';
 import { Button } from '@/components/ui/button';
@@ -100,7 +100,7 @@ export default function OpportunityDetailPage() {
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between pb-2">
                         <CardTitle className="text-sm font-medium">Pipeline Value</CardTitle>
-                        <DollarSign className="w-4 h-4 text-muted-foreground" />
+                        <IndianRupee className="w-4 h-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">₹{opportunity.value.toLocaleString('en-IN')}</div>
@@ -257,5 +257,3 @@ export default function OpportunityDetailPage() {
     </div>
   );
 }
-
-    

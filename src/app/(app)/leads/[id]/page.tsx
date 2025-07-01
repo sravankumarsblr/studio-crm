@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { ArrowLeft, Edit, Phone, Mail, Building2, DollarSign, List, Paperclip, StickyNote, PlusCircle, MoreVertical, Trash2, Download, UserCircle, Briefcase } from 'lucide-react';
+import { ArrowLeft, Edit, Phone, Mail, Building2, IndianRupee, List, Paperclip, StickyNote, PlusCircle, MoreVertical, Trash2, Download, UserCircle, Briefcase } from 'lucide-react';
 
 import { Header } from '@/components/header';
 import { Button } from '@/components/ui/button';
@@ -94,7 +94,7 @@ export default function LeadDetailPage() {
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between pb-2">
                         <CardTitle className="text-sm font-medium">Value</CardTitle>
-                        <DollarSign className="w-4 h-4 text-muted-foreground" />
+                        <IndianRupee className="w-4 h-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">₹{lead.value.toLocaleString('en-IN')}</div>
@@ -249,5 +249,3 @@ export default function LeadDetailPage() {
     </div>
   );
 }
-
-    
