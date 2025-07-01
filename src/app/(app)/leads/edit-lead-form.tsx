@@ -43,6 +43,8 @@ import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { AddCompanyDialog } from "../companies/add-company-dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 
 const editLeadSchema = z.object({
   name: z.string().min(1, "Lead name is required."),
@@ -74,6 +76,128 @@ const editLeadSchema = z.object({
 
 export type EditLeadFormValues = z.infer<typeof editLeadSchema>;
 
+function ProductSelectorDialog({
+  isOpen,
+  setIsOpen,
+  onProductsAdded
+}: {
+  isOpen: boolean,
+  setIsOpen: (open: boolean) => void,
+  onProductsAdded: (productIds: string[]) => void
+}) {
+  const [stagedProductIds, setStagedProductIds] = useState<string[]>([]);
+  const [productSearch, setProductSearch] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [currentPage, setCurrentPage] = useState(1);
+  const productsPerPage = 10;
+
+  const productCategories = useMemo(() => {
+    const categories = new Set(products.map(p => p.category));
+    return ["All", ...Array.from(categories)];
+  }, []);
+
+  const availableProducts = useMemo(() => {
+    return products.filter(p => {
+        const categoryMatch = selectedCategory === "All" || p.category === selectedCategory;
+        const searchMatch = !productSearch || p.name.toLowerCase().includes(productSearch.toLowerCase());
+        return categoryMatch && searchMatch;
+    });
+  }, [selectedCategory, productSearch]);
+
+  const paginatedProducts = useMemo(() => {
+    const startIndex = (currentPage - 1) * productsPerPage;
+    return availableProducts.slice(startIndex, startIndex + productsPerPage);
+  }, [availableProducts, currentPage, productsPerPage]);
+
+  const totalPages = Math.ceil(availableProducts.length / productsPerPage);
+
+  const handleToggleStagedProduct = (productId: string) => {
+    setStagedProductIds(prev =>
+      prev.includes(productId)
+        ? prev.filter(id => id !== productId)
+        : [...prev, productId]
+    );
+  };
+  
+  const handleAddProducts = () => {
+    onProductsAdded(stagedProductIds);
+    setIsOpen(false);
+    setStagedProductIds([]);
+    setProductSearch("");
+    setSelectedCategory("All");
+    setCurrentPage(1);
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogContent className="sm:max-w-4xl h-[80vh] flex flex-col">
+        <DialogHeader>
+          <DialogTitle>Add Products</DialogTitle>
+          <DialogDescription>
+            Select products to add to the lead. You can filter by category and search by name.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="grid grid-cols-4 gap-6 flex-1 overflow-hidden">
+          <div className="col-span-1 border-r pr-4 overflow-y-auto">
+            <h4 className="text-sm font-medium mb-2">Categories</h4>
+            <RadioGroup value={selectedCategory} onValueChange={setSelectedCategory} className="space-y-1">
+              {productCategories.map(category => (
+                <div key={category} className="flex items-center">
+                  <RadioGroupItem value={category} id={`cat-edit-${category}`} />
+                  <Label htmlFor={`cat-edit-${category}`} className="ml-2 text-sm font-normal">{category}</Label>
+                </div>
+              ))}
+            </RadioGroup>
+          </div>
+          <div className="col-span-3 flex flex-col gap-4 overflow-hidden">
+            <Input 
+              placeholder="Search products..."
+              value={productSearch}
+              onChange={(e) => setProductSearch(e.target.value)}
+            />
+            <div className="flex-1 overflow-y-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-[50px]"></TableHead>
+                    <TableHead>Product</TableHead>
+                    <TableHead>Category</TableHead>
+                    <TableHead className="text-right">Price</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {paginatedProducts.map(product => (
+                    <TableRow key={product.id}>
+                      <TableCell>
+                        <Checkbox 
+                          checked={stagedProductIds.includes(product.id)}
+                          onCheckedChange={() => handleToggleStagedProduct(product.id)}
+                        />
+                      </TableCell>
+                      <TableCell className="font-medium">{product.name}</TableCell>
+                      <TableCell>{product.category}</TableCell>
+                      <TableCell className="text-right">₹{product.price.toLocaleString('en-IN')}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+             <div className="flex items-center justify-end space-x-2">
+                <Button variant="outline" size="sm" onClick={() => setCurrentPage(p => p - 1)} disabled={currentPage === 1}>Previous</Button>
+                <span className="text-sm">Page {currentPage} of {totalPages > 0 ? totalPages : 1}</span>
+                <Button variant="outline" size="sm" onClick={() => setCurrentPage(p => p + 1)} disabled={currentPage === totalPages}>Next</Button>
+            </div>
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setIsOpen(false)}>Cancel</Button>
+          <Button onClick={handleAddProducts}>Add {stagedProductIds.length} Products</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
 export function EditLeadForm({
   lead,
   onSave,
@@ -88,11 +212,7 @@ export function EditLeadForm({
   const [isAddCompanyOpen, setIsAddCompanyOpen] = useState(false);
   const [companies, setCompanies] = useState<Company[]>(staticCompanies);
   const [contactSearch, setContactSearch] = useState("");
-  const [productSearch, setProductSearch] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("All");
-  const [categoryOpen, setCategoryOpen] = useState(false);
-  const [productPopoverOpen, setProductPopoverOpen] = useState(false);
-
+  const [isProductSelectorOpen, setIsProductSelectorOpen] = useState(false);
 
   const defaultValues = useMemo(() => {
     const company = companies.find(c => c.name === lead.companyName);
@@ -134,22 +254,6 @@ export function EditLeadForm({
     c.email.toLowerCase().includes(contactSearch.toLowerCase())
   );
 
-  const productCategories = useMemo(() => {
-    const categories = new Set(products.map(p => p.category));
-    return ["All", ...Array.from(categories)];
-  }, []);
-
-  const availableProducts = products.filter(p => !selectedProductIds.includes(p.id));
-
-  const filteredAvailableProducts = useMemo(() => {
-    return availableProducts.filter(p => {
-        const categoryMatch = selectedCategory === "All" || p.category === selectedCategory;
-        const searchMatch = !productSearch || p.name.toLowerCase().includes(productSearch.toLowerCase());
-        return categoryMatch && searchMatch;
-    });
-  }, [availableProducts, selectedCategory, productSearch]);
-
-
   const handleContactCheckedChange = (checked: boolean, contactId: string) => {
     const currentContactIds = form.getValues("contactIds") || [];
     const currentPrimaryId = form.getValues("primaryContactId");
@@ -184,12 +288,11 @@ export function EditLeadForm({
     );
   };
 
-  const handleProductSelect = (productId: string) => {
+  const handleProductsAddedFromSelector = (newProductIds: string[]) => {
     const currentProductIds = form.getValues("productIds");
-    if (!currentProductIds.includes(productId)) {
-        form.setValue("productIds", [...currentProductIds, productId], { shouldValidate: true });
-    }
-  };
+    const mergedIds = Array.from(new Set([...currentProductIds, ...newProductIds]));
+    form.setValue("productIds", mergedIds, { shouldValidate: true });
+  }
 
   const onSubmit = (values: EditLeadFormValues) => {
     onSave(values);
@@ -506,88 +609,10 @@ export function EditLeadForm({
                             </TableBody>
                         </Table>
                          <div className="p-2 flex items-center justify-between">
-                            <Popover open={productPopoverOpen} onOpenChange={setProductPopoverOpen}>
-                                <PopoverTrigger asChild>
-                                <Button variant="outline" size="sm">
-                                    <PlusCircle className="mr-2 h-4 w-4" />
-                                    Add Product
-                                </Button>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-[450px] p-0">
-                                <Command>
-                                  <div className="p-2 border-b grid grid-cols-1 md:grid-cols-2 gap-2">
-                                      <Popover open={categoryOpen} onOpenChange={setCategoryOpen}>
-                                        <PopoverTrigger asChild>
-                                          <Button
-                                            variant="outline"
-                                            role="combobox"
-                                            className="w-full justify-between"
-                                          >
-                                            {selectedCategory === "All" ? "All Categories" : selectedCategory}
-                                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                                          </Button>
-                                        </PopoverTrigger>
-                                        <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
-                                          <Command>
-                                            <CommandInput placeholder="Search category..." />
-                                            <CommandList>
-                                              <CommandEmpty>No category found.</CommandEmpty>
-                                              <CommandGroup>
-                                                {productCategories.map((category) => (
-                                                  <CommandItem
-                                                    key={category}
-                                                    value={category}
-                                                    onSelect={() => {
-                                                      setSelectedCategory(category);
-                                                      setCategoryOpen(false);
-                                                    }}
-                                                  >
-                                                    <Check
-                                                      className={cn(
-                                                        "mr-2 h-4 w-4",
-                                                        selectedCategory === category
-                                                          ? "opacity-100"
-                                                          : "opacity-0"
-                                                      )}
-                                                    />
-                                                    {category}
-                                                  </CommandItem>
-                                                ))}
-                                              </CommandGroup>
-                                            </CommandList>
-                                          </Command>
-                                        </PopoverContent>
-                                      </Popover>
-                                      <Input 
-                                        placeholder="Search products in category..."
-                                        value={productSearch}
-                                        onChange={(e) => setProductSearch(e.target.value)}
-                                      />
-                                    </div>
-                                    <CommandList>
-                                        <CommandEmpty>No products found.</CommandEmpty>
-                                        <CommandGroup>
-                                            {filteredAvailableProducts.map((product) => (
-                                                <CommandItem
-                                                key={product.id}
-                                                onSelect={() => {
-                                                    handleProductSelect(product.id);
-                                                    setProductPopoverOpen(false);
-                                                    setProductSearch("");
-                                                    setSelectedCategory("All");
-                                                }}
-                                                >
-                                                <div className="flex justify-between w-full">
-                                                    <span>{product.name}</span>
-                                                    <span className="text-muted-foreground">{product.category}</span>
-                                                </div>
-                                                </CommandItem>
-                                            ))}
-                                        </CommandGroup>
-                                    </CommandList>
-                                </Command>
-                                </PopoverContent>
-                            </Popover>
+                            <Button variant="outline" size="sm" type="button" onClick={() => setIsProductSelectorOpen(true)}>
+                                <PlusCircle className="mr-2 h-4 w-4" />
+                                Add Product
+                            </Button>
                          </div>
                     </div>
                     <FormMessage />
@@ -628,6 +653,11 @@ export function EditLeadForm({
         isOpen={isAddCompanyOpen}
         setIsOpen={setIsAddCompanyOpen}
         onCompanyCreated={handleCompanyCreated}
+      />
+      <ProductSelectorDialog
+        isOpen={isProductSelectorOpen}
+        setIsOpen={setIsProductSelectorOpen}
+        onProductsAdded={handleProductsAddedFromSelector}
       />
     </>
   );
