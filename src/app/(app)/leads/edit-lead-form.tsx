@@ -93,7 +93,7 @@ export function EditLeadForm({
 
   const defaultValues = useMemo(() => {
     const company = companies.find(c => c.name === lead.companyName);
-    const primaryContact = contacts.find(c => c.name === lead.contactName && c.companyId === company?.id);
+    const primaryContact = contacts.find(c => `${c.firstName} ${c.lastName}` === lead.contactName && c.companyId === company?.id);
 
     return {
       name: lead.name,
@@ -127,7 +127,7 @@ export function EditLeadForm({
     : [];
 
   const filteredContacts = availableContacts.filter(c => 
-    c.name.toLowerCase().includes(contactSearch.toLowerCase()) || 
+    `${c.firstName} ${c.lastName}`.toLowerCase().includes(contactSearch.toLowerCase()) || 
     c.email.toLowerCase().includes(contactSearch.toLowerCase())
   );
 
@@ -420,7 +420,7 @@ export function EditLeadForm({
                                 )}
                               >
                                 <span>
-                                  {contact.name}
+                                  {contact.firstName} {contact.lastName}
                                   <span className="ml-2 text-muted-foreground">({contact.email})</span>
                                 </span>
                                 {field.value === contact.id && (

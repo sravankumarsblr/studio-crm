@@ -116,7 +116,7 @@ export function AddLeadForm({
     : [];
 
   const filteredContacts = availableContacts.filter(c => 
-    c.name.toLowerCase().includes(contactSearch.toLowerCase()) || 
+    `${c.firstName} ${c.lastName}`.toLowerCase().includes(contactSearch.toLowerCase()) || 
     c.email.toLowerCase().includes(contactSearch.toLowerCase())
   );
 
@@ -412,7 +412,7 @@ export function AddLeadForm({
                                 )}
                               >
                                 <span>
-                                  {contact.name}
+                                  {contact.firstName} {contact.lastName}
                                   <span className="ml-2 text-muted-foreground">({contact.email})</span>
                                 </span>
                                 {field.value === contact.id && (

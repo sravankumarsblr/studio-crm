@@ -93,9 +93,9 @@ export function EditOpportunityForm({
   
   const defaultValues = useMemo(() => {
     const company = companies.find(c => c.name === opportunity.companyName);
-    const primaryContact = contacts.find(c => c.name === opportunity.contactName && c.companyId === company?.id);
+    const primaryContact = contacts.find(c => `${c.firstName} ${c.lastName}` === opportunity.contactName && c.companyId === company?.id);
     const associatedContacts = company ? contacts.filter(c => c.companyId === company.id) : [];
-    const contactIds = primaryContact ? [primaryContact.id, ...associatedContacts.filter(c => c.id !== primaryContact.id && opportunity.contactName.includes(c.name)).map(c => c.id)] : [];
+    const contactIds = primaryContact ? [primaryContact.id, ...associatedContacts.filter(c => c.id !== primaryContact.id && opportunity.contactName.includes(`${c.firstName} ${c.lastName}`)).map(c => c.id)] : [];
 
     return {
       name: opportunity.name,
@@ -140,7 +140,7 @@ export function EditOpportunityForm({
     : [];
   
   const filteredContacts = availableContacts.filter(c => 
-    c.name.toLowerCase().includes(contactSearch.toLowerCase()) || 
+    `${c.firstName} ${c.lastName}`.toLowerCase().includes(contactSearch.toLowerCase()) || 
     c.email.toLowerCase().includes(contactSearch.toLowerCase())
   );
 
@@ -457,7 +457,7 @@ export function EditOpportunityForm({
                                 )}
                               >
                                 <span>
-                                  {contact.name}
+                                  {contact.firstName} {contact.lastName}
                                   <span className="ml-2 text-muted-foreground">({contact.email})</span>
                                 </span>
                                 {field.value === contact.id && (
