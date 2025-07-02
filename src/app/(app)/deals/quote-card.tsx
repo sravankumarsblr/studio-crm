@@ -16,7 +16,7 @@ import {
 
 type QuoteCardProps = {
   quote: Quote;
-  opportunityStage: Opportunity['stage'];
+  opportunityStatus: Opportunity['status'];
   onDelete: (quoteId: string) => void;
   onAttachPo: (quote: Quote) => void;
 };
@@ -29,7 +29,7 @@ const statusConfig = {
 } as const;
 
 
-export function QuoteCard({ quote, opportunityStage, onDelete, onAttachPo }: QuoteCardProps) {
+export function QuoteCard({ quote, opportunityStatus, onDelete, onAttachPo }: QuoteCardProps) {
     const {variant, icon: Icon, label} = statusConfig[quote.status];
 
     const calculateTotals = (lineItems: QuoteLineItem[]) => {
@@ -75,7 +75,7 @@ export function QuoteCard({ quote, opportunityStage, onDelete, onAttachPo }: Quo
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuItem><Download className="mr-2 h-4 w-4"/>Download</DropdownMenuItem>
-            {opportunityStage !== 'Closed Won' && quote.status !== 'Accepted' && (
+            {opportunityStatus !== 'Won' && quote.status !== 'Accepted' && (
               <DropdownMenuItem onClick={() => onAttachPo(quote)}>
                 <FileCheck2 className="mr-2 h-4 w-4"/>Attach PO
               </DropdownMenuItem>
@@ -131,5 +131,3 @@ export function QuoteCard({ quote, opportunityStage, onDelete, onAttachPo }: Quo
     </Card>
   );
 }
-
-    

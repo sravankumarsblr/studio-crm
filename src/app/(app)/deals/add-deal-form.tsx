@@ -189,6 +189,11 @@ export function AddOpportunityForm({
   };
 
   const onSubmit = (values: AddOpportunityFormValues) => {
+    // In a real app, status would be set on the server
+    const dataToSave = {
+        ...values,
+        status: 'Open'
+    }
     onSave(values);
   };
 
@@ -283,8 +288,6 @@ export function AddOpportunityForm({
                       <SelectItem value="Qualification">Qualification</SelectItem>
                       <SelectItem value="Proposal">Proposal</SelectItem>
                       <SelectItem value="Negotiation">Negotiation</SelectItem>
-                      <SelectItem value="Closed Won">Closed Won</SelectItem>
-                      <SelectItem value="Closed Lost">Closed Lost</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />

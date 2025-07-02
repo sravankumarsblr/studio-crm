@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { opportunities as allOpportunities, contacts, leads, contracts, products } from "@/lib/data";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { BarChart as BarChartIcon, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts';
 import { ThumbsUp, ThumbsDown, IndianRupee, Target, Clock, Filter, ChevronsUpDown, Check } from 'lucide-react';
 import { format, differenceInDays, parseISO } from 'date-fns';
 import { cn } from '@/lib/utils';
@@ -21,22 +21,15 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { Separator } from '@/components/ui/separator';
 import { LifecycleSummary } from '@/components/lifecycle-summary';
 
-const STAGES = ['Qualification', 'Proposal', 'Negotiation'];
+const STAGES = ['Qualification', 'Proposal', 'Negotiation'] as const;
 const STATUSES = ['Open', 'Won', 'Lost'];
-const ALL_STAGES = [...STAGES, 'Closed Won', 'Closed Lost'];
 
 const STAGE_COLORS: { [key: string]: string } = {
   Qualification: 'hsl(var(--chart-1))',
   Proposal: 'hsl(var(--chart-2))',
   Negotiation: 'hsl(var(--chart-3))',
-  'Closed Won': 'hsl(var(--chart-4))',
-  'Closed Lost': 'hsl(var(--chart-5))',
-};
-
-const getStatus = (stage: Opportunity['stage']) => {
-  if (stage === 'Closed Won') return 'Won';
-  if (stage === 'Closed Lost') return 'Lost';
-  return 'Open';
+  Won: 'hsl(var(--chart-4))',
+  Lost: 'hsl(var(--chart-5))',
 };
 
 export default function DashboardPage() {
@@ -45,9 +38,9 @@ export default function DashboardPage() {
   const [searchTerm, setSearchTerm] = useState('');
 
   const dashboardData = useMemo(() => {
-    const openOpportunities = allOpportunities.filter(o => getStatus(o.stage) === 'Open');
-    const wonOpportunities = allOpportunities.filter(o => getStatus(o.stage) === 'Won');
-    const lostOpportunities = allOpportunities.filter(o => getStatus(o.stage) === 'Lost');
+    const openOpportunities = allOpportunities.filter(o => o.status === 'Open');
+    const wonOpportunities = allOpportunities.filter(o => o.status === 'Won');
+    const lostOpportunities = allOpportunities.filter(o => o.status === 'Lost');
     
     const totalOpenValue = openOpportunities.reduce((sum, o) => sum + o.value, 0);
     const expectedValue = openOpportunities.reduce((sum, o) => sum + (o.value * o.winProbability), 0);
@@ -79,6 +72,15 @@ export default function DashboardPage() {
       }, { name: 'pipeline' } as Record<string, any>)
     ];
 
+    const winLossAnalysis = STAGES.map(stage => {
+        const closedStageOpps = allOpportunities.filter(o => o.status !== 'Open' && o.stage === stage);
+        return {
+            stage,
+            Won: closedStageOpps.filter(o => o.status === 'Won').length,
+            Lost: closedStageOpps.filter(o => o.status === 'Lost').length,
+        }
+    });
+
     return {
       openOpportunities,
       wonOpportunities,
@@ -91,13 +93,13 @@ export default function DashboardPage() {
       timeTuWinDays,
       stageStats,
       pipelineChartData,
+      winLossAnalysis,
     };
   }, []);
 
   const filteredOpportunities = useMemo(() => {
     return allOpportunities.filter(o => {
-      const opportunityStatus = getStatus(o.stage);
-      const statusMatch = statusFilter.length === 0 || statusFilter.includes(opportunityStatus);
+      const statusMatch = statusFilter.length === 0 || statusFilter.includes(o.status);
       const stageMatch = stageFilter.length === 0 || stageFilter.includes(o.stage);
       
       const searchTermLower = searchTerm.toLowerCase();
@@ -120,7 +122,13 @@ export default function DashboardPage() {
     setFilterList(newList);
   };
   
-  const getContactInfo = (contactName: string) => contacts.find(c => c.name === contactName);
+  const getContactInfo = (contactName: string) => contacts.find(c => `${c.firstName} ${c.lastName}` === contactName);
+  
+  const getStatusVariant = (status: Opportunity['status']) => {
+    if (status === 'Won') return 'default';
+    if (status === 'Lost') return 'destructive';
+    return 'secondary';
+  };
 
   return (
     <div className="flex flex-col h-full bg-muted/30">
@@ -182,64 +190,85 @@ export default function DashboardPage() {
                 </CardContent>
             </Card>
         </div>
-        
-        {/* Pipeline Breakdown */}
-        <Card>
-            <CardHeader>
-                <CardTitle>Pipeline Breakdown</CardTitle>
-                <CardDescription>Value of open opportunities by stage.</CardDescription>
-            </CardHeader>
-            <CardContent>
-                <ResponsiveContainer width="100%" height={30}>
-                     <BarChart layout="vertical" data={dashboardData.pipelineChartData} stackOffset="expand" margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
-                        <XAxis type="number" hide domain={[0, 1]}/>
-                        <YAxis type="category" dataKey="name" hide />
-                        <Tooltip
-                            cursor={{ fill: 'transparent' }}
-                            content={({ active, payload }) => {
-                                if (active && payload && payload.length) {
-                                    const stage = payload[0].name;
-                                    const value = payload[0].payload[stage!];
-                                    const stageData = dashboardData.stageStats.find(s => s.stage === stage);
 
-                                    return (
-                                    <div className="rounded-lg border bg-background p-2 shadow-sm">
-                                        <p className="font-bold">{stage}</p>
-                                        <p className="text-sm">{`Count: ${stageData?.count}`}</p>
-                                        <p className="text-sm">{`Value: ₹${value.toLocaleString('en-IN')}`}</p>
-                                    </div>
-                                    );
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+            <Card>
+                <CardHeader>
+                    <CardTitle>Pipeline Breakdown</CardTitle>
+                    <CardDescription>Value of open opportunities by stage.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <ResponsiveContainer width="100%" height={30}>
+                        <BarChartIcon layout="vertical" data={dashboardData.pipelineChartData} stackOffset="expand" margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
+                            <XAxis type="number" hide domain={[0, 1]}/>
+                            <YAxis type="category" dataKey="name" hide />
+                            <Tooltip
+                                cursor={{ fill: 'transparent' }}
+                                content={({ active, payload }) => {
+                                    if (active && payload && payload.length) {
+                                        const stage = payload[0].name;
+                                        const value = payload[0].payload[stage!];
+                                        const stageData = dashboardData.stageStats.find(s => s.stage === stage);
+
+                                        return (
+                                        <div className="rounded-lg border bg-background p-2 shadow-sm">
+                                            <p className="font-bold">{stage}</p>
+                                            <p className="text-sm">{`Count: ${stageData?.count}`}</p>
+                                            <p className="text-sm">{`Value: ₹${value.toLocaleString('en-IN')}`}</p>
+                                        </div>
+                                        );
+                                    }
+                                    return null;
+                                }}
+                            />
+                            {STAGES.map((stage, index) => (
+                            <Bar 
+                                key={stage} 
+                                dataKey={stage} 
+                                stackId="a" 
+                                fill={STAGE_COLORS[stage]} 
+                                radius={
+                                    STAGES.length === 1 ? [4, 4, 4, 4] :
+                                    index === 0 ? [4, 0, 0, 4] :
+                                    index === STAGES.length - 1 ? [0, 4, 4, 0] : 0
                                 }
-                                return null;
-                            }}
-                        />
-                         {STAGES.map((stage, index) => (
-                          <Bar 
-                            key={stage} 
-                            dataKey={stage} 
-                            stackId="a" 
-                            fill={STAGE_COLORS[stage]} 
-                            radius={
-                                STAGES.length === 1 ? [4, 4, 4, 4] :
-                                index === 0 ? [4, 0, 0, 4] :
-                                index === STAGES.length - 1 ? [0, 4, 4, 0] : 0
-                            }
-                          />
+                            />
+                            ))}
+                        </BarChartIcon>
+                    </ResponsiveContainer>
+                    <div className="flex justify-around text-center mt-4">
+                        {dashboardData.stageStats.map(s => (
+                            <div key={s.stage}>
+                                <p className="text-sm text-muted-foreground">{s.stage}</p>
+                                <p className="font-bold text-lg">₹{s.value.toLocaleString('en-IN')}</p>
+                                <p className="text-xs text-muted-foreground">{s.count} opportunities</p>
+                            </div>
                         ))}
-                    </BarChart>
-                </ResponsiveContainer>
-                <div className="flex justify-around text-center mt-4">
-                    {dashboardData.stageStats.map(s => (
-                        <div key={s.stage}>
-                            <p className="text-sm text-muted-foreground">{s.stage}</p>
-                            <p className="font-bold text-lg">₹{s.value.toLocaleString('en-IN')}</p>
-                            <p className="text-xs text-muted-foreground">{s.count} opportunities</p>
-                        </div>
-                    ))}
-                </div>
-            </CardContent>
-        </Card>
+                    </div>
+                </CardContent>
+            </Card>
 
+            <Card>
+              <CardHeader>
+                <CardTitle>Win/Loss Analysis by Stage</CardTitle>
+                <CardDescription>Number of deals won or lost at each stage.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={150}>
+                  <BarChartIcon data={dashboardData.winLossAnalysis} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="stage" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Bar dataKey="Won" stackId="a" fill={STAGE_COLORS['Won']} />
+                    <Bar dataKey="Lost" stackId="a" fill={STAGE_COLORS['Lost']} radius={[4, 4, 0, 0]} />
+                  </BarChartIcon>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+        </div>
+        
         {/* Table View */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           <div className="lg:col-span-9">
@@ -271,13 +300,13 @@ export default function DashboardPage() {
                             <TableCell>{opp.contactName}</TableCell>
                             <TableCell>₹{opp.value.toLocaleString('en-IN')}</TableCell>
                             <TableCell>
-                                <Badge style={{backgroundColor: STAGE_COLORS[opp.stage]}} className="text-white">{opp.stage}</Badge>
+                                <Badge variant="secondary" style={{backgroundColor: STAGE_COLORS[opp.stage]}} className="text-white">{opp.stage}</Badge>
                             </TableCell>
                             <TableCell>{(opp.winProbability * 100).toFixed(0)}%</TableCell>
                             <TableCell>{format(parseISO(opp.closeDate), 'dd-MMM-yyyy')}</TableCell>
                             <TableCell>
-                                <Badge variant={getStatus(opp.stage) === 'Won' ? 'default' : getStatus(opp.stage) === 'Lost' ? 'destructive' : 'secondary'}>
-                                {getStatus(opp.stage)}
+                                <Badge variant={getStatusVariant(opp.status)}>
+                                {opp.status}
                                 </Badge>
                             </TableCell>
                             </TableRow>
@@ -369,7 +398,7 @@ export default function DashboardPage() {
                               <CommandList>
                                 <CommandEmpty>No results found.</CommandEmpty>
                                 <CommandGroup>
-                                  {ALL_STAGES.map((stage) => (
+                                  {STAGES.map((stage) => (
                                     <CommandItem
                                       key={stage}
                                       onSelect={() => handleFilterToggle(stageFilter, setStageFilter, stage)}

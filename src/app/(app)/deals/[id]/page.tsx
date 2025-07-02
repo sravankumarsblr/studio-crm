@@ -3,14 +3,14 @@
 
 import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { ArrowLeft, Edit, FileText, IndianRupee, Building2, UserCircle, Briefcase, FilePlus, StickyNote, Mail, Phone, PlusCircle, Trash2 } from 'lucide-react';
+import { ArrowLeft, Edit, FileText, IndianRupee, Building2, UserCircle, Briefcase, FilePlus, StickyNote, Mail, Phone, PlusCircle, Trash2, CheckCircle } from 'lucide-react';
 
 import { Header } from '@/components/header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { opportunities, contacts, companies, products, Quote, LineItem } from '@/lib/data';
+import { opportunities, contacts, companies, products, Quote, LineItem, Opportunity } from '@/lib/data';
 import { QuoteCard } from '../quote-card';
 import { GenerateQuoteDialog } from '../add-quote-dialog';
 import { LogActivityDialog } from '../log-activity-dialog';
@@ -23,13 +23,18 @@ import type { AttachPoFormValues } from '../attach-po-form';
 import { AddContractDialog } from '@/app/(app)/contracts/add-contract-dialog';
 
 
-const stageVariant: { [key: string]: "default" | "secondary" | "destructive" | "outline" } = {
+const stageVariant: { [key in Opportunity['stage']]: "default" | "secondary" | "outline" } = {
   'Qualification': 'outline',
   'Proposal': 'secondary',
   'Negotiation': 'default',
-  'Closed Won': 'default',
-  'Closed Lost': 'destructive',
 };
+
+const statusVariant: { [key in Opportunity['status']]: "default" | "secondary" | "destructive" } = {
+  'Open': 'secondary',
+  'Won': 'default',
+  'Lost': 'destructive',
+};
+
 
 const dummyActivity = [
     { type: 'note', content: 'Sent over the latest quote for negotiation.', user: 'Priya Singh', time: '4 hours ago', icon: StickyNote },
@@ -105,7 +110,7 @@ export default function OpportunityDetailPage() {
       const updatedOpportunity = {
         ...opportunity,
         quotes: [...opportunity.quotes, newQuote],
-        stage: newQuote.status === 'Accepted' ? 'Closed Won' as const : opportunity.stage,
+        status: newQuote.status === 'Accepted' ? 'Won' as const : opportunity.status,
       };
       setOpportunity(updatedOpportunity);
     }
@@ -146,7 +151,7 @@ export default function OpportunityDetailPage() {
       const updatedOpportunity = {
         ...opportunity,
         quotes: updatedQuotes,
-        stage: 'Closed Won' as const,
+        status: 'Won' as const,
       };
       setOpportunity(updatedOpportunity);
       setQuoteToAttachPo(null);
@@ -161,7 +166,7 @@ export default function OpportunityDetailPage() {
     );
   }
   
-  const isWon = opportunity.stage === 'Closed Won';
+  const isWon = opportunity.status === 'Won';
 
   return (
     <div className="flex flex-col h-full">
@@ -178,14 +183,14 @@ export default function OpportunityDetailPage() {
         <Button variant="outline" onClick={() => setIsLogActivityOpen(true)}>Log Activity</Button>
         <Button variant="outline" onClick={() => setIsEditOpportunityOpen(true)}><Edit className="mr-2"/> Edit</Button>
         <Button onClick={() => setIsAddContractOpen(true)} disabled={!isWon}>
-          Convert to Contract
+          <FilePlus className="mr-2 h-4 w-4" /> Convert to Contract
         </Button>
       </Header>
 
       <main className="flex-1 overflow-y-auto p-4 sm:p-6">
         <div className="grid grid-cols-1 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           <div className="lg:col-span-2 xl:col-span-3 space-y-6">
-            <div className="grid md:grid-cols-3 gap-6">
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between pb-2">
                         <CardTitle className="text-sm font-medium">Pipeline Value</CardTitle>
@@ -198,10 +203,19 @@ export default function OpportunityDetailPage() {
                  <Card>
                     <CardHeader className="flex flex-row items-center justify-between pb-2">
                         <CardTitle className="text-sm font-medium">Stage</CardTitle>
-                        <FileText className="w-4 h-4 text-muted-foreground" />
+                        <Briefcase className="w-4 h-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
                         <Badge variant={stageVariant[opportunity.stage]} className="text-base">{opportunity.stage}</Badge>
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardHeader className="flex flex-row items-center justify-between pb-2">
+                        <CardTitle className="text-sm font-medium">Status</CardTitle>
+                        <CheckCircle className="w-4 h-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                        <Badge variant={statusVariant[opportunity.status]} className="text-base">{opportunity.status}</Badge>
                     </CardContent>
                 </Card>
                 <Card>
@@ -210,7 +224,7 @@ export default function OpportunityDetailPage() {
                         <FileText className="w-4 h-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">{opportunity.closeDate}</div>
+                        <div className="text-lg font-bold">{opportunity.closeDate}</div>
                     </CardContent>
                 </Card>
             </div>
@@ -232,7 +246,7 @@ export default function OpportunityDetailPage() {
                         <UserCircle className="w-5 h-5 mt-1 text-muted-foreground" />
                         <div>
                             <p className="text-muted-foreground">Primary Contact</p>
-                            <p className="font-medium">{primaryContact?.name || opportunity.contactName}</p>
+                            <p className="font-medium">{primaryContact?.firstName} {primaryContact?.lastName}</p>
                              <p className="text-muted-foreground text-xs">{primaryContact?.email}</p>
                         </div>
                     </div>
@@ -242,9 +256,9 @@ export default function OpportunityDetailPage() {
             <Card>
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle>Products & Services</CardTitle>
-                <Button variant="outline" size="sm" onClick={() => setIsProductSelectorOpen(true)}>
+                <Button variant="outline" size="sm" onClick={() => setIsProductSelectorOpen(true)} disabled={isWon}>
                     <PlusCircle className="mr-2 h-4 w-4" />
-                    Add Product
+                    Add/Edit Products
                 </Button>
               </CardHeader>
               <CardContent>
@@ -255,7 +269,7 @@ export default function OpportunityDetailPage() {
                             <TableHead className="w-[100px]">Quantity</TableHead>
                             <TableHead className="w-[120px] text-right">Unit Price</TableHead>
                             <TableHead className="w-[120px] text-right">Total</TableHead>
-                            <TableHead className="w-[50px]"></TableHead>
+                            {!isWon && <TableHead className="w-[50px]"></TableHead>}
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -280,15 +294,18 @@ export default function OpportunityDetailPage() {
                                             value={item.quantity}
                                             onChange={(e) => handleQuantityChange(item.productId, e.target.value)}
                                             className="h-8 w-20"
+                                            disabled={isWon}
                                         />
                                     </TableCell>
                                     <TableCell className="text-right">₹{product.price.toLocaleString('en-IN')}</TableCell>
                                     <TableCell className="text-right">₹{total.toLocaleString('en-IN')}</TableCell>
-                                    <TableCell>
-                                      <Button variant="ghost" size="icon" onClick={() => handleRemoveItem(item.productId)}>
-                                          <Trash2 className="h-4 w-4 text-destructive"/>
-                                      </Button>
-                                    </TableCell>
+                                    {!isWon && (
+                                        <TableCell>
+                                        <Button variant="ghost" size="icon" onClick={() => handleRemoveItem(item.productId)}>
+                                            <Trash2 className="h-4 w-4 text-destructive"/>
+                                        </Button>
+                                        </TableCell>
+                                    )}
                                 </TableRow>
                             );
                         })}
@@ -324,7 +341,7 @@ export default function OpportunityDetailPage() {
               </TabsContent>
 
               <TabsContent value="quotes" className="mt-4 space-y-4">
-                <Button className="w-full" onClick={() => setIsGenerateQuoteOpen(true)}>
+                <Button className="w-full" onClick={() => setIsGenerateQuoteOpen(true)} disabled={isWon}>
                     <FilePlus className="mr-2"/> Generate Quote
                 </Button>
                 <div className="space-y-4">
@@ -333,7 +350,7 @@ export default function OpportunityDetailPage() {
                       <QuoteCard 
                         key={quote.id} 
                         quote={quote} 
-                        opportunityStage={opportunity.stage}
+                        opportunityStatus={opportunity.status}
                         onDelete={handleQuoteDeleted}
                         onAttachPo={handleOpenAttachPoDialog}
                       />

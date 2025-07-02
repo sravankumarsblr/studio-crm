@@ -90,7 +90,8 @@ export type Opportunity = {
   ownerId: string;
   companyName: string;
   contactName: string;
-  stage: 'Qualification' | 'Proposal' | 'Negotiation' | 'Closed Won' | 'Closed Lost';
+  stage: 'Qualification' | 'Proposal' | 'Negotiation';
+  status: 'Open' | 'Won' | 'Lost';
   value: number;
   closeDate: string;
   createdDate: string;
@@ -192,6 +193,7 @@ export const opportunities: Opportunity[] = [
     companyName: 'Vimaan Aerospace Solutions', 
     contactName: 'Sneha Reddy', 
     stage: 'Proposal', 
+    status: 'Open',
     value: 4990000, 
     createdDate: '2024-06-01',
     closeDate: '2024-08-30', 
@@ -207,7 +209,8 @@ export const opportunities: Opportunity[] = [
     ownerId: 'user4',
     companyName: 'Sanjeevani MedTech', 
     contactName: 'Deepak Kumar', 
-    stage: 'Negotiation', 
+    stage: 'Negotiation',
+    status: 'Open',
     value: 11950800, 
     createdDate: '2024-05-15',
     closeDate: '2024-07-25', 
@@ -224,7 +227,8 @@ export const opportunities: Opportunity[] = [
     ownerId: 'user3',
     companyName: 'Accurate Calibration Pvt. Ltd.', 
     contactName: 'Vikram Patel', 
-    stage: 'Closed Won', 
+    stage: 'Negotiation', 
+    status: 'Won',
     value: 2200000, 
     createdDate: '2024-05-20',
     closeDate: '2024-06-15', 
@@ -240,7 +244,8 @@ export const opportunities: Opportunity[] = [
     ownerId: 'user3',
     companyName: 'Navachar Tech Labs', 
     contactName: 'Isha Singh', 
-    stage: 'Qualification', 
+    stage: 'Qualification',
+    status: 'Open',
     value: 2500000, 
     createdDate: '2024-06-10', 
     closeDate: '2024-09-15', 
@@ -254,7 +259,8 @@ export const opportunities: Opportunity[] = [
     ownerId: 'user4',
     companyName: 'Bharat Petrochem', 
     contactName: 'Amit Desai', 
-    stage: 'Closed Lost', 
+    stage: 'Proposal', 
+    status: 'Lost',
     value: 998000, 
     createdDate: '2024-05-01', 
     closeDate: '2024-06-20', 

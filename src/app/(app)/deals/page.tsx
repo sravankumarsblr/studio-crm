@@ -27,37 +27,25 @@ import { Progress } from "@/components/ui/progress";
 import { AddOpportunityDialog } from "./add-deal-dialog";
 import { useToast } from "@/hooks/use-toast";
 
-const OPPORTUNITY_STAGES = ['Qualification', 'Proposal', 'Negotiation', 'Closed Won', 'Closed Lost'] as const;
+const OPPORTUNITY_STAGES = ['Qualification', 'Proposal', 'Negotiation'] as const;
 const DEAL_STATUSES = ['Open', 'Won', 'Lost'];
 
 const stageIcons: { [key in typeof OPPORTUNITY_STAGES[number]]: React.ElementType } = {
   Qualification: BarChart,
   Proposal: Briefcase,
   Negotiation: CheckCircle,
-  'Closed Won': CheckCircle,
-  'Closed Lost': XCircle,
 };
 
 const stageProgress: { [key: string]: number } = {
   'Qualification': 20,
   'Proposal': 50,
   'Negotiation': 75,
-  'Closed Won': 100,
-  'Closed Lost': 100,
 };
 
 const stageVariant: { [key: string]: "default" | "secondary" | "destructive" | "outline" } = {
   'Qualification': 'outline',
   'Proposal': 'secondary',
   'Negotiation': 'default',
-  'Closed Won': 'default',
-  'Closed Lost': 'destructive',
-};
-
-const getStatus = (stage: Opportunity['stage']) => {
-  if (stage === 'Closed Won') return 'Won';
-  if (stage === 'Closed Lost') return 'Lost';
-  return 'Open';
 };
 
 export default function OpportunitiesPage() {
@@ -80,11 +68,9 @@ export default function OpportunitiesPage() {
       'Qualification': 0,
       'Proposal': 0,
       'Negotiation': 0,
-      'Closed Won': 0,
-      'Closed Lost': 0,
     };
     for (const opportunity of allOpportunities) {
-      if (counts[opportunity.stage] !== undefined) {
+      if (opportunity.status === 'Open' && counts[opportunity.stage] !== undefined) {
         counts[opportunity.stage]++;
       }
     }
@@ -96,7 +82,7 @@ export default function OpportunitiesPage() {
       if (nameFilter && !opportunity.name.toLowerCase().includes(nameFilter.toLowerCase())) return false;
       if (companyFilter && !opportunity.companyName.toLowerCase().includes(companyFilter.toLowerCase())) return false;
       if (stageFilter && opportunity.stage !== stageFilter) return false;
-      if (statusFilter && getStatus(opportunity.stage) !== statusFilter) return false;
+      if (statusFilter && opportunity.status !== statusFilter) return false;
       if (valueFilter.min && opportunity.value < Number(valueFilter.min)) return false;
       if (valueFilter.max && opportunity.value > Number(valueFilter.max)) return false;
       if (ownerFilter && opportunity.ownerId !== ownerFilter) return false;
@@ -121,20 +107,33 @@ export default function OpportunitiesPage() {
     setCurrentPage(1);
   };
   
-  const handleCloseAsWon = (opportunityName: string) => {
+  const handleCloseAsWon = (opportunityId: string) => {
+    const opp = opportunities.find(o => o.id === opportunityId);
+    if (!opp) return;
+
+    setOpportunities(prev => prev.map(o => o.id === opportunityId ? { ...o, status: 'Won' } : o));
     toast({
       title: "Opportunity Updated",
-      description: `"${opportunityName}" has been closed as won.`,
+      description: `"${opp.name}" has been closed as won.`,
     });
-    // Here you would typically update the state, but for this prototype we'll just show the toast
   };
 
-  const handleCloseAsLost = (opportunityName: string) => {
+  const handleCloseAsLost = (opportunityId: string) => {
+    const opp = opportunities.find(o => o.id === opportunityId);
+    if (!opp) return;
+
+    setOpportunities(prev => prev.map(o => o.id === opportunityId ? { ...o, status: 'Lost' } : o));
     toast({
       title: "Opportunity Updated",
-      description: `"${opportunityName}" has been closed as lost.`,
+      description: `"${opp.name}" has been closed as lost.`,
       variant: "destructive",
     });
+  };
+  
+  const getStatusVariant = (status: Opportunity['status']) => {
+    if (status === 'Won') return 'default';
+    if (status === 'Lost') return 'destructive';
+    return 'secondary';
   };
 
   return (
@@ -142,7 +141,7 @@ export default function OpportunitiesPage() {
       <Header title="Opportunities" actionText="Add Opportunity" onActionClick={() => setIsAddOpportunityOpen(true)} />
       <main className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 w-full max-w-screen-2xl mx-auto">
 
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {OPPORTUNITY_STAGES.map(stage => {
             const Icon = stageIcons[stage];
             return (
@@ -229,12 +228,12 @@ export default function OpportunitiesPage() {
                       <Badge variant={stageVariant[opportunity.stage]}>{opportunity.stage}</Badge>
                     </TableCell>
                     <TableCell>
-                      <Badge variant={getStatus(opportunity.stage) === 'Won' ? 'default' : getStatus(opportunity.stage) === 'Lost' ? 'destructive' : 'secondary'}>
-                        {getStatus(opportunity.stage)}
+                      <Badge variant={getStatusVariant(opportunity.status)}>
+                        {opportunity.status}
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      <Progress value={stageProgress[opportunity.stage]} className="h-2" />
+                      <Progress value={opportunity.status === 'Open' ? stageProgress[opportunity.stage] : 100} className="h-2" />
                     </TableCell>
                     <TableCell className="text-right">
                       <DropdownMenu>
@@ -247,12 +246,16 @@ export default function OpportunitiesPage() {
                           <DropdownMenuItem asChild>
                             <Link href={`/deals/${opportunity.id}`}>View Details</Link>
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleCloseAsWon(opportunity.name)}>
-                            Close as Won
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleCloseAsLost(opportunity.name)} className="text-destructive">
-                            Close as Lost
-                          </DropdownMenuItem>
+                          {opportunity.status === 'Open' && (
+                            <>
+                              <DropdownMenuItem onClick={() => handleCloseAsWon(opportunity.id)}>
+                                Close as Won
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleCloseAsLost(opportunity.id)} className="text-destructive">
+                                Close as Lost
+                              </DropdownMenuItem>
+                            </>
+                          )}
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>
@@ -300,5 +303,3 @@ export default function OpportunitiesPage() {
     </div>
   );
 }
-
-    

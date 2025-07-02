@@ -278,7 +278,7 @@ export function EditOpportunityForm({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Stage</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select onValueChange={field.onChange} defaultValue={field.value} disabled={opportunity.status !== 'Open'}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select a stage" />
@@ -288,8 +288,6 @@ export function EditOpportunityForm({
                       <SelectItem value="Qualification">Qualification</SelectItem>
                       <SelectItem value="Proposal">Proposal</SelectItem>
                       <SelectItem value="Negotiation">Negotiation</SelectItem>
-                      <SelectItem value="Closed Won">Closed Won</SelectItem>
-                      <SelectItem value="Closed Lost">Closed Lost</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
