@@ -27,10 +27,15 @@ export type Company = {
 
 export type Contact = {
   id: string;
-  name: string;
+  salutation: 'Mr.' | 'Ms.' | 'Mrs.' | 'Dr.';
+  firstName: string;
+  lastName: string;
   email: string;
-  phone: string;
+  mobile: string;
   companyId: string;
+  designation: string;
+  department: string;
+  status: 'active' | 'inactive';
   avatar: string;
 };
 
@@ -139,6 +144,8 @@ export const departments = [
     'Operations'
 ];
 
+export const salutations = ['Mr.', 'Ms.', 'Mrs.', 'Dr.'];
+
 export const roles: Role[] = [
   { id: 'role1', name: 'Admin', description: 'Has access to all features, including the admin section.' },
   { id: 'role2', name: 'Sales Manager', description: 'Can view and manage all leads, opportunities, and contracts.' },
@@ -162,12 +169,12 @@ export const companies: Company[] = [
 ];
 
 export const contacts: Contact[] = [
-  { id: 'con1', name: 'Vikram Patel', email: 'vikram.p@acpl.co.in', phone: '9820098200', companyId: 'com1', avatar: 'https://placehold.co/32x32.png' },
-  { id: 'con2', name: 'Sneha Reddy', email: 'sneha.r@vimaanaero.com', phone: '9848098480', companyId: 'com2', avatar: 'https://placehold.co/32x32.png' },
-  { id: 'con3', name: 'Deepak Kumar', email: 'deepak.k@sanjeevanimed.com', phone: '9811098110', companyId: 'com3', avatar: 'https://placehold.co/32x32.png' },
-  { id: 'con4', name: 'Isha Singh', email: 'isha.s@navacharlabs.com', phone: '9890098900', companyId: 'com4', avatar: 'https://placehold.co/32x32.png' },
-  { id: 'con5', name: 'Amit Desai', email: 'amit.d@bharatpetro.com', phone: '9821098210', companyId: 'com5', avatar: 'https://placehold.co/32x32.png' },
-  { id: 'con6', name: 'Neha Rao', email: 'neha.r@jivabio.com', phone: '9885098850', companyId: 'com6', avatar: 'https://placehold.co/32x32.png' },
+  { id: 'con1', salutation: 'Mr.', firstName: 'Vikram', lastName: 'Patel', email: 'vikram.p@acpl.co.in', mobile: '9820098200', companyId: 'com1', designation: 'Purchase Manager', department: 'Procurement', status: 'active', avatar: 'https://placehold.co/32x32.png' },
+  { id: 'con2', salutation: 'Ms.', firstName: 'Sneha', lastName: 'Reddy', email: 'sneha.r@vimaanaero.com', mobile: '9848098480', companyId: 'com2', designation: 'Senior Engineer', department: 'R&D', status: 'active', avatar: 'https://placehold.co/32x32.png' },
+  { id: 'con3', salutation: 'Mr.', firstName: 'Deepak', lastName: 'Kumar', email: 'deepak.k@sanjeevanimed.com', mobile: '9811098110', companyId: 'com3', designation: 'Quality Head', department: 'QA/QC', status: 'inactive', avatar: 'https://placehold.co/32x32.png' },
+  { id: 'con4', salutation: 'Ms.', firstName: 'Isha', lastName: 'Singh', email: 'isha.s@navacharlabs.com', mobile: '9890098900', companyId: 'com4', designation: 'Lab Director', department: 'Operations', status: 'active', avatar: 'https://placehold.co/32x32.png' },
+  { id: 'con5', salutation: 'Mr.', firstName: 'Amit', lastName: 'Desai', email: 'amit.d@bharatpetro.com', mobile: '9821098210', companyId: 'com5', designation: 'Instrumentation Lead', department: 'Engineering', status: 'active', avatar: 'https://placehold.co/32x32.png' },
+  { id: 'con6', salutation: 'Dr.', firstName: 'Neha', lastName: 'Rao', email: 'neha.r@jivabio.com', mobile: '9885098850', companyId: 'com6', designation: 'Principal Scientist', department: 'R&D', status: 'inactive', avatar: 'https://placehold.co/32x32.png' },
 ];
 
 export const leads: Lead[] = [
@@ -287,3 +294,4 @@ export const products: Product[] = [
   { id: 'prod4', name: 'Automated Digital Pipette P-4A', category: 'Lab Equipment', price: 60000, status: 'active' },
   { id: 'prod5', name: 'CalTrack Software Suite', category: 'Software', price: 250000, status: 'active' },
 ];
+
