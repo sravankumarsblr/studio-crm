@@ -83,7 +83,7 @@ export function AddContactForm({
   return (
     <>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 px-1">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3 px-1">
            <FormField
             control={form.control}
             name="companyId"

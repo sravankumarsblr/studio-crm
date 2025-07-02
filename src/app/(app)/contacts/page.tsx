@@ -50,10 +50,6 @@ export default function ContactsPage() {
     setIsEditOpen(true);
   };
 
-  const handleDelete = (contactId: string) => {
-    setContacts(contacts.filter(c => c.id !== contactId));
-  };
-
   return (
     <>
       <div className="flex flex-col h-full">
@@ -103,9 +99,6 @@ export default function ContactsPage() {
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem onClick={() => handleEditClick(contact)}>
                             Edit
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleDelete(contact.id)} className="text-destructive">
-                            Delete
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
