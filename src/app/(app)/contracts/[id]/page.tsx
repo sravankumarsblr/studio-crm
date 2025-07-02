@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { ArrowLeft, Edit, FileText, IndianRupee, Building2, Calendar, CheckCircle, Clock, FilePlus, Milestone as MilestoneIcon, Briefcase, Hash, FileCheck2, User, MoreHorizontal } from 'lucide-react';
+import { ArrowLeft, Edit, FileText, IndianRupee, Building2, Calendar, CheckCircle, Clock, FilePlus, Milestone as MilestoneIcon, Briefcase, Hash, FileCheck2, User, MoreHorizontal, PlusCircle } from 'lucide-react';
 
 import { Header } from '@/components/header';
 import { Button } from '@/components/ui/button';
