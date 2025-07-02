@@ -1,16 +1,21 @@
 
 'use client';
 
+import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { ArrowLeft, Edit, FileText, IndianRupee, Building2, Calendar, CheckCircle, Clock, FilePlus, Milestone as MilestoneIcon, Briefcase, Hash, FileCheck2 } from 'lucide-react';
+import { ArrowLeft, Edit, FileText, IndianRupee, Building2, Calendar, CheckCircle, Clock, FilePlus, Milestone as MilestoneIcon, Briefcase, Hash, FileCheck2, User, MoreHorizontal } from 'lucide-react';
 
 import { Header } from '@/components/header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { contracts, companies, opportunities, products } from '@/lib/data';
+import { contracts as initialContracts, companies, opportunities, products, users, Milestone } from '@/lib/data';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Separator } from '@/components/ui/separator';
+import { Progress } from '@/components/ui/progress';
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';
+import { AddMilestoneDialog } from '../add-milestone-dialog';
+import { RaiseInvoiceDialog } from '../raise-invoice-dialog';
 
 const contractStatusVariant: { [key: string]: "default" | "secondary" | "destructive" | "outline" } = {
   'Active': 'default',
@@ -21,9 +26,9 @@ const contractStatusVariant: { [key: string]: "default" | "secondary" | "destruc
 };
 
 const milestoneStatusConfig = {
-    'Completed': { variant: "default", icon: CheckCircle, label: "Completed" },
-    'In Progress': { variant: "secondary", icon: Clock, label: "In Progress" },
-    'Pending': { variant: "outline", icon: Clock, label: "Pending" },
+    'Completed': { variant: "default", icon: CheckCircle, label: "Completed", progress: 100 },
+    'In Progress': { variant: "secondary", icon: Clock, label: "In Progress", progress: 50 },
+    'Pending': { variant: "outline", icon: Clock, label: "Pending", progress: 0 },
 } as const;
 
 const invoiceStatusConfig = {
@@ -32,17 +37,49 @@ const invoiceStatusConfig = {
     'Not Invoiced': { variant: "outline", label: "Not Invoiced" },
 } as const;
 
+
 export default function ContractDetailPage() {
   const router = useRouter();
   const params = useParams();
   const contractId = params.id as string;
   
-  const contract = contracts.find((c) => c.id === contractId);
+  const [contract, setContract] = useState(() => initialContracts.find((c) => c.id === contractId));
+  const [isAddMilestoneOpen, setIsAddMilestoneOpen] = useState(false);
+  const [isRaiseInvoiceOpen, setIsRaiseInvoiceOpen] = useState(false);
+  const [selectedMilestone, setSelectedMilestone] = useState<Milestone | null>(null);
 
   // In a real app, this data would be fetched together. Here we simulate joins.
   const company = companies.find(c => c.name === contract?.companyName);
   const opportunity = opportunities.find(o => o.id === contract?.opportunityId);
-  const acceptedQuote = opportunity?.quotes.find(q => q.status === 'Accepted');
+  
+  const handleMilestoneAdded = (newMilestone: Omit<Milestone, 'id'>) => {
+    if (contract) {
+        const milestoneToAdd = { ...newMilestone, id: `m${Date.now()}`};
+        setContract({ ...contract, milestones: [...contract.milestones, milestoneToAdd] });
+    }
+  };
+
+  const handleInvoiceRaised = (milestoneId: string, invoiceNumber: string) => {
+    if (contract) {
+        const updatedMilestones = contract.milestones.map(m => {
+            if (m.id === milestoneId) {
+                return {
+                    ...m,
+                    invoiceStatus: 'Invoiced' as const,
+                    invoiceNumber: invoiceNumber,
+                    invoiceRaisedById: users.find(u => u.role === 'Admin')?.id // Placeholder
+                }
+            }
+            return m;
+        });
+        setContract({ ...contract, milestones: updatedMilestones });
+    }
+  }
+  
+  const openRaiseInvoiceDialog = (milestone: Milestone) => {
+    setSelectedMilestone(milestone);
+    setIsRaiseInvoiceOpen(true);
+  }
 
   if (!contract || !opportunity) {
     return (
@@ -51,9 +88,12 @@ export default function ContractDetailPage() {
         </div>
     );
   }
+  
+  const getAssigneeName = (userId: string) => users.find(u => u.id === userId)?.name || 'N/A';
 
   return (
-    <div className="flex flex-col h-full">
+    <>
+      <div className="flex flex-col h-full">
        <Header title="">
         <div className="flex items-center gap-2 mr-auto">
             <Button variant="ghost" size="icon" onClick={() => router.push('/contracts')}>
@@ -78,6 +118,7 @@ export default function ContractDetailPage() {
                 </CardHeader>
                 <CardContent>
                     <div className="text-2xl font-bold">₹{contract.value.toLocaleString('en-IN')}</div>
+                    <p className="text-xs text-muted-foreground">PO Number: {contract.poNumber}</p>
                 </CardContent>
             </Card>
             <Card>
@@ -91,11 +132,11 @@ export default function ContractDetailPage() {
             </Card>
             <Card>
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
-                    <CardTitle className="text-sm font-medium">Contract Type</CardTitle>
-                    <FileText className="w-4 h-4 text-muted-foreground" />
+                    <CardTitle className="text-sm font-medium">Contract Period</CardTitle>
+                    <Calendar className="w-4 h-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                    <div className="text-lg font-semibold">{contract.type}</div>
+                    <div className="text-lg font-semibold">{contract.startDate} to {contract.endDate}</div>
                 </CardContent>
             </Card>
              <Card>
@@ -113,18 +154,24 @@ export default function ContractDetailPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
             <Card className="lg:col-span-3">
-                <CardHeader>
-                    <CardTitle>Milestones & Delivery</CardTitle>
-                    <CardDescription>Key dates and payment status for this contract.</CardDescription>
+                <CardHeader className="flex flex-row justify-between items-center">
+                    <div>
+                        <CardTitle>Milestones & Delivery</CardTitle>
+                        <CardDescription>Key dates and payment status for this contract.</CardDescription>
+                    </div>
+                    <Button onClick={() => setIsAddMilestoneOpen(true)}><PlusCircle className="mr-2 h-4 w-4" /> Add Milestone</Button>
                 </CardHeader>
                  <CardContent>
                     <Table>
                         <TableHeader>
                             <TableRow>
                                 <TableHead>Milestone</TableHead>
+                                <TableHead>Assigned To</TableHead>
                                 <TableHead>Due Date</TableHead>
-                                <TableHead>Status</TableHead>
-                                <TableHead>Invoice</TableHead>
+                                <TableHead>Amount</TableHead>
+                                <TableHead>Progress</TableHead>
+                                <TableHead>Invoice Status</TableHead>
+                                <TableHead className="text-right">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -134,15 +181,26 @@ export default function ContractDetailPage() {
                                 return (
                                 <TableRow key={milestone.id}>
                                     <TableCell className="font-medium">{milestone.name}</TableCell>
+                                    <TableCell>{getAssigneeName(milestone.assignedToId)}</TableCell>
                                     <TableCell>{milestone.dueDate}</TableCell>
-                                    <TableCell>
-                                        <Badge variant={mStatus.variant as any} className="whitespace-nowrap">
-                                            <mStatus.icon className="mr-1 h-3 w-3" />
-                                            {mStatus.label}
-                                        </Badge>
-                                    </TableCell>
+                                    <TableCell>₹{milestone.amount.toLocaleString('en-IN')}</TableCell>
+                                    <TableCell><Progress value={mStatus.progress} className="h-2" /></TableCell>
                                      <TableCell>
                                         <Badge variant={iStatus.variant as any}>{iStatus.label}</Badge>
+                                    </TableCell>
+                                    <TableCell className="text-right">
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button variant="ghost" size="icon"><MoreHorizontal className="h-4 w-4" /></Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent>
+                                                <DropdownMenuItem>Edit</DropdownMenuItem>
+                                                <DropdownMenuItem onClick={() => openRaiseInvoiceDialog(milestone)} disabled={milestone.invoiceStatus !== 'Not Invoiced'}>
+                                                    Raise Invoice
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem className="text-destructive">Delete</DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
                                     </TableCell>
                                 </TableRow>
                             )})}
@@ -153,51 +211,15 @@ export default function ContractDetailPage() {
              <Card className="lg:col-span-2">
                 <CardHeader>
                     <CardTitle>Contract &amp; Order Details</CardTitle>
-                    <CardDescription>Key terms and items from the original opportunity.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4 text-sm">
-                    <div className="space-y-4">
-                        <div className="flex items-start gap-3">
-                            <Calendar className="w-5 h-5 mt-1 text-muted-foreground" />
-                            <div>
-                                <p className="text-muted-foreground">Effective Date</p>
-                                <p className="font-medium">{contract.contractDate}</p>
-                            </div>
-                        </div>
-                         <div className="flex items-start gap-3">
-                            <Calendar className="w-5 h-5 mt-1 text-muted-foreground" />
-                            <div>
-                                <p className="text-muted-foreground">Expiry Date</p>
-                                <p className="font-medium">{contract.expiryDate}</p>
-                            </div>
-                        </div>
-                        <div className="flex items-start gap-3">
-                            <MilestoneIcon className="w-5 h-5 mt-1 text-muted-foreground" />
-                            <div>
-                                <p className="text-muted-foreground">Scope of Work</p>
-                                <p className="font-medium whitespace-pre-wrap">{contract.scopeOfWork}</p>
-                            </div>
+                     <div className="flex items-start gap-3">
+                        <MilestoneIcon className="w-5 h-5 mt-1 text-muted-foreground" />
+                        <div>
+                            <p className="text-muted-foreground">Scope of Work</p>
+                            <p className="font-medium whitespace-pre-wrap">{contract.scopeOfWork}</p>
                         </div>
                     </div>
-                     <Separator className="my-4"/>
-                    {acceptedQuote && (
-                        <div className="space-y-4 text-sm">
-                             <div className="flex items-start gap-3">
-                                <Hash className="w-4 h-4 mt-1 text-muted-foreground" />
-                                <div>
-                                    <p className="text-muted-foreground">PO Number</p>
-                                    <p className="font-medium">{acceptedQuote.poNumber}</p>
-                                </div>
-                            </div>
-                             <div className="flex items-start gap-3">
-                                <FileCheck2 className="w-4 h-4 mt-1 text-muted-foreground" />
-                                <div>
-                                    <p className="text-muted-foreground">PO Document</p>
-                                    <Button variant="link" className="p-0 h-auto font-medium">{acceptedQuote.poDocumentName || 'View PO'}</Button>
-                                </div>
-                            </div>
-                        </div>
-                    )}
                     <Separator className="my-4"/>
                     <Table>
                         <TableHeader>
@@ -208,7 +230,7 @@ export default function ContractDetailPage() {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {opportunity.lineItems.map((item) => {
+                            {contract.lineItems.map((item) => {
                                 const product = products.find(p => p.id === item.productId);
                                 if (!product) return null;
                                 const total = product.price * item.quantity;
@@ -227,5 +249,22 @@ export default function ContractDetailPage() {
         </div>
       </main>
     </div>
+    <AddMilestoneDialog 
+        isOpen={isAddMilestoneOpen} 
+        setIsOpen={setIsAddMilestoneOpen} 
+        contractId={contract.id}
+        contractValue={contract.value}
+        existingMilestoneTotal={contract.milestones.reduce((acc, m) => acc + m.amount, 0)}
+        onMilestoneAdded={handleMilestoneAdded}
+    />
+    {selectedMilestone && (
+        <RaiseInvoiceDialog
+            isOpen={isRaiseInvoiceOpen}
+            setIsOpen={setIsRaiseInvoiceOpen}
+            milestone={selectedMilestone}
+            onInvoiceRaised={handleInvoiceRaised}
+        />
+    )}
+    </>
   );
 }

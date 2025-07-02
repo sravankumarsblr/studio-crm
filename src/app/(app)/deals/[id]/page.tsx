@@ -20,6 +20,7 @@ import { ProductSelectorDialog } from '@/app/(app)/products/product-selector-dia
 import { Input } from '@/components/ui/input';
 import { AttachPoDialog } from '../attach-po-dialog';
 import type { AttachPoFormValues } from '../attach-po-form';
+import { AddContractDialog } from '@/app/(app)/contracts/add-contract-dialog';
 
 
 const stageVariant: { [key: string]: "default" | "secondary" | "destructive" | "outline" } = {
@@ -48,6 +49,7 @@ export default function OpportunityDetailPage() {
   const [isProductSelectorOpen, setIsProductSelectorOpen] = useState(false);
   const [isAttachPoOpen, setIsAttachPoOpen] = useState(false);
   const [quoteToAttachPo, setQuoteToAttachPo] = useState<Quote | null>(null);
+  const [isAddContractOpen, setIsAddContractOpen] = useState(false);
 
 
   // In a real app, this data would be fetched together. Here we simulate joins.
@@ -158,6 +160,8 @@ export default function OpportunityDetailPage() {
         </div>
     );
   }
+  
+  const isWon = opportunity.stage === 'Closed Won';
 
   return (
     <div className="flex flex-col h-full">
@@ -173,7 +177,9 @@ export default function OpportunityDetailPage() {
         </div>
         <Button variant="outline" onClick={() => setIsLogActivityOpen(true)}>Log Activity</Button>
         <Button variant="outline" onClick={() => setIsEditOpportunityOpen(true)}><Edit className="mr-2"/> Edit</Button>
-        <Button>Convert to Contract</Button>
+        <Button onClick={() => setIsAddContractOpen(true)} disabled={!isWon}>
+          Convert to Contract
+        </Button>
       </Header>
 
       <main className="flex-1 overflow-y-auto p-4 sm:p-6">
@@ -378,6 +384,13 @@ export default function OpportunityDetailPage() {
           onPoAttached={handlePoAttached}
         />
       )}
+       {isWon && (
+        <AddContractDialog
+            isOpen={isAddContractOpen}
+            setIsOpen={setIsAddContractOpen}
+            opportunity={opportunity}
+        />
+       )}
     </div>
   );
 }

@@ -98,23 +98,29 @@ export type Milestone = {
   id: string;
   name: string;
   dueDate: string;
+  assignedToId: string;
+  amount: number;
   status: 'Pending' | 'In Progress' | 'Completed';
-  poNumber: string;
   invoiceStatus: 'Not Invoiced' | 'Invoiced' | 'Paid';
-}
+  invoiceNumber?: string;
+  invoiceRaisedById?: string;
+};
 
 export type Contract = {
   id: string;
   opportunityId: string;
+  poNumber: string;
   contractTitle: string;
   companyName: string;
   value: number;
-  contractDate: string;
-  expiryDate: string;
+  startDate: string;
+  endDate: string;
+  effectiveDate: string;
   status: 'Draft' | 'Active' | 'Expired' | 'Terminated' | 'Renewed';
   type: 'One-time' | 'Subscription' | 'Retainer' | 'SLA';
   scopeOfWork: string;
   milestones: Milestone[];
+  lineItems: LineItem[];
 };
 
 export type Product = {
@@ -212,7 +218,7 @@ export const opportunities: Opportunity[] = [
     companyName: 'Accurate Calibration Pvt. Ltd.', 
     contactName: 'Vikram Patel', 
     stage: 'Closed Won', 
-    value: 2210000, 
+    value: 2200000, 
     createdDate: '2024-05-20',
     closeDate: '2024-06-15', 
     winProbability: 1,
@@ -255,18 +261,21 @@ export const contracts: Contract[] = [
   {
     id: 'CT-2024-001',
     opportunityId: 'deal3',
-    contractTitle: 'Service Agreement with Accurate Calibration Pvt. Ltd.',
+    poNumber: 'PO-ACPL-1138',
+    contractTitle: 'Service Agreement for Accurate Calibration',
     companyName: 'Accurate Calibration Pvt. Ltd.',
     value: 2200000,
-    contractDate: '2024-07-01',
-    expiryDate: '2025-06-30',
+    startDate: '2024-07-01',
+    endDate: '2025-06-30',
+    effectiveDate: '2024-07-01',
     status: 'Active',
     type: 'Retainer',
     scopeOfWork: 'Annual calibration and verification for all torque wrenches at the main facility. Includes two on-site visits and unlimited remote support.',
+    lineItems: [{ productId: 'prod3', quantity: 26 }],
     milestones: [
-      { id: 'm1', name: 'Initial On-site Calibration', dueDate: '2024-07-15', status: 'Completed', poNumber: 'PO-ACPL-1138', invoiceStatus: 'Paid' },
-      { id: 'm2', name: 'Mid-term Review & Report', dueDate: '2025-01-15', status: 'Pending', poNumber: 'PO-ACPL-1138', invoiceStatus: 'Not Invoiced' },
-      { id: 'm3', name: 'Final On-site Calibration', dueDate: '2025-06-15', status: 'Pending', poNumber: 'PO-ACPL-1138', invoiceStatus: 'Not Invoiced' }
+      { id: 'm1', name: 'Initial On-site Calibration', dueDate: '2024-07-15', status: 'Completed', invoiceStatus: 'Paid', amount: 1100000, assignedToId: 'user3', invoiceNumber: 'INV-001', invoiceRaisedById: 'user2' },
+      { id: 'm2', name: 'Mid-term Review & Report', dueDate: '2025-01-15', status: 'Pending', invoiceStatus: 'Not Invoiced', amount: 550000, assignedToId: 'user3' },
+      { id: 'm3', name: 'Final On-site Calibration', dueDate: '2025-06-15', status: 'Pending', invoiceStatus: 'Not Invoiced', amount: 550000, assignedToId: 'user3' }
     ]
   }
 ];
@@ -278,5 +287,3 @@ export const products: Product[] = [
   { id: 'prod4', name: 'Automated Digital Pipette P-4A', category: 'Lab Equipment', price: 60000, status: 'active' },
   { id: 'prod5', name: 'CalTrack Software Suite', category: 'Software', price: 250000, status: 'active' },
 ];
-
-    
