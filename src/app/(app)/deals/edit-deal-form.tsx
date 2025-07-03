@@ -92,6 +92,10 @@ export function EditOpportunityForm({
   const [isProductSelectorOpen, setIsProductSelectorOpen] = useState(false);
   const [totalValue, setTotalValue] = useState(opportunity.value);
   
+  const creatorName = useMemo(() => {
+    return users.find(u => u.id === opportunity.createdById)?.name || "Unknown";
+  }, [opportunity.createdById]);
+  
   const defaultValues = useMemo(() => {
     const company = companies.find(c => c.name === opportunity.companyName);
     const primaryContact = contacts.find(c => `${c.firstName} ${c.lastName}` === opportunity.contactName && c.companyId === company?.id);
@@ -217,7 +221,7 @@ export function EditOpportunityForm({
               </FormItem>
             )}
           />
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
              <FormField
               control={form.control}
               name="ownerId"
@@ -275,6 +279,14 @@ export function EditOpportunityForm({
                 </FormItem>
               )}
             />
+            <FormItem>
+                <FormLabel>Created By</FormLabel>
+                <FormControl>
+                    <Input value={creatorName} disabled />
+                </FormControl>
+            </FormItem>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormField
               control={form.control}
               name="stage"

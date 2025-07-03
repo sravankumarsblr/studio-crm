@@ -4,8 +4,9 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, Check, ChevronsUpDown } from "lucide-react";
 import { format } from "date-fns";
+import { useState, useMemo } from "react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -29,9 +30,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { Contract } from "@/lib/data";
+import { users } from "@/lib/data";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 
 const editContractSchema = z.object({
   contractTitle: z.string().min(1, "Contract title is required."),
+  ownerId: z.string().min(1, "Owner is required."),
   startDate: z.string().min(1, "Start date is required."),
   endDate: z.string().min(1, "End date is required."),
   effectiveDate: z.string().min(1, "Effective date is required."),
@@ -52,11 +56,17 @@ export function EditContractForm({
   onSave: (data: EditContractFormValues) => void;
   onCancel: () => void;
 }) {
+  const [ownerOpen, setOwnerOpen] = useState(false);
+
+  const creatorName = useMemo(() => {
+    return users.find(u => u.id === contract.createdById)?.name || "Unknown";
+  }, [contract.createdById]);
 
   const form = useForm<EditContractFormValues>({
     resolver: zodResolver(editContractSchema),
     defaultValues: {
       contractTitle: contract.contractTitle,
+      ownerId: contract.ownerId,
       startDate: contract.startDate,
       endDate: contract.endDate,
       effectiveDate: contract.effectiveDate,
@@ -85,6 +95,25 @@ export function EditContractForm({
             </FormItem>
           )}
         />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <FormField
+              control={form.control}
+              name="ownerId"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel>Assigned to</FormLabel>
+                   <Popover open={ownerOpen} onOpenChange={setOwnerOpen}><PopoverTrigger asChild><FormControl><Button variant="outline" role="combobox" className={cn("justify-between", !field.value && "text-muted-foreground")}>{field.value ? users.find((user) => user.id === field.value)?.name : "Select owner"}<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" /></Button></FormControl></PopoverTrigger><PopoverContent className="w-[--radix-popover-trigger-width] p-0"><Command><CommandInput placeholder="Search owner..." /><CommandList><CommandEmpty>No owner found.</CommandEmpty><CommandGroup>{users.map((user) => (<CommandItem value={user.name} key={user.id} onSelect={() => { form.setValue("ownerId", user.id, { shouldValidate: true }); setOwnerOpen(false); }}><Check className={cn("mr-2 h-4 w-4", user.id === field.value ? "opacity-100" : "opacity-0")} />{user.name}</CommandItem>))}</CommandGroup></CommandList></Command></PopoverContent></Popover>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+             <FormItem>
+                <FormLabel>Created By</FormLabel>
+                <FormControl>
+                    <Input value={creatorName} disabled />
+                </FormControl>
+            </FormItem>
+        </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <FormField
               control={form.control}

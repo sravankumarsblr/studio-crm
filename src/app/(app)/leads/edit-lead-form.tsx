@@ -91,6 +91,10 @@ export function EditLeadForm({
   const [contactSearch, setContactSearch] = useState("");
   const [isProductSelectorOpen, setIsProductSelectorOpen] = useState(false);
 
+  const creatorName = useMemo(() => {
+    return users.find(u => u.id === lead.createdById)?.name || "Unknown";
+  }, [lead.createdById]);
+
   const defaultValues = useMemo(() => {
     const company = companies.find(c => c.name === lead.companyName);
     const primaryContact = contacts.find(c => `${c.firstName} ${c.lastName}` === lead.contactName && c.companyId === company?.id);
@@ -204,7 +208,33 @@ export function EditLeadForm({
                 </FormItem>
               )}
             />
-             <FormField
+            <FormField
+              control={form.control}
+              name="status"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Status</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a status" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="New">New</SelectItem>
+                      <SelectItem value="Contacted">Contacted</SelectItem>
+                      <SelectItem value="Qualified">Qualified</SelectItem>
+                      <SelectItem value="Lost">Lost</SelectItem>
+                      <SelectItem value="Junk">Junk</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <FormField
               control={form.control}
               name="ownerId"
               render={({ field }) => (
@@ -261,32 +291,15 @@ export function EditLeadForm({
                 </FormItem>
               )}
             />
+            <FormItem>
+                <FormLabel>Created By</FormLabel>
+                <FormControl>
+                    <Input value={creatorName} disabled />
+                </FormControl>
+            </FormItem>
           </div>
           <div className="grid grid-cols-2 gap-4">
-            <FormField
-              control={form.control}
-              name="status"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Status</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a status" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="New">New</SelectItem>
-                      <SelectItem value="Contacted">Contacted</SelectItem>
-                      <SelectItem value="Qualified">Qualified</SelectItem>
-                      <SelectItem value="Lost">Lost</SelectItem>
-                      <SelectItem value="Junk">Junk</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            
             <FormField
               control={form.control}
               name="source"

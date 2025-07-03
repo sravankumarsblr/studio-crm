@@ -43,6 +43,7 @@ export type Lead = {
   id: string;
   name: string;
   ownerId: string;
+  createdById: string;
   companyName: string;
   contactName: string;
   value: number;
@@ -88,6 +89,7 @@ export type Opportunity = {
   id: string;
   name: string;
   ownerId: string;
+  createdById: string;
   companyName: string;
   contactName: string;
   stage: 'Qualification' | 'Proposal' | 'Negotiation';
@@ -115,6 +117,8 @@ export type Milestone = {
 export type Contract = {
   id: string;
   opportunityId: string;
+  ownerId: string;
+  createdById: string;
   poNumber: string;
   contractTitle: string;
   companyName: string;
@@ -180,10 +184,10 @@ export const contacts: Contact[] = [
 ];
 
 export const leads: Lead[] = [
-  { id: 'lead1', name: 'Sensor Calibration Service Inquiry', ownerId: 'user3', companyName: 'Navachar Tech Labs', contactName: 'Isha Singh', value: 1500000, status: 'New', source: 'Web Form', createdDate: '2024-05-01', productIds: ['prod1'], leadData: { industry: 'R&D', companySize: 75, pastPurchases: 0, websiteVisits: 5 } },
-  { id: 'lead2', name: 'Pressure Gauge Batch Testing', ownerId: 'user4', companyName: 'Bharat Petrochem', contactName: 'Amit Desai', value: 7500000, status: 'Qualified', source: 'Referral', createdDate: '2024-05-10', productIds: ['prod1', 'prod3'], leadData: { industry: 'Oil & Gas', companySize: 2500, pastPurchases: 3, websiteVisits: 2, referredBy: 'Vimaan Aerospace' } },
-  { id: 'lead3', name: 'Annual Pipette Calibration Contract', ownerId: 'user3', companyName: 'Jiva Bio-Sciences', contactName: 'Neha Rao', value: 2500000, status: 'Contacted', source: 'Trade Show', createdDate: '2024-05-20', productIds: ['prod4'], leadData: { industry: 'Biotechnology', companySize: 180, pastPurchases: 1, websiteVisits: 1 } },
-  { id: 'lead4', name: 'Enquiry for Old System Upgrade', ownerId: 'user4', companyName: 'Navachar Tech Labs', contactName: 'Isha Singh', value: 500000, status: 'Junk', source: 'Cold Call', createdDate: '2024-05-22', productIds: [], leadData: { industry: 'R&D', companySize: 75, pastPurchases: 0, websiteVisits: 0, reason: 'Budget constraints' } },
+  { id: 'lead1', name: 'Sensor Calibration Service Inquiry', ownerId: 'user3', createdById: 'user2', companyName: 'Navachar Tech Labs', contactName: 'Isha Singh', value: 1500000, status: 'New', source: 'Web Form', createdDate: '2024-05-01', productIds: ['prod1'], leadData: { industry: 'R&D', companySize: 75, pastPurchases: 0, websiteVisits: 5 } },
+  { id: 'lead2', name: 'Pressure Gauge Batch Testing', ownerId: 'user4', createdById: 'user2', companyName: 'Bharat Petrochem', contactName: 'Amit Desai', value: 7500000, status: 'Qualified', source: 'Referral', createdDate: '2024-05-10', productIds: ['prod1', 'prod3'], leadData: { industry: 'Oil & Gas', companySize: 2500, pastPurchases: 3, websiteVisits: 2, referredBy: 'Vimaan Aerospace' } },
+  { id: 'lead3', name: 'Annual Pipette Calibration Contract', ownerId: 'user3', createdById: 'user1', companyName: 'Jiva Bio-Sciences', contactName: 'Neha Rao', value: 2500000, status: 'Contacted', source: 'Trade Show', createdDate: '2024-05-20', productIds: ['prod4'], leadData: { industry: 'Biotechnology', companySize: 180, pastPurchases: 1, websiteVisits: 1 } },
+  { id: 'lead4', name: 'Enquiry for Old System Upgrade', ownerId: 'user4', createdById: 'user1', companyName: 'Navachar Tech Labs', contactName: 'Isha Singh', value: 500000, status: 'Junk', source: 'Cold Call', createdDate: '2024-05-22', productIds: [], leadData: { industry: 'R&D', companySize: 75, pastPurchases: 0, websiteVisits: 0, reason: 'Budget constraints' } },
 ];
 
 export const opportunities: Opportunity[] = [
@@ -191,6 +195,7 @@ export const opportunities: Opportunity[] = [
     id: 'deal1', 
     name: 'Q3 Pressure Sensor Contract', 
     ownerId: 'user3',
+    createdById: 'user2',
     companyName: 'Vimaan Aerospace Solutions', 
     contactName: 'Sneha Reddy', 
     stage: 'Proposal', 
@@ -208,6 +213,7 @@ export const opportunities: Opportunity[] = [
     id: 'deal2', 
     name: 'Medical Scale Fleet Calibration', 
     ownerId: 'user4',
+    createdById: 'user2',
     companyName: 'Sanjeevani MedTech', 
     contactName: 'Deepak Kumar', 
     stage: 'Negotiation',
@@ -226,6 +232,7 @@ export const opportunities: Opportunity[] = [
     id: 'deal3', 
     name: 'Torque Wrench Verification AMC', 
     ownerId: 'user3',
+    createdById: 'user1',
     companyName: 'Accurate Calibration Pvt. Ltd.', 
     contactName: 'Vikram Patel', 
     stage: 'Negotiation', 
@@ -243,6 +250,7 @@ export const opportunities: Opportunity[] = [
     id: 'deal4', 
     name: 'Calibration Software Suite License', 
     ownerId: 'user3',
+    createdById: 'user2',
     companyName: 'Navachar Tech Labs', 
     contactName: 'Isha Singh', 
     stage: 'Qualification',
@@ -258,6 +266,7 @@ export const opportunities: Opportunity[] = [
     id: 'deal5', 
     name: 'Bulk Sensor Batch Order', 
     ownerId: 'user4',
+    createdById: 'user1',
     companyName: 'Bharat Petrochem', 
     contactName: 'Amit Desai', 
     stage: 'Proposal', 
@@ -275,6 +284,8 @@ export const contracts: Contract[] = [
   {
     id: 'CT-2024-001',
     opportunityId: 'deal3',
+    ownerId: 'user3',
+    createdById: 'user1',
     poNumber: 'PO-ACPL-1138',
     contractTitle: 'Service Agreement for Accurate Calibration',
     companyName: 'Accurate Calibration Pvt. Ltd.',
@@ -302,6 +313,3 @@ export const products: Product[] = [
   { id: 'prod4', name: 'Automated Digital Pipette P-4A', category: 'Lab Equipment', price: 60000, status: 'active' },
   { id: 'prod5', name: 'CalTrack Software Suite', category: 'Software', price: 250000, status: 'active' },
 ];
-
-
-
