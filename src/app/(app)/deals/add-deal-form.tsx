@@ -50,6 +50,7 @@ const addOpportunitySchema = z.object({
   name: z.string().min(1, "Opportunity name is required."),
   ownerId: z.string().min(1, "Deal owner is required."),
   stage: z.string().min(1, "Stage is required."),
+  status: z.string().min(1, "Status is required."),
   closeDate: z.string().min(1, "Close date is required"),
   companyId: z.string().min(1, "Company is required."),
   contactIds: z
@@ -96,6 +97,7 @@ export function AddOpportunityForm({
     defaultValues: {
       name: "",
       stage: "Qualification",
+      status: "Open",
       ownerId: "",
       closeDate: "",
       companyId: "",
@@ -214,7 +216,7 @@ export function AddOpportunityForm({
               </FormItem>
             )}
           />
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
              <FormField
               control={form.control}
               name="ownerId"
@@ -288,6 +290,26 @@ export function AddOpportunityForm({
                       <SelectItem value="Qualification">Qualification</SelectItem>
                       <SelectItem value="Proposal">Proposal</SelectItem>
                       <SelectItem value="Negotiation">Negotiation</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="status"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Status</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value} disabled>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="Open">Open</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />

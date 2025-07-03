@@ -49,6 +49,7 @@ const editOpportunitySchema = z.object({
   name: z.string().min(1, "Opportunity name is required."),
   ownerId: z.string().min(1, "Deal owner is required."),
   stage: z.string().min(1, "Stage is required."),
+  status: z.string().min(1, "Status is required."),
   closeDate: z.string().min(1, "Close date is required"),
   companyId: z.string().min(1, "Company is required."),
   contactIds: z
@@ -100,6 +101,7 @@ export function EditOpportunityForm({
     return {
       name: opportunity.name,
       stage: opportunity.stage,
+      status: opportunity.status,
       ownerId: opportunity.ownerId,
       closeDate: opportunity.closeDate,
       companyId: company?.id || "",
@@ -126,6 +128,7 @@ export function EditOpportunityForm({
   const selectedCompanyId = form.watch("companyId");
   const selectedContactIds = form.watch("contactIds");
   const lineItems = form.watch("lineItems");
+  const status = form.watch("status");
 
   useEffect(() => {
     const newTotal = lineItems.reduce((acc, item) => {
@@ -214,7 +217,7 @@ export function EditOpportunityForm({
               </FormItem>
             )}
           />
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
              <FormField
               control={form.control}
               name="ownerId"
@@ -278,7 +281,7 @@ export function EditOpportunityForm({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Stage</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value} disabled={opportunity.status !== 'Open'}>
+                  <Select onValueChange={field.onChange} defaultValue={field.value} disabled={status !== 'Open'}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select a stage" />
@@ -288,6 +291,28 @@ export function EditOpportunityForm({
                       <SelectItem value="Qualification">Qualification</SelectItem>
                       <SelectItem value="Proposal">Proposal</SelectItem>
                       <SelectItem value="Negotiation">Negotiation</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+             <FormField
+              control={form.control}
+              name="status"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Status</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a status" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="Open">Open</SelectItem>
+                      <SelectItem value="Won">Won</SelectItem>
+                      <SelectItem value="Lost">Lost</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
