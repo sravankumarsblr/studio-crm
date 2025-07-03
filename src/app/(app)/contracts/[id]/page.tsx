@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { ArrowLeft, Edit, FileText, IndianRupee, Building2, Calendar, CheckCircle, Clock, FilePlus, Milestone as MilestoneIcon, Briefcase, Hash, FileCheck2, User, MoreHorizontal, PlusCircle } from 'lucide-react';
+import { ArrowLeft, Edit, FileText, IndianRupee, Building2, Calendar, CheckCircle, Clock, FilePlus, Milestone as MilestoneIcon, Briefcase, Hash, FileCheck2, User, MoreHorizontal, PlusCircle, Upload } from 'lucide-react';
 
 import { Header } from '@/components/header';
 import { Button } from '@/components/ui/button';
@@ -49,6 +49,8 @@ export default function ContractDetailPage() {
   const [isAddMilestoneOpen, setIsAddMilestoneOpen] = useState(false);
   const [isRaiseInvoiceOpen, setIsRaiseInvoiceOpen] = useState(false);
   const [selectedMilestone, setSelectedMilestone] = useState<Milestone | null>(null);
+  const [contractFile, setContractFile] = useState<File | null>(null);
+
 
   // In a real app, this data would be fetched together. Here we simulate joins.
   const company = companies.find(c => c.name === contract?.companyName);
@@ -78,6 +80,14 @@ export default function ContractDetailPage() {
         setContract({ ...contract, milestones: updatedMilestones });
     }
   }
+
+  const handleFileUpload = () => {
+    if (!contractFile || !contract) return;
+    // In a real app, this would be an API call.
+    // Here, we'll just simulate the upload by updating the state.
+    setContract({ ...contract, documentName: contractFile.name });
+    setContractFile(null); // Clear the file input
+  };
   
   const openRaiseInvoiceDialog = (milestone: Milestone) => {
     setSelectedMilestone(milestone);
@@ -250,9 +260,18 @@ export default function ContractDetailPage() {
                                 <Button variant="ghost" size="sm">Download</Button>
                             </div>
                             ) : (
-                            <div className="flex flex-col gap-2">
-                                <Label htmlFor="contract-upload">Upload Signed Contract (PDF)</Label>
-                                <Input id="contract-upload" type="file" accept=".pdf" className="text-xs" />
+                            <div className="flex items-center gap-2">
+                                <Input 
+                                    id="contract-upload" 
+                                    type="file" 
+                                    accept=".pdf" 
+                                    className="text-xs flex-1"
+                                    onChange={(e) => setContractFile(e.target.files ? e.target.files[0] : null)}
+                                />
+                                <Button size="sm" onClick={handleFileUpload} disabled={!contractFile}>
+                                    <Upload className="mr-2 h-4 w-4" />
+                                    Upload
+                                </Button>
                             </div>
                             )}
                         </div>
