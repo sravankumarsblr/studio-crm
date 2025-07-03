@@ -9,13 +9,15 @@ import { Header } from '@/components/header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { contracts as initialContracts, companies, opportunities, products, users, Milestone } from '@/lib/data';
+import { contracts as initialContracts, companies, opportunities, products, users, Milestone, Quote } from '@/lib/data';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Separator } from '@/components/ui/separator';
 import { Progress } from '@/components/ui/progress';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { AddMilestoneDialog } from '../add-milestone-dialog';
 import { RaiseInvoiceDialog } from '../raise-invoice-dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 const contractStatusVariant: { [key: string]: "default" | "secondary" | "destructive" | "outline" } = {
   'Active': 'default',
@@ -51,6 +53,7 @@ export default function ContractDetailPage() {
   // In a real app, this data would be fetched together. Here we simulate joins.
   const company = companies.find(c => c.name === contract?.companyName);
   const opportunity = opportunities.find(o => o.id === contract?.opportunityId);
+  const acceptedQuote = opportunity?.quotes.find(q => q.status === 'Accepted');
   
   const handleMilestoneAdded = (newMilestone: Omit<Milestone, 'id'>) => {
     if (contract) {
@@ -156,7 +159,7 @@ export default function ContractDetailPage() {
             <Card className="lg:col-span-3">
                 <CardHeader className="flex flex-row justify-between items-center">
                     <div>
-                        <CardTitle>Milestones & Delivery</CardTitle>
+                        <CardTitle>Milestones &amp; Delivery</CardTitle>
                         <CardDescription>Key dates and payment status for this contract.</CardDescription>
                     </div>
                     <Button onClick={() => setIsAddMilestoneOpen(true)}><PlusCircle className="mr-2 h-4 w-4" /> Add Milestone</Button>
@@ -210,9 +213,51 @@ export default function ContractDetailPage() {
             </Card>
              <Card className="lg:col-span-2">
                 <CardHeader>
-                    <CardTitle>Contract &amp; Order Details</CardTitle>
+                    <CardTitle>Contract Documents &amp; Details</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4 text-sm">
+                    {acceptedQuote && (
+                        <div>
+                        <h4 className="font-medium mb-2 text-muted-foreground">Source Documents</h4>
+                        <div className="space-y-3 p-3 rounded-md border bg-muted/50">
+                             <div className="flex justify-between items-center">
+                                <span className="text-muted-foreground">Source Quote</span>
+                                <Button variant="link" size="sm" className="p-0 h-auto">{acceptedQuote.quoteNumber}</Button>
+                            </div>
+                            <div className="flex justify-between items-center">
+                                <span className="text-muted-foreground">PO Number</span>
+                                <span className="font-medium">{acceptedQuote.poNumber}</span>
+                            </div>
+                            {acceptedQuote.poDocumentName && (
+                                <div className="flex justify-between items-center">
+                                    <span className="text-muted-foreground">PO Document</span>
+                                    <Button variant="link" size="sm" className="p-0 h-auto">{acceptedQuote.poDocumentName}</Button>
+                                </div>
+                            )}
+                        </div>
+                        </div>
+                    )}
+                    <Separator/>
+                     <div>
+                        <h4 className="font-medium mb-2 text-muted-foreground">Contract Agreement</h4>
+                        <div className="space-y-2 p-3 rounded-md border bg-muted/50">
+                            {contract.documentName ? (
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                    <FileText className="h-4 w-4" />
+                                    <span className="font-medium">{contract.documentName}</span>
+                                </div>
+                                <Button variant="ghost" size="sm">Download</Button>
+                            </div>
+                            ) : (
+                            <div className="flex flex-col gap-2">
+                                <Label htmlFor="contract-upload">Upload Signed Contract (PDF)</Label>
+                                <Input id="contract-upload" type="file" accept=".pdf" className="text-xs" />
+                            </div>
+                            )}
+                        </div>
+                    </div>
+                    <Separator/>
                      <div className="flex items-start gap-3">
                         <MilestoneIcon className="w-5 h-5 mt-1 text-muted-foreground" />
                         <div>

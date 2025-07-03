@@ -127,6 +127,7 @@ export type Contract = {
   scopeOfWork: string;
   milestones: Milestone[];
   lineItems: LineItem[];
+  documentName?: string;
 };
 
 export type Product = {
@@ -284,6 +285,7 @@ export const contracts: Contract[] = [
     status: 'Active',
     type: 'Retainer',
     scopeOfWork: 'Annual calibration and verification for all torque wrenches at the main facility. Includes two on-site visits and unlimited remote support.',
+    documentName: 'Contract_Agreement_ACPL.pdf',
     lineItems: [{ productId: 'prod3', quantity: 26 }],
     milestones: [
       { id: 'm1', name: 'Initial On-site Calibration', dueDate: '2024-07-15', status: 'Completed', invoiceStatus: 'Paid', amount: 1100000, assignedToId: 'user3', invoiceNumber: 'INV-001', invoiceRaisedById: 'user2' },
@@ -300,5 +302,6 @@ export const products: Product[] = [
   { id: 'prod4', name: 'Automated Digital Pipette P-4A', category: 'Lab Equipment', price: 60000, status: 'active' },
   { id: 'prod5', name: 'CalTrack Software Suite', category: 'Software', price: 250000, status: 'active' },
 ];
+
 
 
