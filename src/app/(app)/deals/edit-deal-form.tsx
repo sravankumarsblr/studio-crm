@@ -49,7 +49,7 @@ const editOpportunitySchema = z.object({
   name: z.string().min(1, "Opportunity name is required."),
   ownerId: z.string().min(1, "Deal owner is required."),
   stage: z.string().min(1, "Stage is required."),
-  status: z.string().min(1, "Status is required."),
+  status: z.enum(["New", "In Progress", "Won", "Lost"]),
   closeDate: z.string().min(1, "Close date is required"),
   companyId: z.string().min(1, "Company is required."),
   contactIds: z
@@ -281,7 +281,7 @@ export function EditOpportunityForm({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Stage</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value} disabled={status !== 'Open'}>
+                  <Select onValueChange={field.onChange} defaultValue={field.value} disabled={status === 'Won' || status === 'Lost'}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select a stage" />
@@ -310,7 +310,8 @@ export function EditOpportunityForm({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="Open">Open</SelectItem>
+                      <SelectItem value="New">New</SelectItem>
+                      <SelectItem value="In Progress">In Progress</SelectItem>
                       <SelectItem value="Won">Won</SelectItem>
                       <SelectItem value="Lost">Lost</SelectItem>
                     </SelectContent>

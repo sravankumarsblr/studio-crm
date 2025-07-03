@@ -91,7 +91,7 @@ export type Opportunity = {
   companyName: string;
   contactName: string;
   stage: 'Qualification' | 'Proposal' | 'Negotiation';
-  status: 'Open' | 'Won' | 'Lost';
+  status: 'New' | 'In Progress' | 'Won' | 'Lost';
   value: number;
   closeDate: string;
   createdDate: string;
@@ -193,7 +193,7 @@ export const opportunities: Opportunity[] = [
     companyName: 'Vimaan Aerospace Solutions', 
     contactName: 'Sneha Reddy', 
     stage: 'Proposal', 
-    status: 'Open',
+    status: 'In Progress',
     value: 4990000, 
     createdDate: '2024-06-01',
     closeDate: '2024-08-30', 
@@ -210,7 +210,7 @@ export const opportunities: Opportunity[] = [
     companyName: 'Sanjeevani MedTech', 
     contactName: 'Deepak Kumar', 
     stage: 'Negotiation',
-    status: 'Open',
+    status: 'In Progress',
     value: 11950800, 
     createdDate: '2024-05-15',
     closeDate: '2024-07-25', 
@@ -245,7 +245,7 @@ export const opportunities: Opportunity[] = [
     companyName: 'Navachar Tech Labs', 
     contactName: 'Isha Singh', 
     stage: 'Qualification',
-    status: 'Open',
+    status: 'New',
     value: 2500000, 
     createdDate: '2024-06-10', 
     closeDate: '2024-09-15', 
@@ -300,4 +300,5 @@ export const products: Product[] = [
   { id: 'prod4', name: 'Automated Digital Pipette P-4A', category: 'Lab Equipment', price: 60000, status: 'active' },
   { id: 'prod5', name: 'CalTrack Software Suite', category: 'Software', price: 250000, status: 'active' },
 ];
+
 

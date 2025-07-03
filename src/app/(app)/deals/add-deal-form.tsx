@@ -50,7 +50,7 @@ const addOpportunitySchema = z.object({
   name: z.string().min(1, "Opportunity name is required."),
   ownerId: z.string().min(1, "Deal owner is required."),
   stage: z.string().min(1, "Stage is required."),
-  status: z.string().min(1, "Status is required."),
+  status: z.enum(["New", "In Progress", "Won", "Lost"]),
   closeDate: z.string().min(1, "Close date is required"),
   companyId: z.string().min(1, "Company is required."),
   contactIds: z
@@ -97,7 +97,7 @@ export function AddOpportunityForm({
     defaultValues: {
       name: "",
       stage: "Qualification",
-      status: "Open",
+      status: "New",
       ownerId: "",
       closeDate: "",
       companyId: "",
@@ -194,7 +194,6 @@ export function AddOpportunityForm({
     // In a real app, status would be set on the server
     const dataToSave = {
         ...values,
-        status: 'Open'
     }
     onSave(values);
   };
@@ -302,14 +301,17 @@ export function AddOpportunityForm({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Status</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value} disabled>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="Open">Open</SelectItem>
+                      <SelectItem value="New">New</SelectItem>
+                      <SelectItem value="In Progress">In Progress</SelectItem>
+                      <SelectItem value="Won">Won</SelectItem>
+                      <SelectItem value="Lost">Lost</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />

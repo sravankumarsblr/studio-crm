@@ -29,8 +29,9 @@ const stageVariant: { [key in Opportunity['stage']]: "default" | "secondary" | "
   'Negotiation': 'default',
 };
 
-const statusVariant: { [key in Opportunity['status']]: "default" | "secondary" | "destructive" } = {
-  'Open': 'secondary',
+const statusVariant: { [key in Opportunity['status']]: "default" | "secondary" | "destructive" | "outline" } = {
+  'New': 'outline',
+  'In Progress': 'secondary',
   'Won': 'default',
   'Lost': 'destructive',
 };
@@ -59,7 +60,7 @@ export default function OpportunityDetailPage() {
 
   // In a real app, this data would be fetched together. Here we simulate joins.
   const company = companies.find(c => c.name === opportunity?.companyName);
-  const primaryContact = contacts.find(c => c.name === opportunity?.contactName);
+  const primaryContact = contacts.find(c => `${c.firstName} ${c.lastName}` === opportunity?.contactName);
   const associatedContacts = company ? contacts.filter(c => c.companyId === company.id) : [];
 
   const updateOpportunityLineItems = (newLineItems: LineItem[]) => {

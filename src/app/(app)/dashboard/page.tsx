@@ -22,7 +22,7 @@ import { Separator } from '@/components/ui/separator';
 import { LifecycleSummary } from '@/components/lifecycle-summary';
 
 const STAGES = ['Qualification', 'Proposal', 'Negotiation'] as const;
-const STATUSES = ['Open', 'Won', 'Lost'];
+const STATUSES = ['New', 'In Progress', 'Won', 'Lost'];
 
 const STAGE_COLORS: { [key: string]: string } = {
   Qualification: 'hsl(var(--chart-1))',
@@ -38,7 +38,7 @@ export default function DashboardPage() {
   const [searchTerm, setSearchTerm] = useState('');
 
   const dashboardData = useMemo(() => {
-    const openOpportunities = allOpportunities.filter(o => o.status === 'Open');
+    const openOpportunities = allOpportunities.filter(o => o.status === 'New' || o.status === 'In Progress');
     const wonOpportunities = allOpportunities.filter(o => o.status === 'Won');
     const lostOpportunities = allOpportunities.filter(o => o.status === 'Lost');
     
@@ -73,7 +73,7 @@ export default function DashboardPage() {
     ];
 
     const winLossAnalysis = STAGES.map(stage => {
-        const closedStageOpps = allOpportunities.filter(o => o.status !== 'Open' && o.stage === stage);
+        const closedStageOpps = allOpportunities.filter(o => (o.status === 'Won' || o.status === 'Lost') && o.stage === stage);
         return {
             stage,
             Won: closedStageOpps.filter(o => o.status === 'Won').length,
@@ -127,6 +127,7 @@ export default function DashboardPage() {
   const getStatusVariant = (status: Opportunity['status']) => {
     if (status === 'Won') return 'default';
     if (status === 'Lost') return 'destructive';
+    if (status === 'New') return 'outline';
     return 'secondary';
   };
 

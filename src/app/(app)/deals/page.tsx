@@ -28,7 +28,7 @@ import { AddOpportunityDialog } from "./add-deal-dialog";
 import { useToast } from "@/hooks/use-toast";
 
 const OPPORTUNITY_STAGES = ['Qualification', 'Proposal', 'Negotiation'] as const;
-const DEAL_STATUSES = ['Open', 'Won', 'Lost'];
+const DEAL_STATUSES = ['New', 'In Progress', 'Won', 'Lost'];
 
 const stageIcons: { [key in typeof OPPORTUNITY_STAGES[number]]: React.ElementType } = {
   Qualification: BarChart,
@@ -70,8 +70,10 @@ export default function OpportunitiesPage() {
       'Negotiation': 0,
     };
     for (const opportunity of allOpportunities) {
-      if (opportunity.status === 'Open' && counts[opportunity.stage] !== undefined) {
-        counts[opportunity.stage]++;
+      if (opportunity.status === 'New' || opportunity.status === 'In Progress') {
+        if (counts[opportunity.stage] !== undefined) {
+          counts[opportunity.stage]++;
+        }
       }
     }
     return counts;
@@ -133,6 +135,7 @@ export default function OpportunitiesPage() {
   const getStatusVariant = (status: Opportunity['status']) => {
     if (status === 'Won') return 'default';
     if (status === 'Lost') return 'destructive';
+    if (status === 'New') return 'outline';
     return 'secondary';
   };
 
@@ -233,7 +236,7 @@ export default function OpportunitiesPage() {
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      <Progress value={opportunity.status === 'Open' ? stageProgress[opportunity.stage] : 100} className="h-2" />
+                      <Progress value={(opportunity.status === 'New' || opportunity.status === 'In Progress') ? stageProgress[opportunity.stage] : 100} className="h-2" />
                     </TableCell>
                     <TableCell className="text-right">
                       <DropdownMenu>
@@ -246,7 +249,7 @@ export default function OpportunitiesPage() {
                           <DropdownMenuItem asChild>
                             <Link href={`/deals/${opportunity.id}`}>View Details</Link>
                           </DropdownMenuItem>
-                          {opportunity.status === 'Open' && (
+                          {opportunity.status !== 'Won' && opportunity.status !== 'Lost' && (
                             <>
                               <DropdownMenuItem onClick={() => handleCloseAsWon(opportunity.id)}>
                                 Close as Won
