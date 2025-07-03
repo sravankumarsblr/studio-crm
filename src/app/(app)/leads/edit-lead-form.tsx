@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Check, ChevronsUpDown, PlusCircle, Trash2 } from "lucide-react";
@@ -56,9 +56,10 @@ const editLeadSchema = z.object({
     .array(z.string())
     .min(1, "You must select at least one contact."),
   primaryContactId: z.string().optional(),
-  productIds: z
-    .array(z.string())
-    .min(1, "You have to select at least one product."),
+  lineItems: z.array(z.object({
+    productId: z.string().min(1),
+    quantity: z.coerce.number().int().min(1, "Qty must be at least 1."),
+  })).min(1, "Please add at least one product."),
   convertToDeal: z.boolean().default(false),
 }).refine(
   (data) => {
@@ -108,7 +109,7 @@ export function EditLeadForm({
       companyId: company?.id || "",
       contactIds: primaryContact ? [primaryContact.id] : [],
       primaryContactId: primaryContact?.id || "",
-      productIds: lead.productIds || [],
+      lineItems: lead.lineItems || [],
       convertToDeal: false,
     };
   }, [lead, companies]);
@@ -118,13 +119,17 @@ export function EditLeadForm({
     defaultValues,
   });
 
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "lineItems"
+  });
+
   useEffect(() => {
     form.reset(defaultValues);
   }, [defaultValues, form]);
 
   const selectedCompanyId = form.watch("companyId");
   const selectedContactIds = form.watch("contactIds");
-  const selectedProductIds = form.watch("productIds");
 
   const availableContacts = selectedCompanyId
     ? contacts.filter((c) => c.companyId === selectedCompanyId)
@@ -160,18 +165,25 @@ export function EditLeadForm({
     setCompanyOpen(false);
   };
   
-  const handleProductRemove = (productId: string) => {
-    const currentProductIds = form.getValues("productIds");
-    form.setValue(
-        "productIds",
-        currentProductIds.filter(id => id !== productId),
-        { shouldValidate: true }
-    );
-  };
-
   const handleProductsAddedFromSelector = (newProductIds: string[]) => {
-    form.setValue("productIds", newProductIds, { shouldValidate: true });
-  }
+    const fieldProductIds = fields.map(f => f.productId);
+    
+    const productsToAdd = newProductIds
+      .filter(id => !fieldProductIds.includes(id))
+      .map(id => ({ productId: id, quantity: 1 }));
+    
+    if (productsToAdd.length > 0) {
+      append(productsToAdd);
+    }
+    
+    const indicesToRemove = fieldProductIds
+      .map((id, index) => (newProductIds.includes(id) ? -1 : index))
+      .filter(index => index !== -1);
+      
+    if (indicesToRemove.length > 0) {
+      indicesToRemove.sort((a, b) => b - a).forEach(index => remove(index));
+    }
+  };
 
   const onSubmit = (values: EditLeadFormValues) => {
     onSave(values);
@@ -457,7 +469,7 @@ export function EditLeadForm({
           
           <FormField
             control={form.control}
-            name="productIds"
+            name="lineItems"
             render={() => (
                 <FormItem>
                     <FormLabel>Products & Services</FormLabel>
@@ -465,38 +477,49 @@ export function EditLeadForm({
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead>Product Name</TableHead>
-                                    <TableHead>Category</TableHead>
+                                    <TableHead>Product</TableHead>
+                                    <TableHead className="w-[100px]">Quantity</TableHead>
+                                    <TableHead className="w-[120px] text-right">Unit Price</TableHead>
+                                    <TableHead className="w-[120px] text-right">Total</TableHead>
                                     <TableHead className="w-[50px]"></TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {selectedProductIds.length > 0 ? (
-                                    selectedProductIds.map((id) => {
-                                        const product = products.find(p => p.id === id);
-                                        if (!product) return null;
-                                        return (
-                                            <TableRow key={id}>
-                                                <TableCell className="font-medium">{product.name}</TableCell>
-                                                <TableCell>{product.category}</TableCell>
-                                                <TableCell>
-                                                    <Button variant="ghost" size="icon" onClick={() => handleProductRemove(id)}>
-                                                        <Trash2 className="h-4 w-4 text-destructive"/>
-                                                    </Button>
-                                                </TableCell>
-                                            </TableRow>
-                                        );
-                                    })
-                                ) : (
+                                {fields.length === 0 && (
                                     <TableRow>
-                                        <TableCell colSpan={3} className="h-24 text-center">
-                                        No products selected.
+                                        <TableCell colSpan={5} className="text-center h-24">
+                                            No products added yet.
                                         </TableCell>
                                     </TableRow>
                                 )}
+                                {fields.map((field, index) => {
+                                    const product = products.find(p => p.id === field.productId);
+                                    const price = product?.price ?? 0;
+                                    const total = price * field.quantity;
+                                    return (
+                                        <TableRow key={field.id}>
+                                            <TableCell className="font-medium">{product?.name}</TableCell>
+                                            <TableCell>
+                                                <Input
+                                                    type="number"
+                                                    min="1"
+                                                    {...form.register(`lineItems.${index}.quantity`)}
+                                                    className="h-8"
+                                                />
+                                            </TableCell>
+                                            <TableCell className="text-right">₹{price.toLocaleString('en-IN')}</TableCell>
+                                            <TableCell className="text-right">₹{total.toLocaleString('en-IN')}</TableCell>
+                                            <TableCell>
+                                                <Button variant="ghost" size="icon" onClick={() => remove(index)}>
+                                                    <Trash2 className="h-4 w-4 text-destructive"/>
+                                                </Button>
+                                            </TableCell>
+                                        </TableRow>
+                                    );
+                                })}
                             </TableBody>
                         </Table>
-                         <div className="p-2 flex items-center justify-between">
+                         <div className="p-2 flex items-center justify-between border-t">
                             <Button variant="outline" size="sm" type="button" onClick={() => setIsProductSelectorOpen(true)}>
                                 <PlusCircle className="mr-2 h-4 w-4" />
                                 Add Product
@@ -546,7 +569,7 @@ export function EditLeadForm({
         isOpen={isProductSelectorOpen}
         setIsOpen={setIsProductSelectorOpen}
         onProductsAdded={handleProductsAddedFromSelector}
-        initialSelectedIds={selectedProductIds}
+        initialSelectedIds={fields.map(f => f.productId)}
       />
     </>
   );

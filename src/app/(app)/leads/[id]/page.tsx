@@ -50,8 +50,13 @@ export default function LeadDetailPage() {
   // In a real app, this data would be fetched together. Here we simulate joins.
   const company = companies.find(c => c.name === lead?.companyName);
   const primaryContact = contacts.find(c => c.name === lead?.contactName);
-  const associatedProducts = lead ? products.filter(p => lead.productIds.includes(p.id)) : [];
   const associatedContacts = company ? contacts.filter(c => c.companyId === company.id) : [];
+
+  const lineItemsWithDetails = lead ? lead.lineItems.map(item => {
+    const product = products.find(p => p.id === item.productId);
+    return { ...item, product };
+  }) : [];
+
 
   const getStatusVariant = (status?: string) => {
     switch (status) {
@@ -66,9 +71,14 @@ export default function LeadDetailPage() {
 
   const handleProductsAdded = (newProductIds: string[]) => {
     if (lead) {
+      const existingLineItems = new Map(lead.lineItems.map(item => [item.productId, item.quantity]));
+      const newLineItems = newProductIds.map(id => ({
+          productId: id,
+          quantity: existingLineItems.get(id) || 1,
+      }));
       const updatedLead = {
         ...lead,
-        productIds: Array.from(new Set(newProductIds)),
+        lineItems: newLineItems,
       };
       setLead(updatedLead);
     }
@@ -148,7 +158,7 @@ export default function LeadDetailPage() {
                         <UserCircle className="w-5 h-5 mt-1 text-muted-foreground" />
                         <div>
                             <p className="text-muted-foreground">Primary Contact</p>
-                            <p className="font-medium">{primaryContact?.name || lead.contactName}</p>
+                            <p className="font-medium">{primaryContact?.firstName} {primaryContact?.lastName}</p>
                              <p className="text-muted-foreground text-xs">{primaryContact?.email}</p>
                         </div>
                     </div>
@@ -169,19 +179,23 @@ export default function LeadDetailPage() {
                           <TableRow>
                               <TableHead>Product</TableHead>
                               <TableHead>Category</TableHead>
+                              <TableHead>Quantity</TableHead>
                               <TableHead className="text-right">Price</TableHead>
                           </TableRow>
                       </TableHeader>
                       <TableBody>
-                          {associatedProducts.length === 0 && (
-                              <TableRow><TableCell colSpan={3} className="text-center h-24">No products associated with this lead.</TableCell></TableRow>
+                          {lineItemsWithDetails.length === 0 && (
+                              <TableRow><TableCell colSpan={4} className="text-center h-24">No products associated with this lead.</TableCell></TableRow>
                           )}
-                          {associatedProducts.map(product => (
-                              <TableRow key={product.id}>
-                                  <TableCell className="font-medium">{product.name}</TableCell>
-                                  <TableCell>{product.category}</TableCell>
-                                  <TableCell className="text-right">₹{product.price.toLocaleString('en-IN')}</TableCell>
-                              </TableRow>
+                          {lineItemsWithDetails.map(item => (
+                              item.product && (
+                                <TableRow key={item.productId}>
+                                    <TableCell className="font-medium">{item.product.name}</TableCell>
+                                    <TableCell>{item.product.category}</TableCell>
+                                    <TableCell>{item.quantity}</TableCell>
+                                    <TableCell className="text-right">₹{item.product.price.toLocaleString('en-IN')}</TableCell>
+                                </TableRow>
+                              )
                           ))}
                       </TableBody>
                   </Table>
@@ -283,7 +297,7 @@ export default function LeadDetailPage() {
         isOpen={isAddProductOpen}
         setIsOpen={setIsAddProductOpen}
         onProductsAdded={handleProductsAdded}
-        initialSelectedIds={lead.productIds}
+        initialSelectedIds={lead.lineItems.map(item => item.productId)}
       />
     </div>
   );
