@@ -16,7 +16,6 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { AddContactDialog } from "./add-contact-dialog";
 import { EditContactDialog } from "./edit-contact-dialog";
-import type { AddContactFormValues } from "./add-contact-form";
 
 export default function ContactsPage() {
   const [contacts, setContacts] = useState<Contact[]>(initialContacts);
@@ -41,14 +40,8 @@ export default function ContactsPage() {
     ));
   };
 
-  const handleContactAdded = (newContact: AddContactFormValues) => {
-    const contactToAdd: Contact = {
-        ...newContact,
-        id: `con${new Date().getTime()}`,
-        status: 'active',
-        avatar: 'https://placehold.co/32x32.png',
-    };
-    setContacts(prev => [...prev, contactToAdd]);
+  const handleContactAdded = (newContact: Contact) => {
+    setContacts(prev => [...prev, newContact]);
   };
 
   const handleContactUpdated = (updatedContact: Contact) => {

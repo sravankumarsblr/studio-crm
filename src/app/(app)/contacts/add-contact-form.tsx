@@ -48,9 +48,11 @@ export type AddContactFormValues = z.infer<typeof addContactSchema>;
 export function AddContactForm({
   onSave,
   onCancel,
+  companyId
 }: {
   onSave: (data: AddContactFormValues) => void;
   onCancel: () => void;
+  companyId?: string;
 }) {
   const [companyOpen, setCompanyOpen] = useState(false);
   const [isAddCompanyOpen, setIsAddCompanyOpen] = useState(false);
@@ -59,7 +61,7 @@ export function AddContactForm({
   const form = useForm<AddContactFormValues>({
     resolver: zodResolver(addContactSchema),
     defaultValues: {
-      companyId: "",
+      companyId: companyId || "",
       salutation: undefined,
       firstName: "",
       lastName: "",
@@ -93,7 +95,7 @@ export function AddContactForm({
                 <Popover open={companyOpen} onOpenChange={setCompanyOpen}>
                   <PopoverTrigger asChild>
                     <FormControl>
-                      <Button variant="outline" role="combobox" className={cn("w-full justify-between", !field.value && "text-muted-foreground")}>
+                      <Button variant="outline" role="combobox" className={cn("w-full justify-between", !field.value && "text-muted-foreground")} disabled={!!companyId}>
                         {field.value ? companies.find((c) => c.id === field.value)?.name : "Select company"}
                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                       </Button>

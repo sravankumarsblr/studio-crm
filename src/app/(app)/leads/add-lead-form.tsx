@@ -31,7 +31,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Switch } from "@/components/ui/switch";
-import { companies as staticCompanies, contacts, products, users, Company } from "@/lib/data";
+import { companies as staticCompanies, contacts as initialContacts, products, users, Company, Contact } from "@/lib/data";
 import {
   Select,
   SelectContent,
@@ -44,6 +44,7 @@ import { Badge } from "@/components/ui/badge";
 import { AddCompanyDialog } from "../companies/add-company-dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ProductSelectorDialog } from "../products/product-selector-dialog";
+import { AddContactDialog } from "../contacts/add-contact-dialog";
 
 const addLeadSchema = z.object({
   name: z.string().min(1, "Lead name is required."),
@@ -90,6 +91,8 @@ export function AddLeadForm({
   const [contactSearch, setContactSearch] = useState("");
   const [isProductSelectorOpen, setIsProductSelectorOpen] = useState(false);
   const [totalValue, setTotalValue] = useState(0);
+  const [isAddContactOpen, setIsAddContactOpen] = useState(false);
+  const [localContacts, setLocalContacts] = useState<Contact[]>(initialContacts);
 
 
   const form = useForm<AddLeadFormValues>({
@@ -125,7 +128,7 @@ export function AddLeadForm({
   }, [lineItems]);
 
   const availableContacts = selectedCompanyId
-    ? contacts.filter((c) => c.companyId === selectedCompanyId)
+    ? localContacts.filter((c) => c.companyId === selectedCompanyId)
     : [];
 
   const filteredContacts = availableContacts.filter(c => 
@@ -152,6 +155,15 @@ export function AddLeadForm({
     } else if (checked && newContactIds.length === 1) {
       // If this is the first and only contact selected, make it primary
       form.setValue("primaryContactId", contactId, { shouldValidate: true });
+    }
+  };
+  
+  const handleContactCreated = (newContact: Contact) => {
+    setLocalContacts(prev => [...prev, newContact]);
+    const currentContactIds = form.getValues("contactIds") || [];
+    form.setValue("contactIds", [...currentContactIds, newContact.id], { shouldValidate: true });
+    if (!form.getValues("primaryContactId")) {
+        form.setValue("primaryContactId", newContact.id, { shouldValidate: true });
     }
   };
 
@@ -373,11 +385,23 @@ export function AddLeadForm({
             name="primaryContactId"
             render={({ field }) => (
               <FormItem>
-                <div className="mb-2 flex items-baseline justify-between">
-                  <FormLabel>Contacts</FormLabel>
-                  <FormMessage className="text-xs">
-                    {form.formState.errors.contactIds?.message}
-                  </FormMessage>
+                <div className="mb-2 flex items-center justify-between">
+                    <FormLabel>Contacts</FormLabel>
+                    <div className="flex items-center gap-4">
+                        <FormMessage className="text-xs">
+                            {form.formState.errors.contactIds?.message}
+                        </FormMessage>
+                        <Button
+                            type="button"
+                            variant="link"
+                            size="sm"
+                            className="p-0 h-auto"
+                            onClick={() => setIsAddContactOpen(true)}
+                            disabled={!selectedCompanyId}
+                        >
+                            <PlusCircle className="mr-2 h-4 w-4" /> Add Contact
+                        </Button>
+                    </div>
                 </div>
                 <div className="rounded-md border">
                   <div className="border-b p-2">
@@ -547,6 +571,12 @@ export function AddLeadForm({
         setIsOpen={setIsProductSelectorOpen}
         onProductsAdded={handleProductsAddedFromSelector}
         initialSelectedIds={fields.map(f => f.productId)}
+      />
+      <AddContactDialog
+        isOpen={isAddContactOpen}
+        setIsOpen={setIsAddContactOpen}
+        onContactAdded={handleContactCreated}
+        companyId={selectedCompanyId}
       />
     </>
   );

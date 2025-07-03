@@ -9,18 +9,27 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { AddContactForm, type AddContactFormValues } from "./add-contact-form";
+import type { Contact } from "@/lib/data";
 
 export function AddContactDialog({
   isOpen,
   setIsOpen,
   onContactAdded,
+  companyId,
 }: {
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
-  onContactAdded: (newContact: AddContactFormValues) => void;
+  onContactAdded: (newContact: Contact) => void;
+  companyId?: string;
 }) {
   const handleSave = (data: AddContactFormValues) => {
-    onContactAdded(data);
+    const contactToAdd: Contact = {
+      ...data,
+      id: `con${new Date().getTime()}`,
+      status: "active",
+      avatar: "https://placehold.co/32x32.png",
+    };
+    onContactAdded(contactToAdd);
     setIsOpen(false);
   };
 
@@ -34,7 +43,7 @@ export function AddContactDialog({
           </DialogDescription>
         </DialogHeader>
         <div className="py-4">
-          <AddContactForm onSave={handleSave} onCancel={() => setIsOpen(false)} />
+          <AddContactForm onSave={handleSave} onCancel={() => setIsOpen(false)} companyId={companyId} />
         </div>
       </DialogContent>
     </Dialog>
