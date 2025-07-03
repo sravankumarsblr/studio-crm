@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -48,7 +48,6 @@ import { ProductSelectorDialog } from "../products/product-selector-dialog";
 const addLeadSchema = z.object({
   name: z.string().min(1, "Lead name is required."),
   ownerId: z.string().min(1, "Lead owner is required."),
-  value: z.coerce.number().min(0, "Value must be a positive number."),
   status: z.string().min(1, "Status is required."),
   source: z.string().min(1, "Source is required."),
   companyId: z.string().min(1, "Company is required."),
@@ -90,13 +89,13 @@ export function AddLeadForm({
   const [companies, setCompanies] = useState<Company[]>(staticCompanies);
   const [contactSearch, setContactSearch] = useState("");
   const [isProductSelectorOpen, setIsProductSelectorOpen] = useState(false);
+  const [totalValue, setTotalValue] = useState(0);
 
 
   const form = useForm<AddLeadFormValues>({
     resolver: zodResolver(addLeadSchema),
     defaultValues: {
       name: "",
-      value: 0,
       ownerId: "",
       status: "New",
       source: "",
@@ -115,6 +114,15 @@ export function AddLeadForm({
 
   const selectedCompanyId = form.watch("companyId");
   const selectedContactIds = form.watch("contactIds");
+  const lineItems = form.watch("lineItems");
+
+  useEffect(() => {
+    const newTotal = lineItems.reduce((acc, item) => {
+        const product = products.find(p => p.id === item.productId);
+        return acc + (product ? product.price * item.quantity : 0);
+    }, 0);
+    setTotalValue(newTotal);
+  }, [lineItems]);
 
   const availableContacts = selectedCompanyId
     ? contacts.filter((c) => c.companyId === selectedCompanyId)
@@ -195,19 +203,6 @@ export function AddLeadForm({
             )}
           />
           <div className="grid grid-cols-2 gap-4">
-            <FormField
-              control={form.control}
-              name="value"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Value (₹)</FormLabel>
-                  <FormControl>
-                    <Input type="number" placeholder="e.g., 50000" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
              <FormField
               control={form.control}
               name="ownerId"
@@ -265,8 +260,6 @@ export function AddLeadForm({
                 </FormItem>
               )}
             />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
             <FormField
               control={form.control}
               name="status"
@@ -291,20 +284,20 @@ export function AddLeadForm({
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="source"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Source</FormLabel>
-                  <FormControl>
-                    <Input placeholder="e.g., Web Form" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
           </div>
+          <FormField
+            control={form.control}
+            name="source"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Source</FormLabel>
+                <FormControl>
+                  <Input placeholder="e.g., Web Form" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <FormField
             control={form.control}
             name="companyId"
@@ -503,6 +496,11 @@ export function AddLeadForm({
                                 <PlusCircle className="mr-2 h-4 w-4" />
                                 Add Product
                             </Button>
+                             {fields.length > 0 && (
+                                <div className="text-right font-medium pr-4">
+                                    Total: <span className="text-lg font-bold">₹{totalValue.toLocaleString('en-IN')}</span>
+                                </div>
+                            )}
                          </div>
                     </div>
                     <FormMessage />

@@ -48,7 +48,6 @@ import { ProductSelectorDialog } from "../products/product-selector-dialog";
 const editLeadSchema = z.object({
   name: z.string().min(1, "Lead name is required."),
   ownerId: z.string().min(1, "Lead owner is required."),
-  value: z.coerce.number().min(0, "Value must be a positive number."),
   status: z.string().min(1, "Status is required."),
   source: z.string().min(1, "Source is required."),
   companyId: z.string().min(1, "Company is required."),
@@ -91,6 +90,7 @@ export function EditLeadForm({
   const [companies, setCompanies] = useState<Company[]>(staticCompanies);
   const [contactSearch, setContactSearch] = useState("");
   const [isProductSelectorOpen, setIsProductSelectorOpen] = useState(false);
+  const [totalValue, setTotalValue] = useState(0);
 
   const creatorName = useMemo(() => {
     return users.find(u => u.id === lead.createdById)?.name || "Unknown";
@@ -102,7 +102,6 @@ export function EditLeadForm({
 
     return {
       name: lead.name,
-      value: lead.value,
       ownerId: lead.ownerId,
       status: lead.status,
       source: lead.source,
@@ -130,6 +129,15 @@ export function EditLeadForm({
 
   const selectedCompanyId = form.watch("companyId");
   const selectedContactIds = form.watch("contactIds");
+  const lineItems = form.watch("lineItems");
+
+  useEffect(() => {
+    const newTotal = lineItems.reduce((acc, item) => {
+        const product = products.find(p => p.id === item.productId);
+        return acc + (product ? product.price * item.quantity : 0);
+    }, 0);
+    setTotalValue(newTotal);
+  }, [lineItems]);
 
   const availableContacts = selectedCompanyId
     ? contacts.filter((c) => c.companyId === selectedCompanyId)
@@ -206,45 +214,30 @@ export function EditLeadForm({
               </FormItem>
             )}
           />
-          <div className="grid grid-cols-2 gap-4">
-            <FormField
-              control={form.control}
-              name="value"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Value (₹)</FormLabel>
+          <FormField
+            control={form.control}
+            name="status"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Status</FormLabel>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
-                    <Input type="number" placeholder="e.g., 50000" {...field} />
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a status" />
+                    </SelectTrigger>
                   </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="status"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Status</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a status" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="New">New</SelectItem>
-                      <SelectItem value="Contacted">Contacted</SelectItem>
-                      <SelectItem value="Qualified">Qualified</SelectItem>
-                      <SelectItem value="Lost">Lost</SelectItem>
-                      <SelectItem value="Junk">Junk</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
+                  <SelectContent>
+                    <SelectItem value="New">New</SelectItem>
+                    <SelectItem value="Contacted">Contacted</SelectItem>
+                    <SelectItem value="Qualified">Qualified</SelectItem>
+                    <SelectItem value="Lost">Lost</SelectItem>
+                    <SelectItem value="Junk">Junk</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <div className="grid grid-cols-2 gap-4">
             <FormField
               control={form.control}
@@ -524,6 +517,11 @@ export function EditLeadForm({
                                 <PlusCircle className="mr-2 h-4 w-4" />
                                 Add Product
                             </Button>
+                            {fields.length > 0 && (
+                                <div className="text-right font-medium pr-4">
+                                    Total: <span className="text-lg font-bold">₹{totalValue.toLocaleString('en-IN')}</span>
+                                </div>
+                            )}
                          </div>
                     </div>
                     <FormMessage />

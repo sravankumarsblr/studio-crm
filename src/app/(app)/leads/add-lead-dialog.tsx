@@ -10,6 +10,7 @@ import {
 import { AddLeadForm } from "./add-lead-form";
 import { useToast } from "@/hooks/use-toast";
 import type { AddLeadFormValues } from "./add-lead-form";
+import { products } from "@/lib/data";
 
 export function AddLeadDialog({
   isOpen,
@@ -21,9 +22,14 @@ export function AddLeadDialog({
   const { toast } = useToast();
 
   const handleSave = (data: AddLeadFormValues) => {
+    const totalValue = data.lineItems.reduce((acc, item) => {
+        const product = products.find(p => p.id === item.productId);
+        return acc + (product?.price || 0) * item.quantity;
+    }, 0);
+
     // In a real app, this would trigger a server action to save the new lead
     // and potentially a opportunity, then re-fetch data.
-    console.log("New lead to save:", data);
+    console.log("New lead to save:", { ...data, value: totalValue });
 
     if (data.convertToOpportunity) {
       toast({

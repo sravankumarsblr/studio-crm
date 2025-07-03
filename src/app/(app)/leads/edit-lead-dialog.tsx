@@ -12,6 +12,7 @@ import { EditLeadForm } from "./edit-lead-form";
 import { useToast } from "@/hooks/use-toast";
 import type { EditLeadFormValues } from "./edit-lead-form";
 import type { Lead } from "@/lib/data";
+import { products } from "@/lib/data";
 
 export function EditLeadDialog({
   isOpen,
@@ -25,8 +26,12 @@ export function EditLeadDialog({
   const { toast } = useToast();
 
   const handleSave = (data: EditLeadFormValues) => {
+    const totalValue = data.lineItems.reduce((acc, item) => {
+        const product = products.find(p => p.id === item.productId);
+        return acc + (product?.price || 0) * item.quantity;
+    }, 0);
     // In a real app, this would trigger a server action to update the lead.
-    console.log("Updated lead data to save:", data);
+    console.log("Updated lead data to save:", { ...data, value: totalValue });
     toast({
       title: "Lead Updated",
       description: `The lead "${data.name}" has been successfully updated.`,
