@@ -42,6 +42,7 @@ const addContractSchema = z.object({
   status: z.string().min(1, "Status is required."),
   type: z.string().min(1, "Contract type is required."),
   scopeOfWork: z.string().min(1, "Scope of work is required."),
+  document: z.any().optional(),
 });
 
 export type AddContractFormValues = z.infer<typeof addContractSchema>;
@@ -68,6 +69,7 @@ export function AddContractForm({
       status: "Draft",
       type: "One-time",
       scopeOfWork: "",
+      document: undefined,
     },
   });
 
@@ -179,6 +181,24 @@ export function AddContractForm({
                   <FormLabel>Scope of Work</FormLabel>
                   <FormControl>
                     <Textarea placeholder="Describe the scope of work..." {...field} className="min-h-[150px]" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="document"
+              render={({ field: { onChange, value, ...rest } }) => (
+                <FormItem>
+                  <FormLabel>Contract Document (PDF)</FormLabel>
+                  <FormControl>
+                    <Input 
+                      type="file" 
+                      accept=".pdf"
+                      onChange={(e) => onChange(e.target.files ? e.target.files[0] : null)}
+                      {...rest}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

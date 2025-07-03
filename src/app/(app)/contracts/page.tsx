@@ -102,6 +102,10 @@ export default function ContractsPage() {
     setCurrentPage(1);
   };
 
+  const handleContractAdded = (newContract: Contract) => {
+    setContracts(prev => [...prev, newContract]);
+  }
+
   const contractStatuses = [...new Set(contracts.map(c => c.status))];
   const contractTypes = [...new Set(contracts.map(c => c.type))];
 
@@ -258,7 +262,7 @@ export default function ContractsPage() {
           </Card>
         </main>
       </div>
-      <SelectOpportunityDialog isOpen={isSelectOppOpen} setIsOpen={setIsSelectOppOpen} />
+      <SelectOpportunityDialog isOpen={isSelectOppOpen} setIsOpen={setIsSelectOppOpen} onContractAdded={handleContractAdded} />
     </>
   );
 }

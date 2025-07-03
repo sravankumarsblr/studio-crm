@@ -9,12 +9,13 @@ import { Header } from '@/components/header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { contracts as initialContracts, companies, opportunities, products, users, Milestone, Quote } from '@/lib/data';
+import { contracts as initialContracts, companies, opportunities, products, users, Milestone, Quote, Contract } from '@/lib/data';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Separator } from '@/components/ui/separator';
 import { Progress } from '@/components/ui/progress';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { AddMilestoneDialog } from '../add-milestone-dialog';
+import { EditContractDialog } from '../edit-contract-dialog';
 import { RaiseInvoiceDialog } from '../raise-invoice-dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -47,6 +48,7 @@ export default function ContractDetailPage() {
   
   const [contract, setContract] = useState(() => initialContracts.find((c) => c.id === contractId));
   const [isAddMilestoneOpen, setIsAddMilestoneOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
   const [isRaiseInvoiceOpen, setIsRaiseInvoiceOpen] = useState(false);
   const [selectedMilestone, setSelectedMilestone] = useState<Milestone | null>(null);
   const [contractFile, setContractFile] = useState<File | null>(null);
@@ -61,6 +63,12 @@ export default function ContractDetailPage() {
     if (contract) {
         const milestoneToAdd = { ...newMilestone, id: `m${Date.now()}`};
         setContract({ ...contract, milestones: [...contract.milestones, milestoneToAdd] });
+    }
+  };
+
+  const handleContractUpdated = (updatedData: Partial<Contract>) => {
+    if (contract) {
+        setContract({ ...contract, ...updatedData });
     }
   };
 
@@ -118,7 +126,7 @@ export default function ContractDetailPage() {
             </div>
         </div>
         <Button variant="outline"><FilePlus className="mr-2"/> Renew Contract</Button>
-        <Button variant="outline"><Edit className="mr-2"/> Edit</Button>
+        <Button variant="outline" onClick={() => setIsEditOpen(true)}><Edit className="mr-2"/> Edit</Button>
         <Button variant="destructive">Terminate</Button>
       </Header>
 
@@ -321,6 +329,14 @@ export default function ContractDetailPage() {
         existingMilestoneTotal={contract.milestones.reduce((acc, m) => acc + m.amount, 0)}
         onMilestoneAdded={handleMilestoneAdded}
     />
+    {contract && (
+        <EditContractDialog
+            isOpen={isEditOpen}
+            setIsOpen={setIsEditOpen}
+            contract={contract}
+            onContractUpdated={handleContractUpdated}
+        />
+    )}
     {selectedMilestone && (
         <RaiseInvoiceDialog
             isOpen={isRaiseInvoiceOpen}

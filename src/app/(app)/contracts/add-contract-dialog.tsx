@@ -9,7 +9,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { AddContractForm, type AddContractFormValues } from "./add-contract-form";
-import type { Opportunity } from "@/lib/data";
+import type { Opportunity, Contract } from "@/lib/data";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 
@@ -17,23 +17,42 @@ type AddContractDialogProps = {
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
   opportunity: Opportunity;
+  onContractAdded: (newContract: Contract) => void;
 };
 
-export function AddContractDialog({ isOpen, setIsOpen, opportunity }: AddContractDialogProps) {
+export function AddContractDialog({ 
+    isOpen, 
+    setIsOpen, 
+    opportunity, 
+    onContractAdded,
+}: AddContractDialogProps) {
   const { toast } = useToast();
   const router = useRouter();
 
   const handleSave = (data: AddContractFormValues) => {
     // In a real app, this would trigger a server action
-    console.log("New contract to save:", data);
+    const acceptedQuote = opportunity.quotes.find(q => q.status === 'Accepted');
+    
+    const newContract: Contract = {
+        id: `CT-${new Date().getFullYear()}-${Math.floor(Math.random() * 900) + 100}`,
+        opportunityId: opportunity.id,
+        poNumber: acceptedQuote?.poNumber || 'N/A',
+        value: opportunity.value,
+        companyName: opportunity.companyName,
+        lineItems: opportunity.lineItems,
+        milestones: [],
+        documentName: data.document?.name,
+        ...data,
+    };
+
+    onContractAdded(newContract);
     
     toast({
       title: "Contract Created",
       description: `The contract "${data.contractTitle}" has been successfully created.`,
     });
     setIsOpen(false);
-    // You might want to redirect to the new contract page
-    // router.push(`/contracts/new-contract-id`);
+    router.push(`/contracts/${newContract.id}`);
   };
 
   return (

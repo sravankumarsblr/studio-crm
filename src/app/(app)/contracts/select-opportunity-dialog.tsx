@@ -11,15 +11,16 @@ import {
 } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { opportunities, type Opportunity } from "@/lib/data";
+import { opportunities, type Opportunity, type Contract } from "@/lib/data";
 import { AddContractDialog } from "./add-contract-dialog";
 
 type SelectOpportunityDialogProps = {
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
+  onContractAdded: (newContract: Contract) => void;
 };
 
-export function SelectOpportunityDialog({ isOpen, setIsOpen }: SelectOpportunityDialogProps) {
+export function SelectOpportunityDialog({ isOpen, setIsOpen, onContractAdded }: SelectOpportunityDialogProps) {
   const [selectedOpp, setSelectedOpp] = useState<Opportunity | null>(null);
   const [isContractDialogOpen, setIsContractDialogOpen] = useState(false);
   
@@ -82,6 +83,7 @@ export function SelectOpportunityDialog({ isOpen, setIsOpen }: SelectOpportunity
           isOpen={isContractDialogOpen}
           setIsOpen={handleContractDialogClose}
           opportunity={selectedOpp}
+          onContractAdded={onContractAdded}
         />
       )}
     </>
