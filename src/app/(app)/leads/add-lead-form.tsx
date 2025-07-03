@@ -31,7 +31,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Switch } from "@/components/ui/switch";
-import { companies as staticCompanies, contacts as initialContacts, products, users, Company, Contact } from "@/lib/data";
+import { leadSources, companies as staticCompanies, contacts as initialContacts, products, users, Company, Contact } from "@/lib/data";
 import {
   Select,
   SelectContent,
@@ -50,7 +50,7 @@ const addLeadSchema = z.object({
   name: z.string().min(1, "Lead name is required."),
   ownerId: z.string().min(1, "Lead owner is required."),
   status: z.string().min(1, "Status is required."),
-  source: z.string().min(1, "Source is required."),
+  source: z.enum(leadSources, { required_error: "Source is required." }),
   companyId: z.string().min(1, "Company is required."),
   contactIds: z
     .array(z.string())
@@ -101,7 +101,7 @@ export function AddLeadForm({
       name: "",
       ownerId: "",
       status: "New",
-      source: "",
+      source: undefined,
       companyId: "",
       contactIds: [],
       primaryContactId: "",
@@ -303,9 +303,16 @@ export function AddLeadForm({
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Source</FormLabel>
-                <FormControl>
-                  <Input placeholder="e.g., Web Form" {...field} />
-                </FormControl>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a source" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {leadSources.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                  </SelectContent>
+                </Select>
                 <FormMessage />
               </FormItem>
             )}

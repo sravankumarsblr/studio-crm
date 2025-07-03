@@ -44,6 +44,8 @@ export type LineItem = {
   quantity: number;
 };
 
+export const leadSources = ["Phone", "Email", "Just Dial", "IndiaMart", "Coldcall"] as const;
+
 export type Lead = {
   id: string;
   name: string;
@@ -53,7 +55,7 @@ export type Lead = {
   contactName: string;
   value: number;
   status: 'New' | 'Contacted' | 'Qualified' | 'Lost' | 'Junk';
-  source: string;
+  source: typeof leadSources[number];
   createdDate: string;
   leadData: Record<string, any>;
   lineItems: LineItem[];
@@ -98,6 +100,7 @@ export type Opportunity = {
   closeDate: string;
   createdDate: string;
   winProbability: number;
+  source: typeof leadSources[number];
   quotes: Quote[];
   lineItems: LineItem[];
 };
@@ -184,10 +187,10 @@ export const contacts: Contact[] = [
 ];
 
 export const leads: Lead[] = [
-  { id: 'lead1', name: 'Sensor Calibration Service Inquiry', ownerId: 'user3', createdById: 'user2', companyName: 'Navachar Tech Labs', contactName: 'Isha Singh', value: 1500000, status: 'New', source: 'Web Form', createdDate: '2024-05-01', lineItems: [{ productId: 'prod1', quantity: 30 }], leadData: { industry: 'R&D', companySize: 75, pastPurchases: 0, websiteVisits: 5 } },
-  { id: 'lead2', name: 'Pressure Gauge Batch Testing', ownerId: 'user4', createdById: 'user2', companyName: 'Bharat Petrochem', contactName: 'Amit Desai', value: 7500000, status: 'Qualified', source: 'Referral', createdDate: '2024-05-10', lineItems: [{ productId: 'prod1', quantity: 50 }, { productId: 'prod3', quantity: 20 }], leadData: { industry: 'Oil & Gas', companySize: 2500, pastPurchases: 3, websiteVisits: 2, referredBy: 'Vimaan Aerospace' } },
-  { id: 'lead3', name: 'Annual Pipette Calibration Contract', ownerId: 'user3', createdById: 'user1', companyName: 'Jiva Bio-Sciences', contactName: 'Neha Rao', value: 2500000, status: 'Contacted', source: 'Trade Show', createdDate: '2024-05-20', lineItems: [{ productId: 'prod4', quantity: 40 }], leadData: { industry: 'Biotechnology', companySize: 180, pastPurchases: 1, websiteVisits: 1 } },
-  { id: 'lead4', name: 'Enquiry for Old System Upgrade', ownerId: 'user4', createdById: 'user1', companyName: 'Navachar Tech Labs', contactName: 'Isha Singh', value: 500000, status: 'Junk', source: 'Cold Call', createdDate: '2024-05-22', lineItems: [], leadData: { industry: 'R&D', companySize: 75, pastPurchases: 0, websiteVisits: 0, reason: 'Budget constraints' } },
+  { id: 'lead1', name: 'Sensor Calibration Service Inquiry', ownerId: 'user3', createdById: 'user2', companyName: 'Navachar Tech Labs', contactName: 'Isha Singh', value: 1500000, status: 'New', source: 'IndiaMart', createdDate: '2024-05-01', lineItems: [{ productId: 'prod1', quantity: 30 }], leadData: { industry: 'R&D', companySize: 75, pastPurchases: 0, websiteVisits: 5 } },
+  { id: 'lead2', name: 'Pressure Gauge Batch Testing', ownerId: 'user4', createdById: 'user2', companyName: 'Bharat Petrochem', contactName: 'Amit Desai', value: 7500000, status: 'Qualified', source: 'Phone', createdDate: '2024-05-10', lineItems: [{ productId: 'prod1', quantity: 50 }, { productId: 'prod3', quantity: 20 }], leadData: { industry: 'Oil & Gas', companySize: 2500, pastPurchases: 3, websiteVisits: 2, referredBy: 'Vimaan Aerospace' } },
+  { id: 'lead3', name: 'Annual Pipette Calibration Contract', ownerId: 'user3', createdById: 'user1', companyName: 'Jiva Bio-Sciences', contactName: 'Neha Rao', value: 2500000, status: 'Contacted', source: 'Just Dial', createdDate: '2024-05-20', lineItems: [{ productId: 'prod4', quantity: 40 }], leadData: { industry: 'Biotechnology', companySize: 180, pastPurchases: 1, websiteVisits: 1 } },
+  { id: 'lead4', name: 'Enquiry for Old System Upgrade', ownerId: 'user4', createdById: 'user1', companyName: 'Navachar Tech Labs', contactName: 'Isha Singh', value: 500000, status: 'Junk', source: 'Coldcall', createdDate: '2024-05-22', lineItems: [], leadData: { industry: 'R&D', companySize: 75, pastPurchases: 0, websiteVisits: 0, reason: 'Budget constraints' } },
 ];
 
 export const opportunities: Opportunity[] = [
@@ -204,6 +207,7 @@ export const opportunities: Opportunity[] = [
     createdDate: '2024-06-01',
     closeDate: '2024-08-30', 
     winProbability: 0.5,
+    source: 'Email',
     lineItems: [{ productId: 'prod1', quantity: 100 }], 
     quotes: [
       { id: 'qt1', opportunityId: 'deal1', quoteNumber: 'QT-2024-001', date: '2024-06-10', expiryDate: '2024-07-10', preparedBy: 'Aryan Sharma', status: 'Sent', documentName: 'Vimaan_Quote_v1.pdf', lineItems: [{ productId: 'prod1', quantity: 100, unitPrice: 49900 }] }
@@ -222,6 +226,7 @@ export const opportunities: Opportunity[] = [
     createdDate: '2024-05-15',
     closeDate: '2024-07-25', 
     winProbability: 0.75,
+    source: 'Phone',
     lineItems: [{ productId: 'prod2', quantity: 92 }], 
     quotes: [
        { id: 'qt2', opportunityId: 'deal2', quoteNumber: 'QT-2024-002', date: '2024-06-15', expiryDate: '2024-07-15', preparedBy: 'Aryan Sharma', status: 'Sent', lineItems: [{ productId: 'prod2', quantity: 92, unitPrice: 129900 }] },
@@ -241,6 +246,7 @@ export const opportunities: Opportunity[] = [
     createdDate: '2024-05-20',
     closeDate: '2024-06-15', 
     winProbability: 1,
+    source: 'Just Dial',
     lineItems: [{ productId: 'prod3', quantity: 26 }], 
     quotes: [
       { id: 'qt4', opportunityId: 'deal3', quoteNumber: 'QT-2024-004', date: '2024-06-01', expiryDate: '2024-07-01', preparedBy: 'Aryan Sharma', status: 'Accepted', poNumber: 'PO-ACPL-1138', poValue: 2200000, poDate: '2024-06-14', poDocumentName: 'PO-ACPL-1138.pdf', lineItems: [{ productId: 'prod3', quantity: 26, unitPrice: 85000, discount: { type: 'fixed', value: 10000 } }] }
@@ -259,6 +265,7 @@ export const opportunities: Opportunity[] = [
     createdDate: '2024-06-10', 
     closeDate: '2024-09-15', 
     winProbability: 0.2, 
+    source: 'IndiaMart',
     lineItems: [{ productId: 'prod5', quantity: 10 }], 
     quotes: [] 
   },
@@ -275,6 +282,7 @@ export const opportunities: Opportunity[] = [
     createdDate: '2024-05-01', 
     closeDate: '2024-06-20', 
     winProbability: 0, 
+    source: 'Coldcall',
     lineItems: [{ productId: 'prod1', quantity: 20 }], 
     quotes: [] 
   },

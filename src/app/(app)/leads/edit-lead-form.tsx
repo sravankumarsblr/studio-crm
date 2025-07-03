@@ -30,7 +30,7 @@ import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { companies as staticCompanies, contacts as initialContacts, products, users, Lead, Company, Contact } from "@/lib/data";
+import { leadSources, companies as staticCompanies, contacts as initialContacts, products, users, Lead, Company, Contact } from "@/lib/data";
 import {
   Select,
   SelectContent,
@@ -50,7 +50,7 @@ const editLeadSchema = z.object({
   name: z.string().min(1, "Lead name is required."),
   ownerId: z.string().min(1, "Lead owner is required."),
   status: z.string().min(1, "Status is required."),
-  source: z.string().min(1, "Source is required."),
+  source: z.enum(leadSources, { required_error: "Source is required." }),
   companyId: z.string().min(1, "Company is required."),
   contactIds: z
     .array(z.string())
@@ -226,30 +226,52 @@ export function EditLeadForm({
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="status"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Status</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a status" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="New">New</SelectItem>
-                    <SelectItem value="Contacted">Contacted</SelectItem>
-                    <SelectItem value="Qualified">Qualified</SelectItem>
-                    <SelectItem value="Lost">Lost</SelectItem>
-                    <SelectItem value="Junk">Junk</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className="grid grid-cols-2 gap-4">
+            <FormField
+              control={form.control}
+              name="status"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Status</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a status" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="New">New</SelectItem>
+                      <SelectItem value="Contacted">Contacted</SelectItem>
+                      <SelectItem value="Qualified">Qualified</SelectItem>
+                      <SelectItem value="Lost">Lost</SelectItem>
+                      <SelectItem value="Junk">Junk</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="source"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Source</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a source" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {leadSources.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
           <div className="grid grid-cols-2 gap-4">
             <FormField
               control={form.control}
@@ -314,22 +336,6 @@ export function EditLeadForm({
                     <Input value={creatorName} disabled />
                 </FormControl>
             </FormItem>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            
-            <FormField
-              control={form.control}
-              name="source"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Source</FormLabel>
-                  <FormControl>
-                    <Input placeholder="e.g., Web Form" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
           </div>
           <FormField
             control={form.control}

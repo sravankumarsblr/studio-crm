@@ -31,7 +31,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar } from "@/components/ui/calendar";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { companies as staticCompanies, contacts as initialContacts, products, users, Opportunity, Company, LineItem, Contact } from "@/lib/data";
+import { leadSources, companies as staticCompanies, contacts as initialContacts, products, users, Opportunity, Company, LineItem, Contact } from "@/lib/data";
 import {
   Select,
   SelectContent,
@@ -51,6 +51,7 @@ const editOpportunitySchema = z.object({
   ownerId: z.string().min(1, "Deal owner is required."),
   stage: z.string().min(1, "Stage is required."),
   status: z.enum(["New", "In Progress", "Won", "Lost"]),
+  source: z.enum(leadSources, { required_error: "Source is required." }),
   closeDate: z.string().min(1, "Close date is required"),
   companyId: z.string().min(1, "Company is required."),
   contactIds: z
@@ -109,6 +110,7 @@ export function EditOpportunityForm({
       name: opportunity.name,
       stage: opportunity.stage,
       status: opportunity.status,
+      source: opportunity.source,
       ownerId: opportunity.ownerId,
       closeDate: opportunity.closeDate,
       companyId: company?.id || "",
@@ -298,7 +300,7 @@ export function EditOpportunityForm({
                 </FormControl>
             </FormItem>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <FormField
               control={form.control}
               name="stage"
@@ -338,6 +340,26 @@ export function EditOpportunityForm({
                       <SelectItem value="In Progress">In Progress</SelectItem>
                       <SelectItem value="Won">Won</SelectItem>
                       <SelectItem value="Lost">Lost</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="source"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Source</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a source" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {leadSources.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
                     </SelectContent>
                   </Select>
                   <FormMessage />
