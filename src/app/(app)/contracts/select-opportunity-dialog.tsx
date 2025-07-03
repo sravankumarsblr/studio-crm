@@ -23,7 +23,7 @@ export function SelectOpportunityDialog({ isOpen, setIsOpen }: SelectOpportunity
   const [selectedOpp, setSelectedOpp] = useState<Opportunity | null>(null);
   const [isContractDialogOpen, setIsContractDialogOpen] = useState(false);
   
-  const wonOpportunities = opportunities.filter(o => o.stage === 'Closed Won');
+  const wonOpportunities = opportunities.filter(o => o.status === 'Won');
 
   const handleSelect = (opp: Opportunity) => {
     setSelectedOpp(opp);
@@ -45,7 +45,7 @@ export function SelectOpportunityDialog({ isOpen, setIsOpen }: SelectOpportunity
           <DialogHeader>
             <DialogTitle>Select a Won Opportunity</DialogTitle>
             <DialogDescription>
-              Choose a "Closed Won" opportunity to create a new contract from.
+              Choose a "Won" opportunity to create a new contract from.
             </DialogDescription>
           </DialogHeader>
           <div className="py-4">
