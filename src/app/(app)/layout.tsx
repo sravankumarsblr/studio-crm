@@ -1,5 +1,6 @@
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import Nav from "@/components/nav";
+import { AiAssistant } from "@/components/ai-assistant";
 
 export default function AppLayout({
   children,
@@ -19,6 +20,7 @@ export default function AppLayout({
           </SidebarInset>
         </div>
       </div>
+      <AiAssistant />
     </SidebarProvider>
   );
 }
