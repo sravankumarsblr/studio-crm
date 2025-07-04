@@ -78,7 +78,7 @@ export function AttachPoForm({
               <FormItem>
                 <FormLabel>PO Value (₹)</FormLabel>
                 <FormControl>
-                  <Input type="number" placeholder="e.g., 50000" {...field} />
+                  <Input type="number" placeholder="e.g., 50000" {...field} value={field.value ?? ''} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
