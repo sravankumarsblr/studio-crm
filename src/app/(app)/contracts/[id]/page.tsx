@@ -166,7 +166,7 @@ export default function ContractDetailPage() {
                     <Briefcase className="w-4 h-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                     <Button variant="link" asChild className="p-0 h-auto text-base">
+                     <Button variant="link" asChild className="p-0 h-auto text-base text-left whitespace-normal leading-snug">
                         <a href={`/deals/${contract.opportunityId}`}>{opportunity.name}</a>
                     </Button>
                 </CardContent>
