@@ -108,7 +108,7 @@ export function GenerateQuoteForm({
       }),
       attachPo: false,
       poNumber: "",
-      poValue: undefined,
+      poValue: '',
       poDate: "",
     },
   });
@@ -355,7 +355,7 @@ export function GenerateQuoteForm({
                     <FormItem>
                       <FormLabel>PO Value (₹)</FormLabel>
                       <FormControl>
-                        <Input type="number" placeholder="e.g., 50000" {...field} value={field.value ?? ""} />
+                        <Input type="number" placeholder="e.g., 50000" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

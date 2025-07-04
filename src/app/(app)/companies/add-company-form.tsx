@@ -69,7 +69,7 @@ export function AddCompanyForm({
     defaultValues: {
       name: "",
       industry: "",
-      numberOfEmployees: undefined,
+      numberOfEmployees: '',
       website: "",
       address: "",
     },
@@ -172,7 +172,7 @@ export function AddCompanyForm({
             <FormItem>
               <FormLabel>Number of Employees</FormLabel>
               <FormControl>
-                <Input type="number" placeholder="e.g., 150" {...field} value={field.value ?? ''} />
+                <Input type="number" placeholder="e.g., 150" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>

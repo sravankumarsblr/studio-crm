@@ -34,7 +34,7 @@ export function AddRoleForm({
   const form = useForm<AddRoleFormValues>({
     resolver: zodResolver(addRoleSchema),
     defaultValues: {
-      name: undefined,
+      name: '',
       description: "",
     },
   });

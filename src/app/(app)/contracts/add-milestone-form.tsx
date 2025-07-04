@@ -52,7 +52,7 @@ export function AddMilestoneForm({ onSave, onCancel, contractValue, existingMile
       name: "",
       dueDate: "",
       assignedToId: "",
-      amount: undefined,
+      amount: '',
     },
   });
 
@@ -81,7 +81,7 @@ export function AddMilestoneForm({ onSave, onCancel, contractValue, existingMile
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Amount (₹)</FormLabel>
-                <FormControl><Input type="number" placeholder="e.g., 50000" {...field} value={field.value ?? ''} /></FormControl>
+                <FormControl><Input type="number" placeholder="e.g., 50000" {...field} /></FormControl>
                 <FormMessage />
               </FormItem>
             )}

@@ -45,7 +45,7 @@ export function AttachPoForm({
     resolver: zodResolver(attachPoSchema),
     defaultValues: {
       poNumber: "",
-      poValue: undefined,
+      poValue: '',
       poDate: "",
     },
   });
@@ -78,7 +78,7 @@ export function AttachPoForm({
               <FormItem>
                 <FormLabel>PO Value (₹)</FormLabel>
                 <FormControl>
-                  <Input type="number" placeholder="e.g., 50000" {...field} value={field.value ?? ''} />
+                  <Input type="number" placeholder="e.g., 50000" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

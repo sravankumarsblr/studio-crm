@@ -175,7 +175,7 @@ export function EditCompanyForm({
             <FormItem>
               <FormLabel>Number of Employees</FormLabel>
               <FormControl>
-                <Input type="number" placeholder="e.g., 150" {...field} value={field.value ?? ''} />
+                <Input type="number" placeholder="e.g., 150" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
