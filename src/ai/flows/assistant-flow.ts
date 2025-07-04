@@ -45,7 +45,7 @@ const assistantFlow = ai.defineFlow(
     outputSchema: z.string(),
   },
   async (input) => {
-    const {output} = await assistantPrompt(input);
-    return output!;
+    const response = await assistantPrompt(input);
+    return response.text;
   }
 );
