@@ -319,5 +319,5 @@ export const products: Product[] = [
   { id: 'prod2', name: 'Precision Medical Scale MS-2', category: 'Scales', price: 129900, status: 'active' },
   { id: 'prod3', name: 'Digital Torque Wrench TW-30', category: 'Tools', price: 85000, status: 'inactive' },
   { id: 'prod4', name: 'Automated Digital Pipette P-4A', category: 'Lab Equipment', price: 60000, status: 'active' },
-  { id: 'prod5', name: 'CalTrack Software Suite', category: 'Software', price: 250000, status: 'active' },
+  { id: 'prod5', name: 'CalTrack Software Suite', category: 'Tools', price: 250000, status: 'active' },
 ];

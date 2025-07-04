@@ -40,7 +40,20 @@ const addProductSchema = z.object({
 
 export type AddProductFormValues = z.infer<typeof addProductSchema>;
 
-const productCategories = ["Sensors", "Scales", "Tools", "Lab Equipment", "Software"];
+const productCategories = [
+  "Sensors",
+  "Scales",
+  "Tools",
+  "Lab Equipment",
+  "Weighing Machine Calibration Services",
+  "Weight Calibration Services",
+  "Electrical Instruments Calibration Services",
+  "Dimensional Calibration Services",
+  "Pressure Gauge and Vacuum Gauges Calibration Services",
+  "Autoclave Calibration Services",
+  "Flow Meter Calibration Services",
+  "Tachometer & Sound Level Meter Calibration Services",
+];
 
 export function AddProductForm({
   onSave,
