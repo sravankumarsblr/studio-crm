@@ -81,19 +81,6 @@ export function AddProductForm({
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 px-1">
         <FormField
           control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Product Name</FormLabel>
-              <FormControl>
-                <Input placeholder="e.g., Pressure Sensor X1" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
           name="category"
           render={({ field }) => (
             <FormItem className="flex flex-col">
@@ -121,7 +108,7 @@ export function AddProductForm({
                 <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
                   <Command>
                     <CommandInput placeholder="Search category..." />
-                    <CommandList>
+                    <CommandList className="max-h-52">
                       <CommandEmpty>No category found.</CommandEmpty>
                       <CommandGroup>
                         {productCategories.map((category) => (
@@ -155,12 +142,25 @@ export function AddProductForm({
         />
         <FormField
           control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Product/Service Name</FormLabel>
+              <FormControl>
+                <Input placeholder="e.g., On-site Industrial Scale Calibration" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
           name="price"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Price (INR)</FormLabel>
               <FormControl>
-                <Input type="number" placeholder="e.g., 499" {...field} />
+                <Input type="number" placeholder="e.g., 15000" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>

@@ -84,19 +84,6 @@ export function EditProductForm({
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 px-1">
         <FormField
           control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Product Name</FormLabel>
-              <FormControl>
-                <Input placeholder="e.g., Pressure Sensor X1" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
           name="category"
           render={({ field }) => (
             <FormItem className="flex flex-col">
@@ -124,7 +111,7 @@ export function EditProductForm({
                 <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
                   <Command>
                     <CommandInput placeholder="Search category..." />
-                    <CommandList>
+                    <CommandList className="max-h-52">
                       <CommandEmpty>No category found.</CommandEmpty>
                       <CommandGroup>
                         {productCategories.map((category) => (
@@ -152,6 +139,19 @@ export function EditProductForm({
                   </Command>
                 </PopoverContent>
               </Popover>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Product/Service Name</FormLabel>
+              <FormControl>
+                <Input placeholder="e.g., Pressure Sensor X1" {...field} />
+              </FormControl>
               <FormMessage />
             </FormItem>
           )}
