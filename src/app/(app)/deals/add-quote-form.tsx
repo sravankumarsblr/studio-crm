@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect } from "react";
@@ -24,10 +25,13 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Switch } from "@/components/ui/switch";
 import type { Opportunity } from "@/lib/data";
-import { products, users } from "@/lib/data";
+import { products } from "@/lib/data";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Separator } from "@/components/ui/separator";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+const poStatuses = ["Received", "Acceptance Mail", "On Phone"] as const;
 
 const generateQuoteSchema = z.object({
   expiryDate: z.string().min(1, "Expiry date is required."),
@@ -43,6 +47,7 @@ const generateQuoteSchema = z.object({
   poNumber: z.string().optional(),
   poValue: z.coerce.number().optional(),
   poDate: z.string().optional(),
+  poStatus: z.enum(poStatuses).optional(),
   poDocument: z.any().optional(),
 }).refine(data => {
     for (const item of data.lineItems) {
@@ -78,6 +83,14 @@ const generateQuoteSchema = z.object({
 }, {
     message: "PO date is required.",
     path: ["poDate"],
+}).refine(data => {
+    if (data.attachPo && !data.poStatus) {
+        return false;
+    }
+    return true;
+}, {
+    message: "PO Status is required when attaching a PO.",
+    path: ["poStatus"],
 });
 
 
@@ -108,12 +121,13 @@ export function GenerateQuoteForm({
       }),
       attachPo: false,
       poNumber: "",
-      poValue: '',
+      poValue: undefined,
       poDate: "",
+      poStatus: undefined,
     },
   });
 
-  const { fields, remove } = useFieldArray({
+  const { fields } = useFieldArray({
     control: form.control,
     name: "lineItems"
   });
@@ -334,19 +348,43 @@ export function GenerateQuoteForm({
           />
           {attachPo && (
             <div className="space-y-4 pt-6">
-              <FormField
-                control={form.control}
-                name="poNumber"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Purchase Order Number</FormLabel>
-                    <FormControl>
-                      <Input placeholder="e.g., PO-ACPL-12345" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                 <FormField
+                  control={form.control}
+                  name="poNumber"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Purchase Order Number</FormLabel>
+                      <FormControl>
+                        <Input placeholder="e.g., PO-ACPL-12345" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                 <FormField
+                    control={form.control}
+                    name="poStatus"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>PO Status</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select PO Status" />
+                            </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                            {poStatuses.map(status => (
+                                <SelectItem key={status} value={status}>{status}</SelectItem>
+                            ))}
+                            </SelectContent>
+                        </Select>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                />
+               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
@@ -355,7 +393,7 @@ export function GenerateQuoteForm({
                     <FormItem>
                       <FormLabel>PO Value (₹)</FormLabel>
                       <FormControl>
-                        <Input type="number" placeholder="e.g., 50000" {...field} />
+                        <Input type="number" placeholder="e.g., 50000" {...field} value={field.value ?? ""} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

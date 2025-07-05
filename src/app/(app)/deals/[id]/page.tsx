@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { opportunities, contacts, companies, products, Quote, LineItem, Opportunity } from '@/lib/data';
+import { opportunities, contacts, companies, products, Quote, LineItem, Opportunity, Contract } from '@/lib/data';
 import { QuoteCard } from '../quote-card';
 import { GenerateQuoteDialog } from '../add-quote-dialog';
 import { LogActivityDialog } from '../log-activity-dialog';
@@ -62,6 +62,7 @@ export default function OpportunityDetailPage() {
   const company = companies.find(c => c.name === opportunity?.companyName);
   const primaryContact = contacts.find(c => `${c.firstName} ${c.lastName}` === opportunity?.contactName);
   const associatedContacts = company ? contacts.filter(c => c.companyId === company.id) : [];
+  const [contracts, setContracts] = useState<Contract[]>([]);
 
   const updateOpportunityLineItems = (newLineItems: LineItem[]) => {
     if (opportunity) {
@@ -143,6 +144,7 @@ export default function OpportunityDetailPage() {
             poNumber: poDetails.poNumber,
             poValue: poDetails.poValue,
             poDate: poDetails.poDate,
+            poStatus: poDetails.poStatus,
             poDocumentName: poDetails.poDocument?.name,
           };
         }
@@ -157,6 +159,10 @@ export default function OpportunityDetailPage() {
       setOpportunity(updatedOpportunity);
       setQuoteToAttachPo(null);
     }
+  };
+  
+  const handleContractAdded = (newContract: Contract) => {
+    setContracts(prev => [...prev, newContract]);
   };
 
   if (!opportunity) {
@@ -407,6 +413,7 @@ export default function OpportunityDetailPage() {
             isOpen={isAddContractOpen}
             setIsOpen={setIsAddContractOpen}
             opportunity={opportunity}
+            onContractAdded={handleContractAdded}
         />
        )}
     </div>

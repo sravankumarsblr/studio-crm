@@ -115,6 +115,12 @@ export function QuoteCard({ quote, opportunityStatus, onDelete, onAttachPo }: Qu
               <span className="font-medium">{quote.poNumber}</span>
           </div>
         )}
+        {quote.poStatus && (
+          <div className="flex justify-between">
+              <span className="text-muted-foreground">PO Status</span>
+              <span className="font-medium">{quote.poStatus}</span>
+          </div>
+        )}
         {quote.documentName && (
              <div className="flex justify-between items-center pt-2">
                 <span className="text-muted-foreground">Quote Doc</span>

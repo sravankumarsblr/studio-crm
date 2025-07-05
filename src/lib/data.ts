@@ -85,6 +85,7 @@ export type Quote = {
   poValue?: number;
   poDate?: string;
   poDocumentName?: string;
+  poStatus?: 'Received' | 'Acceptance Mail' | 'On Phone';
 };
 
 export type Opportunity = {
@@ -150,7 +151,11 @@ export const departments = [
     'Marketing',
     'Technical Support',
     'Management',
-    'Operations'
+    'Operations',
+    'Procurement',
+    'R&D',
+    'QA/QC',
+    'Engineering'
 ];
 
 export const salutations = ['Mr.', 'Ms.', 'Mrs.', 'Dr.'];
@@ -250,7 +255,7 @@ export const opportunities: Opportunity[] = [
     source: 'Just Dial',
     lineItems: [{ productId: 'prod3', quantity: 26 }], 
     quotes: [
-      { id: 'qt4', opportunityId: 'deal3', quoteNumber: 'QT-2024-004', date: '2024-06-01', expiryDate: '2024-07-01', preparedBy: 'Aryan Sharma', status: 'Accepted', poNumber: 'PO-ACPL-1138', poValue: 2200000, poDate: '2024-06-14', poDocumentName: 'PO-ACPL-1138.pdf', lineItems: [{ productId: 'prod3', quantity: 26, unitPrice: 85000, discount: { type: 'fixed', value: 10000 } }] }
+      { id: 'qt4', opportunityId: 'deal3', quoteNumber: 'QT-2024-004', date: '2024-06-01', expiryDate: '2024-07-01', preparedBy: 'Aryan Sharma', status: 'Accepted', poNumber: 'PO-ACPL-1138', poValue: 2200000, poDate: '2024-06-14', poDocumentName: 'PO-ACPL-1138.pdf', poStatus: 'Received', lineItems: [{ productId: 'prod3', quantity: 26, unitPrice: 85000, discount: { type: 'fixed', value: 10000 } }] }
     ] 
   },
   { 

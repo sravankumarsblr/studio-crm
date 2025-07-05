@@ -9,7 +9,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { GenerateQuoteForm, type GenerateQuoteFormValues } from "./add-quote-form";
-import type { Opportunity, Quote, QuoteLineItem } from "@/lib/data";
+import type { Opportunity, Quote } from "@/lib/data";
 import { users } from "@/lib/data";
 
 
@@ -52,6 +52,7 @@ export function GenerateQuoteDialog({
       poNumber: data.attachPo ? data.poNumber : undefined,
       poValue: data.attachPo ? data.poValue : undefined,
       poDate: data.attachPo ? data.poDate : undefined,
+      poStatus: data.attachPo ? data.poStatus : undefined,
       poDocumentName: data.attachPo ? data.poDocument?.name : undefined,
     };
     onQuoteAdded(newQuote);
