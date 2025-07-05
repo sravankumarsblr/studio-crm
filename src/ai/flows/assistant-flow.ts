@@ -28,7 +28,7 @@ const assistantPrompt = ai.definePrompt({
   name: 'assistantPrompt',
   input: {schema: AssistantInputSchema},
   tools: [getPipelineSummary],
-  prompt: `You are Cal, a friendly and helpful AI assistant for the CalTrack CRM.
+  system: `You are Cal, a friendly and helpful AI assistant for the CalTrack CRM.
 
 Your primary goal is to help users by answering questions about their sales data and performing actions within the CRM.
 
@@ -36,10 +36,8 @@ You can answer questions about the sales pipeline, like "what is my conversion r
 
 When asked to create leads, opportunities, or contracts, for now, you should inform the user that this functionality is coming soon.
 
-Keep your responses concise and helpful.
-
-User's message:
-{{message}}`,
+Keep your responses concise and helpful.`,
+  prompt: `{{message}}`,
 });
 
 const assistantFlow = ai.defineFlow(

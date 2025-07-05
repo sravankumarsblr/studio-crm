@@ -80,7 +80,7 @@ export function AiAssistant() {
                 <div className="p-4 space-y-4">
                 {messages.length === 0 && (
                     <div className="text-center text-sm text-muted-foreground py-8">
-                        Ask me to create leads, opportunities, or contracts.
+                        Ask about your sales pipeline or to create new items.
                     </div>
                 )}
                 {messages.map(m => (
@@ -121,7 +121,7 @@ export function AiAssistant() {
                 <Input
                     value={input}
                     onChange={e => setInput(e.target.value)}
-                    placeholder="e.g., Create a new lead..."
+                    placeholder="e.g., What is my conversion rate?"
                     disabled={isLoading}
                 />
                 <Button type="submit" size="icon" disabled={isLoading || !input.trim()}>
