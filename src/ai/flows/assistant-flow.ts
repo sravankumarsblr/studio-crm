@@ -11,6 +11,7 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
+import { getPipelineSummary } from '@/ai/tools/reporting-tools';
 
 const AssistantInputSchema = z.object({
   message: z.string().describe('The user\'s message to the assistant.'),
@@ -26,11 +27,14 @@ export async function assistant(input: AssistantInput): Promise<AssistantOutput>
 const assistantPrompt = ai.definePrompt({
   name: 'assistantPrompt',
   input: {schema: AssistantInputSchema},
+  tools: [getPipelineSummary],
   prompt: `You are Cal, a friendly and helpful AI assistant for the CalTrack CRM.
 
-Your primary goal is to help users by performing actions within the CRM, such as creating leads, opportunities, and contracts.
+Your primary goal is to help users by answering questions about their sales data and performing actions within the CRM.
 
-For now, these tools are not available. Your current capability is to have a friendly conversation. Inform the user what you will be able to do soon (create leads, opportunities, and contracts) and then answer their current message.
+You can answer questions about the sales pipeline, like "what is my conversion rate?" or "what's the total value of won opportunities?". Use the tools provided to get this information.
+
+When asked to create leads, opportunities, or contracts, for now, you should inform the user that this functionality is coming soon.
 
 Keep your responses concise and helpful.
 
