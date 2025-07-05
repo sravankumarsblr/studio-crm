@@ -28,7 +28,7 @@ const editUserSchema = z.object({
   name: z.string().min(1, "Full name is required."),
   email: z.string().email("Please enter a valid email address."),
   department: z.string().min(1, "Department is required."),
-  role: z.string().min(1, "Role is required.") as z.ZodSchema<User['role']>,
+  role: z.string().min(1, "Role is required."),
 });
 
 export type EditUserFormValues = z.infer<typeof editUserSchema>;

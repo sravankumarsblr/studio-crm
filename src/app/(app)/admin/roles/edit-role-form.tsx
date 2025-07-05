@@ -19,7 +19,7 @@ import { Textarea } from "@/components/ui/textarea";
 import type { Role } from "@/lib/data";
 
 const editRoleSchema = z.object({
-  name: z.string().min(1, "Role name is required.") as z.ZodSchema<'Admin' | 'Sales Manager' | 'Sales Rep'>,
+  name: z.string().min(1, "Role name is required."),
   description: z.string().min(1, "Description is required."),
 });
 

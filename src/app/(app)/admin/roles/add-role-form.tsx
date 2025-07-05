@@ -18,7 +18,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 
 const addRoleSchema = z.object({
-  name: z.string().min(1, "Role name is required.") as z.ZodSchema<'Admin' | 'Sales Manager' | 'Sales Rep'>,
+  name: z.string().min(1, "Role name is required."),
   description: z.string().min(1, "Description is required."),
 });
 
@@ -34,7 +34,7 @@ export function AddRoleForm({
   const form = useForm<AddRoleFormValues>({
     resolver: zodResolver(addRoleSchema),
     defaultValues: {
-      name: '',
+      name: "",
       description: "",
     },
   });

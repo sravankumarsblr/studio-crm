@@ -1,7 +1,7 @@
 
 export type Role = {
   id: string;
-  name: 'Admin' | 'Sales Manager' | 'Sales Rep';
+  name: string;
   description: string;
 };
 
@@ -159,6 +159,7 @@ export const roles: Role[] = [
   { id: 'role1', name: 'Admin', description: 'Has access to all features, including the admin section.' },
   { id: 'role2', name: 'Sales Manager', description: 'Can view and manage all leads, opportunities, and contracts.' },
   { id: 'role3', name: 'Sales Rep', description: 'Can only access and manage their own assigned records.' },
+  { id: 'role4', name: 'BackOfficeTeam', description: 'Responsible to create Leads and Opportunities' },
 ];
 
 export const users: User[] = [
