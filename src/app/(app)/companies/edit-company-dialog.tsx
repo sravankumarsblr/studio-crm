@@ -30,14 +30,14 @@ export function EditCompanyDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="sm:max-w-3xl max-h-[90vh] flex flex-col">
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Edit Company</DialogTitle>
           <DialogDescription>
             Update the details for "{company.name}".
           </DialogDescription>
         </DialogHeader>
-        <div className="flex-1 overflow-y-auto -mr-6 pr-6 py-4">
+        <div className="py-4">
           <EditCompanyForm
             company={company}
             onSave={handleSave}
