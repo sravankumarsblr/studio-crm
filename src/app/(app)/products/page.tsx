@@ -15,6 +15,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Badge } from "@/components/ui/badge";
 
 
 const productCategories = [
@@ -140,6 +141,10 @@ export default function ProductsPage() {
                   <TableRow>
                     <TableHead>Product Name</TableHead>
                     <TableHead>Category</TableHead>
+                    <TableHead>Range</TableHead>
+                    <TableHead>Resolution</TableHead>
+                    <TableHead>NABL</TableHead>
+                    <TableHead>Location</TableHead>
                     <TableHead>Price (INR)</TableHead>
                     <TableHead className="w-[120px]">Status</TableHead>
                     <TableHead className="text-right w-[100px]">Actions</TableHead>
@@ -150,6 +155,14 @@ export default function ProductsPage() {
                     <TableRow key={product.id}>
                       <TableCell className="font-medium">{product.name}</TableCell>
                       <TableCell>{product.category}</TableCell>
+                      <TableCell>{product.range || '-'}</TableCell>
+                      <TableCell>{product.resolution || '-'}</TableCell>
+                      <TableCell>
+                        <Badge variant={product.isNabl ? "default" : "secondary"}>
+                          {product.isNabl ? 'Yes' : 'No'}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>{product.location}</TableCell>
                       <TableCell>₹{product.price.toLocaleString('en-IN')}</TableCell>
                       <TableCell>
                         <Switch
@@ -176,7 +189,7 @@ export default function ProductsPage() {
                     </TableRow>
                   )) : (
                      <TableRow>
-                        <TableCell colSpan={5} className="h-24 text-center">
+                        <TableCell colSpan={9} className="h-24 text-center">
                           No results found.
                         </TableCell>
                       </TableRow>

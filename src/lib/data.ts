@@ -144,6 +144,10 @@ export type Product = {
   category: string;
   price: number;
   status: 'active' | 'inactive';
+  range?: string;
+  resolution?: string;
+  isNabl: boolean;
+  location: 'Lab' | 'Site' | 'Both';
 };
 
 export const departments = [
@@ -321,25 +325,28 @@ export const contracts: Contract[] = [
 ];
 
 export const products: Product[] = [
-  { id: 'prod1', name: 'Pressure Sensor XL-100', category: 'Sensors', price: 49900, status: 'active' },
-  { id: 'prod2', name: 'Precision Medical Scale MS-2', category: 'Scales', price: 129900, status: 'active' },
-  { id: 'prod3', name: 'Digital Torque Wrench TW-30', category: 'Tools', price: 85000, status: 'inactive' },
-  { id: 'prod4', name: 'Automated Digital Pipette P-4A', category: 'Lab Equipment', price: 60000, status: 'active' },
-  { id: 'prod5', name: 'CalTrack Software Suite', category: 'Tools', price: 250000, status: 'active' },
-  { id: 'prod6', name: 'On-site Industrial Scale Calibration', category: 'Weighing Machine Calibration Services', price: 15000, status: 'active' },
-  { id: 'prod7', name: 'Retail Weighing Scale Certification', category: 'Weighing Machine Calibration Services', price: 5000, status: 'active' },
-  { id: 'prod8', name: 'E1 Class Weight Box Calibration', category: 'Weight Calibration Services', price: 25000, status: 'active' },
-  { id: 'prod9', name: 'F1 Class Weight Set Verification', category: 'Weight Calibration Services', price: 18000, status: 'active' },
-  { id: 'prod10', name: 'Multimeter & Clamp Meter Calibration', category: 'Electrical Instruments Calibration Services', price: 7500, status: 'active' },
-  { id: 'prod11', name: 'High Voltage Probe Calibration', category: 'Electrical Instruments Calibration Services', price: 12000, status: 'active' },
-  { id: 'prod12', name: 'Vernier Caliper & Micrometer Calibration', category: 'Dimensional Calibration Services', price: 6000, status: 'active' },
-  { id: 'prod13', name: 'Gauge Block Calibration (NABL)', category: 'Dimensional Calibration Services', price: 20000, status: 'active' },
-  { id: 'prod14', name: 'Digital Pressure Gauge Calibration', category: 'Pressure Gauge and Vacuum Gauges Calibration Services', price: 9000, status: 'active' },
-  { id: 'prod15', name: 'Analog Vacuum Gauge Testing', category: 'Pressure Gauge and Vacuum Gauges Calibration Services', price: 7000, status: 'active' },
-  { id: 'prod16', name: 'Medical Autoclave Temperature Mapping', category: 'Autoclave Calibration Services', price: 30000, status: 'active' },
-  { id: 'prod17', name: 'Pharmaceutical Autoclave Validation', category: 'Autoclave Calibration Services', price: 45000, status: 'active' },
-  { id: 'prod18', name: 'Liquid Flow Meter Calibration (On-site)', category: 'Flow Meter Calibration Services', price: 50000, status: 'active' },
-  { id: 'prod19', name: 'Gas Flow Meter Calibration (Lab)', category: 'Flow Meter Calibration Services', price: 65000, status: 'active' },
-  { id: 'prod20', name: 'Digital Tachometer Calibration', category: 'Tachometer & Sound Level Meter Calibration Services', price: 8000, status: 'active' },
-  { id: 'prod21', name: 'Sound Level Meter Accuracy Test', category: 'Tachometer & Sound Level Meter Calibration Services', price: 10000, status: 'active' },
+  { id: 'prod1', name: 'Pressure Sensor XL-100', category: 'Sensors', price: 49900, status: 'active', isNabl: true, location: 'Both' },
+  { id: 'prod2', name: 'Precision Medical Scale MS-2', category: 'Scales', price: 129900, status: 'active', isNabl: true, location: 'Lab' },
+  { id: 'prod3', name: 'Digital Torque Wrench TW-30', category: 'Tools', price: 85000, status: 'inactive', isNabl: false, location: 'Site' },
+  { id: 'prod4', name: 'Automated Digital Pipette P-4A', category: 'Lab Equipment', price: 60000, status: 'active', isNabl: true, location: 'Lab' },
+  { id: 'prod5', name: 'CalTrack Software Suite', category: 'Tools', price: 250000, status: 'active', isNabl: false, location: 'Site' },
+  { id: 'prod6', name: 'On-site Industrial Scale Calibration', category: 'Weighing Machine Calibration Services', price: 15000, status: 'active', isNabl: true, location: 'Site' },
+  { id: 'prod7', name: 'Retail Weighing Scale Certification', category: 'Weighing Machine Calibration Services', price: 5000, status: 'active', isNabl: false, location: 'Site' },
+  { id: 'prod8', name: 'E1 Class Weight Box Calibration', category: 'Weight Calibration Services', price: 25000, status: 'active', isNabl: true, location: 'Lab' },
+  { id: 'prod9', name: 'F1 Class Weight Set Verification', category: 'Weight Calibration Services', price: 18000, status: 'active', isNabl: true, location: 'Lab' },
+  { id: 'prod10', name: 'Multimeter & Clamp Meter Calibration', category: 'Electrical Instruments Calibration Services', price: 7500, status: 'active', isNabl: true, location: 'Lab' },
+  { id: 'prod11', name: 'High Voltage Probe Calibration', category: 'Electrical Instruments Calibration Services', price: 12000, status: 'active', isNabl: true, location: 'Lab' },
+  { id: 'prod12', name: 'Vernier Caliper & Micrometer Calibration', category: 'Dimensional Calibration Services', price: 6000, status: 'active', isNabl: true, location: 'Lab' },
+  { id: 'prod13', name: 'Gauge Block Calibration (NABL)', category: 'Dimensional Calibration Services', price: 20000, status: 'active', isNabl: true, location: 'Lab' },
+  { id: 'prod14', name: 'Digital Pressure Gauge Calibration', category: 'Pressure Gauge and Vacuum Gauges Calibration Services', price: 9000, status: 'active', isNabl: true, location: 'Both' },
+  { id: 'prod15', name: 'Analog Vacuum Gauge Testing', category: 'Pressure Gauge and Vacuum Gauges Calibration Services', price: 7000, status: 'active', isNabl: false, location: 'Lab' },
+  { id: 'prod16', name: 'Medical Autoclave Temperature Mapping', category: 'Autoclave Calibration Services', price: 30000, status: 'active', isNabl: true, location: 'Site' },
+  { id: 'prod17', name: 'Pharmaceutical Autoclave Validation', category: 'Autoclave Calibration Services', price: 45000, status: 'active', isNabl: true, location: 'Site' },
+  { id: 'prod18', name: 'Liquid Flow Meter Calibration (On-site)', category: 'Flow Meter Calibration Services', price: 50000, status: 'active', isNabl: true, location: 'Site' },
+  { id: 'prod19', name: 'Gas Flow Meter Calibration (Lab)', category: 'Flow Meter Calibration Services', price: 65000, status: 'active', isNabl: true, location: 'Lab' },
+  { id: 'prod20', name: 'Digital Tachometer Calibration', category: 'Tachometer & Sound Level Meter Calibration Services', price: 8000, status: 'active', isNabl: true, location: 'Lab' },
+  { id: 'prod21', name: 'Sound Level Meter Accuracy Test', category: 'Tachometer & Sound Level Meter Calibration Services', price: 10000, status: 'active', isNabl: true, location: 'Both' },
+  { id: 'prod22', name: 'Glass Thermometer', category: 'Electrical Instruments Calibration Services', price: 1500, status: 'active', range: '-80 to 250 degree C', resolution: '0.1 C', isNabl: true, location: 'Lab' },
+  { id: 'prod23', name: 'Wet & Dry Thermometer', category: 'Electrical Instruments Calibration Services', price: 1500, status: 'active', range: '-80 to1200 degree C', resolution: '1 C', isNabl: true, location: 'Lab' },
+  { id: 'prod24', name: 'Digital Indicator with sensor', category: 'Electrical Instruments Calibration Services', price: 1500, status: 'active', range: '-80 to1200 degree C', resolution: '0.1 C', isNabl: true, location: 'Site' },
 ];
