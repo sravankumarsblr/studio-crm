@@ -1,4 +1,6 @@
 
+import { z } from "zod";
+
 export type Role = {
   id: string;
   name: string;
@@ -14,14 +16,59 @@ export type User = {
   department: string;
 };
 
-export type Company = {
+export const companyIndustries = ['Pharma', 'Food Processing', 'Hotels', 'Engineering', 'Power', 'R&D labs', 'Defence', 'Aerospace', 'Hospitals', 'Manufacturing', 'Biotechnology', 'Medical Devices', 'Oil & Gas', 'Technology', 'Finance', 'Automotive', 'Retail', 'Construction'];
+export const companySizes = ['Small (< ₹10 Cr)', 'Medium (₹10–100 Cr)', 'Large (> ₹100 Cr)'];
+export const employeeCounts = ['<50', '50-200', '200+'];
+export const ownershipTypes = ['Private', 'Public', 'Government', 'Multinational', 'SME', 'Startup'];
+export const businessStages = ['Startup', 'Growth', 'Mature'];
+export const serviceDependencies = ['One-time', 'Annual contract (AMC)', 'Multi-year', 'On Demand', 'Turnkey'];
+export const productPortfolios = ['Manufacturing', 'Trading', 'R&D', 'Service provider'];
+export const annualSpends = ['High', 'Medium', 'Low value clients'];
+export const decisionCycles = ['Quick', 'Long approval process'];
+export const serviceExpectations = ['Speed', 'Price sensitivity', 'Technical depth'];
+export const locationPreferences = ['Onsite', 'At lab', 'Both'];
+export const paymentCycles = ['Immediate', 'Advance payment', 'Credit 30days', 'Credit 45days', 'Credit 60days'];
+export const paymentMethods = ['Cheque', 'NEFT', 'Online portal'];
+export const complaintFrequencies = ['Regular calibration users', 'Occasional users'];
+export const certificateFormats = ['High', 'Medium', 'Low value clients'];
+export const auditSupportOptions = ['Continuous', 'One time', 'Not Needed'];
+export const willingnessToPayOptions = ['Yes', 'No'];
+export const relationshipLengths = ['New', 'Long Term Client >10 years', 'Trusted Client>2 years'];
+export const engagementLevels = ['Continuous', 'Calls', 'Mails'];
+export const loyaltyOptions = ['References', 'Testimonials'];
+
+export const firmographicSchema = z.object({
+  name: z.string().min(1, "Company name is required."),
+  industry: z.string().min(1, "Industry is required."),
+  website: z.string().url("Please enter a valid URL.").or(z.literal("")),
+  address: z.string().min(1, "Address is required."),
+  companySize: z.enum(companySizes).optional(),
+  numberOfEmployees: z.enum(employeeCounts).optional(),
+  location: z.string().min(1, "Location is required."),
+  ownershipType: z.enum(ownershipTypes).optional(),
+  stageOfBusiness: z.enum(businessStages).optional(),
+  accreditations: z.string().optional(),
+  serviceDependency: z.enum(serviceDependencies).optional(),
+  productPortfolio: z.enum(productPortfolios).optional(),
+  annualSpend: z.enum(annualSpends).optional(),
+  decisionCycle: z.enum(decisionCycles).optional(),
+  serviceExpectations: z.enum(serviceExpectations).optional(),
+  preferences: z.enum(locationPreferences).optional(),
+  paymentCycle: z.enum(paymentCycles).optional(),
+  paymentMethod: z.enum(paymentMethods).optional(),
+  complaints: z.enum(complaintFrequencies).optional(),
+  certificateFormat: z.enum(certificateFormats).optional(),
+  auditSupport: z.enum(auditSupportOptions).optional(),
+  willingnessToPay: z.enum(willingnessToPayOptions).optional(),
+  lengthOfRelationship: z.enum(relationshipLengths).optional(),
+  levelOfEngagement: z.enum(engagementLevels).optional(),
+  loyalty: z.enum(loyaltyOptions).optional(),
+});
+
+
+export type Company = z.infer<typeof firmographicSchema> & {
   id:string;
-  name: string;
-  industry: string;
   logo: string;
-  numberOfEmployees: number;
-  website: string;
-  address: string;
   status: 'active' | 'inactive';
 };
 
@@ -136,6 +183,8 @@ export type Contract = {
   milestones: Milestone[];
   lineItems: LineItem[];
   documentName?: string;
+  paymentCycle?: typeof paymentCycles[number];
+  paymentMethod?: typeof paymentMethods[number];
 };
 
 export type Product = {
@@ -179,13 +228,14 @@ export const users: User[] = [
 ];
 
 export const companies: Company[] = [
-  { id: 'com1', name: 'Accurate Calibration Pvt. Ltd.', industry: 'Manufacturing', logo: 'https://placehold.co/40x40.png', numberOfEmployees: 250, website: 'https://acpl.co.in', address: 'A-123, MIDC, Pune, Maharashtra 411026', status: 'active' },
-  { id: 'com2', name: 'Vimaan Aerospace Solutions', industry: 'Aerospace', logo: 'https://placehold.co/40x40.png', numberOfEmployees: 500, website: 'https://vimaanaero.com', address: 'Plot 45, KIADB, Bengaluru, Karnataka 560067', status: 'active' },
-  { id: 'com3', name: 'Sanjeevani MedTech', industry: 'Medical Devices', logo: 'https://placehold.co/40x40.png', numberOfEmployees: 120, website: 'https://sanjeevanimed.com', address: '789, Health City, Hyderabad, Telangana 500081', status: 'inactive' },
-  { id: 'com4', name: 'Navachar Tech Labs', industry: 'R&D', logo: 'https://placehold.co/40x40.png', numberOfEmployees: 75, website: 'https://navacharlabs.com', address: '101, GIDC, Ahmedabad, Gujarat 380015', status: 'active' },
-  { id: 'com5', name: 'Bharat Petrochem', industry: 'Oil & Gas', logo: 'https://placehold.co/40x40.png', numberOfEmployees: 2500, website: 'https://bharatpetro.com', address: '202, Energy Estate, Jamnagar, Gujarat 361001', status: 'active' },
-  { id: 'com6', name: 'Jiva Bio-Sciences', industry: 'Biotechnology', logo: 'https://placehold.co/40x40.png', numberOfEmployees: 180, website: 'https://jivabio.com', address: '303, Genome Valley, Hyderabad, Telangana 500078', status: 'inactive' },
+  { id: 'com1', name: 'Accurate Calibration Pvt. Ltd.', industry: 'Engineering', logo: 'https://placehold.co/40x40.png', website: 'https://acpl.co.in', address: 'A-123, MIDC, Pune, Maharashtra 411026', status: 'active', companySize: 'Medium (₹10–100 Cr)', numberOfEmployees: '200+', location: 'Pune, Maharashtra', ownershipType: 'Private', stageOfBusiness: 'Mature', accreditations: 'ISO 9001, ISO 17025', serviceDependency: 'Annual contract (AMC)', productPortfolio: 'Service provider', annualSpend: 'Medium', decisionCycle: 'Long approval process', serviceExpectations: 'Technical depth', preferences: 'Both', paymentCycle: 'Credit 45days', paymentMethod: 'Cheque', complaints: 'Occasional users', certificateFormat: 'Medium', auditSupport: 'Continuous', willingnessToPay: 'Yes', lengthOfRelationship: 'Long Term Client >10 years', levelOfEngagement: 'Continuous', loyalty: 'References' },
+  { id: 'com2', name: 'Vimaan Aerospace Solutions', industry: 'Aerospace', logo: 'https://placehold.co/40x40.png', website: 'https://vimaanaero.com', address: 'Plot 45, KIADB, Bengaluru, Karnataka 560067', status: 'active', companySize: 'Large (> ₹100 Cr)', numberOfEmployees: '200+', location: 'Bengaluru, Karnataka', ownershipType: 'Public', stageOfBusiness: 'Mature', accreditations: 'AS9100, ISO 17025', serviceDependency: 'Multi-year', productPortfolio: 'Manufacturing', annualSpend: 'High', decisionCycle: 'Long approval process', serviceExpectations: 'Technical depth', preferences: 'Onsite', paymentCycle: 'Credit 60days', paymentMethod: 'NEFT', complaints: 'Regular calibration users', certificateFormat: 'High', auditSupport: 'Continuous', willingnessToPay: 'Yes', lengthOfRelationship: 'Trusted Client>2 years', levelOfEngagement: 'Mails', loyalty: 'Testimonials' },
+  { id: 'com3', name: 'Sanjeevani MedTech', industry: 'Medical Devices', logo: 'https://placehold.co/40x40.png', website: 'https://sanjeevanimed.com', address: '789, Health City, Hyderabad, Telangana 500081', status: 'inactive', companySize: 'Medium (₹10–100 Cr)', numberOfEmployees: '50-200', location: 'Hyderabad, Telangana', ownershipType: 'Startup', stageOfBusiness: 'Growth', accreditations: 'ISO 13485', serviceDependency: 'On Demand', productPortfolio: 'R&D', annualSpend: 'Medium', decisionCycle: 'Quick', serviceExpectations: 'Speed', preferences: 'At lab', paymentCycle: 'Credit 30days', paymentMethod: 'Online portal', complaints: 'Occasional users', certificateFormat: 'Medium', auditSupport: 'One time', willingnessToPay: 'No', lengthOfRelationship: 'New', levelOfEngagement: 'Calls', loyalty: 'References' },
+  { id: 'com4', name: 'Navachar Tech Labs', industry: 'R&D labs', logo: 'https://placehold.co/40x40.png', website: 'https://navacharlabs.com', address: '101, GIDC, Ahmedabad, Gujarat 380015', status: 'active', companySize: 'Small (< ₹10 Cr)', numberOfEmployees: '50-200', location: 'Ahmedabad, Gujarat', ownershipType: 'SME', stageOfBusiness: 'Growth', accreditations: 'ISO 17025', serviceDependency: 'On Demand', productPortfolio: 'R&D', annualSpend: 'Low value clients', decisionCycle: 'Quick', serviceExpectations: 'Price sensitivity', preferences: 'At lab', paymentCycle: 'Advance payment', paymentMethod: 'NEFT', complaints: 'Regular calibration users', certificateFormat: 'Low', auditSupport: 'Not Needed', willingnessToPay: 'No', lengthOfRelationship: 'New', levelOfEngagement: 'Mails', loyalty: 'Testimonials' },
+  { id: 'com5', name: 'Bharat Petrochem', industry: 'Power', logo: 'https://placehold.co/40x40.png', website: 'https://bharatpetro.com', address: '202, Energy Estate, Jamnagar, Gujarat 361001', status: 'active', companySize: 'Large (> ₹100 Cr)', numberOfEmployees: '200+', location: 'Jamnagar, Gujarat', ownershipType: 'Government', stageOfBusiness: 'Mature', accreditations: 'ISO 9001, OHSAS 18001', serviceDependency: 'Annual contract (AMC)', productPortfolio: 'Manufacturing', annualSpend: 'High', decisionCycle: 'Long approval process', serviceExpectations: 'Technical depth', preferences: 'Onsite', paymentCycle: 'Credit 60days', paymentMethod: 'Cheque', complaints: 'Regular calibration users', certificateFormat: 'High', auditSupport: 'Continuous', willingnessToPay: 'Yes', lengthOfRelationship: 'Long Term Client >10 years', levelOfEngagement: 'Continuous', loyalty: 'References' },
+  { id: 'com6', name: 'Jiva Bio-Sciences', industry: 'Pharma', logo: 'https://placehold.co/40x40.png', website: 'https://jivabio.com', address: '303, Genome Valley, Hyderabad, Telangana 500078', status: 'inactive', companySize: 'Medium (₹10–100 Cr)', numberOfEmployees: '50-200', location: 'Hyderabad, Telangana', ownershipType: 'Private', stageOfBusiness: 'Mature', accreditations: 'GMP, ISO 17025', serviceDependency: 'Turnkey', productPortfolio: 'R&D', annualSpend: 'High', decisionCycle: 'Long approval process', serviceExpectations: 'Technical depth', preferences: 'Both', paymentCycle: 'Credit 45days', paymentMethod: 'Online portal', complaints: 'Occasional users', certificateFormat: 'Medium', auditSupport: 'One time', willingnessToPay: 'Yes', lengthOfRelationship: 'Trusted Client>2 years', levelOfEngagement: 'Mails', loyalty: 'Testimonials' },
 ];
+
 
 export const contacts: Contact[] = [
   { id: 'con1', salutation: 'Mr.', firstName: 'Vikram', lastName: 'Patel', email: 'vikram.p@acpl.co.in', mobile: '9820098200', companyId: 'com1', designation: 'Purchase Manager', department: 'Procurement', status: 'active', avatar: 'https://placehold.co/32x32.png' },
@@ -316,6 +366,8 @@ export const contracts: Contract[] = [
     scopeOfWork: 'Annual calibration and verification for all torque wrenches at the main facility. Includes two on-site visits and unlimited remote support.',
     documentName: 'Contract_Agreement_ACPL.pdf',
     lineItems: [{ productId: 'prod3', quantity: 26 }],
+    paymentCycle: 'Credit 45days',
+    paymentMethod: 'Cheque',
     milestones: [
       { id: 'm1', name: 'Initial On-site Calibration', dueDate: '2024-07-15', status: 'Completed', invoiceStatus: 'Paid', amount: 1100000, assignedToId: 'user3', invoiceNumber: 'INV-001', invoiceRaisedById: 'user2' },
       { id: 'm2', name: 'Mid-term Review & Report', dueDate: '2025-01-15', status: 'Pending', invoiceStatus: 'Not Invoiced', amount: 550000, assignedToId: 'user3' },
@@ -350,5 +402,3 @@ export const products: Product[] = [
   { id: 'prod23', name: 'Wet & Dry Thermometer', category: 'Electrical Instruments Calibration Services', price: 1500, status: 'active', range: '-80 to1200 degree C', resolution: '1 C', isNabl: true, location: 'Lab' },
   { id: 'prod24', name: 'Digital Indicator with sensor', category: 'Electrical Instruments Calibration Services', price: 1500, status: 'active', range: '-80 to1200 degree C', resolution: '0.1 C', isNabl: true, location: 'Site' },
 ];
-
-    

@@ -34,14 +34,14 @@ export function AddCompanyDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="sm:max-w-3xl max-h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>Add New Company</DialogTitle>
           <DialogDescription>
             Enter the details for the new company.
           </DialogDescription>
         </DialogHeader>
-        <div className="py-4">
+        <div className="flex-1 overflow-y-auto -mr-6 pr-6 py-4">
           <AddCompanyForm onSave={handleSave} onCancel={() => setIsOpen(false)} />
         </div>
       </DialogContent>

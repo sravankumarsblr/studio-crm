@@ -63,9 +63,15 @@ export default function CompaniesPage() {
                 {companies.map((company) => (
                   <TableRow key={company.id}>
                     <TableCell>
-                      <Image src={company.logo} alt={company.name} width={40} height={40} className="rounded-md" data-ai-hint="logo" />
+                      <Link href={`/companies/${company.id}`}>
+                        <Image src={company.logo} alt={company.name} width={40} height={40} className="rounded-md" data-ai-hint="logo" />
+                      </Link>
                     </TableCell>
-                    <TableCell className="font-medium">{company.name}</TableCell>
+                    <TableCell className="font-medium">
+                       <Link href={`/companies/${company.id}`} className="hover:underline text-primary">
+                        {company.name}
+                      </Link>
+                    </TableCell>
                     <TableCell>{company.industry}</TableCell>
                     <TableCell>
                       <Link href={company.website} target="_blank" className="text-primary hover:underline">
@@ -89,6 +95,9 @@ export default function CompaniesPage() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
+                           <DropdownMenuItem asChild>
+                             <Link href={`/companies/${company.id}`}>View Details</Link>
+                          </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => handleEditClick(company)}>
                             Edit
                           </DropdownMenuItem>
