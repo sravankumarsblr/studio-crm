@@ -67,6 +67,15 @@ export type Company = {
   loyaltyAdvocacy?: (typeof loyaltyAdvocacyOptions[number])[];
 };
 
+export const jobTitles = ['Quality manager', 'Maintenance head', 'Purchase manager', 'Owner', 'CEO'] as const;
+export const contactNumberTypes = ['Personal', 'Professional'] as const;
+export const seniorities = ['Executive', 'Middle manager', 'Director', 'Owner'] as const;
+export const educationalBackgrounds = ['Engineering', 'Science', 'Commerce', 'Finance', 'Others'] as const;
+export const ageGroups = ['Younger managers', 'Senior decision-makers'] as const;
+export const genders = ['Female', 'Male'] as const;
+export const languages = ['Telugu', 'Hindi', 'English'] as const;
+export const digitalOpennessLevels = ['Manageable', 'Open', 'No Knowledge'] as const;
+
 export type Contact = {
   id: string;
   salutation: 'Mr.' | 'Ms.' | 'Mrs.' | 'Dr.';
@@ -75,10 +84,18 @@ export type Contact = {
   email: string;
   mobile: string;
   companyId: string;
-  designation: string;
   department: string;
   status: 'active' | 'inactive';
   avatar: string;
+  // New Profiling Fields
+  jobTitle?: typeof jobTitles[number];
+  contactNumberType?: typeof contactNumberTypes[number];
+  seniority?: typeof seniorities[number];
+  educationalBackground?: typeof educationalBackgrounds[number];
+  ageGroup?: typeof ageGroups[number];
+  gender?: typeof genders[number];
+  language?: typeof languages[number];
+  opennessToDigital?: typeof digitalOpennessLevels[number];
 };
 
 export type LineItem = {
@@ -262,12 +279,12 @@ export const companies: Company[] = [
 ];
 
 export const contacts: Contact[] = [
-  { id: 'con1', salutation: 'Mr.', firstName: 'Vikram', lastName: 'Patel', email: 'vikram.p@acpl.co.in', mobile: '9820098200', companyId: 'com1', designation: 'Purchase Manager', department: 'Procurement', status: 'active', avatar: 'https://placehold.co/32x32.png' },
-  { id: 'con2', salutation: 'Ms.', firstName: 'Sneha', lastName: 'Reddy', email: 'sneha.r@vimaanaero.com', mobile: '9848098480', companyId: 'com2', designation: 'Senior Engineer', department: 'R&D', status: 'active', avatar: 'https://placehold.co/32x32.png' },
-  { id: 'con3', salutation: 'Mr.', firstName: 'Deepak', lastName: 'Kumar', email: 'deepak.k@sanjeevanimed.com', mobile: '9811098110', companyId: 'com3', designation: 'Quality Head', department: 'QA/QC', status: 'inactive', avatar: 'https://placehold.co/32x32.png' },
-  { id: 'con4', salutation: 'Ms.', firstName: 'Isha', lastName: 'Singh', email: 'isha.s@navacharlabs.com', mobile: '9890098900', companyId: 'com4', designation: 'Lab Director', department: 'Operations', status: 'active', avatar: 'https://placehold.co/32x32.png' },
-  { id: 'con5', salutation: 'Mr.', firstName: 'Amit', lastName: 'Desai', email: 'amit.d@bharatpetro.com', mobile: '9821098210', companyId: 'com5', designation: 'Instrumentation Lead', department: 'Engineering', status: 'active', avatar: 'https://placehold.co/32x32.png' },
-  { id: 'con6', salutation: 'Dr.', firstName: 'Neha', lastName: 'Rao', email: 'neha.r@jivabio.com', mobile: '9885098850', companyId: 'com6', designation: 'Principal Scientist', department: 'R&D', status: 'inactive', avatar: 'https://placehold.co/32x32.png' },
+  { id: 'con1', salutation: 'Mr.', firstName: 'Vikram', lastName: 'Patel', email: 'vikram.p@acpl.co.in', mobile: '9820098200', companyId: 'com1', department: 'Procurement', status: 'active', avatar: 'https://placehold.co/32x32.png', jobTitle: 'Purchase manager', seniority: 'Middle manager', contactNumberType: 'Professional' },
+  { id: 'con2', salutation: 'Ms.', firstName: 'Sneha', lastName: 'Reddy', email: 'sneha.r@vimaanaero.com', mobile: '9848098480', companyId: 'com2', department: 'R&D', status: 'active', avatar: 'https://placehold.co/32x32.png', jobTitle: 'Quality manager', seniority: 'Executive', contactNumberType: 'Professional' },
+  { id: 'con3', salutation: 'Mr.', firstName: 'Deepak', lastName: 'Kumar', email: 'deepak.k@sanjeevanimed.com', mobile: '9811098110', companyId: 'com3', department: 'QA/QC', status: 'inactive', avatar: 'https://placehold.co/32x32.png', jobTitle: 'Maintenance head', seniority: 'Middle manager', contactNumberType: 'Personal' },
+  { id: 'con4', salutation: 'Ms.', firstName: 'Isha', lastName: 'Singh', email: 'isha.s@navacharlabs.com', mobile: '9890098900', companyId: 'com4', department: 'Operations', status: 'active', avatar: 'https://placehold.co/32x32.png', jobTitle: 'CEO', seniority: 'Director', contactNumberType: 'Professional' },
+  { id: 'con5', salutation: 'Mr.', firstName: 'Amit', lastName: 'Desai', email: 'amit.d@bharatpetro.com', mobile: '9821098210', companyId: 'com5', department: 'Engineering', status: 'active', avatar: 'https://placehold.co/32x32.png', jobTitle: 'Maintenance head', seniority: 'Middle manager', contactNumberType: 'Professional' },
+  { id: 'con6', salutation: 'Dr.', firstName: 'Neha', lastName: 'Rao', email: 'neha.r@jivabio.com', mobile: '9885098850', companyId: 'com6', department: 'R&D', status: 'inactive', avatar: 'https://placehold.co/32x32.png', jobTitle: 'Quality manager', seniority: 'Director', contactNumberType: 'Personal' },
 ];
 
 export const leads: Lead[] = [
@@ -426,3 +443,5 @@ export const products: Product[] = [
   { id: 'prod23', name: 'Wet & Dry Thermometer', category: 'Electrical Instruments Calibration Services', price: 1500, status: 'active', range: '-80 to1200 degree C', resolution: '1 C', isNabl: true, location: 'Lab' },
   { id: 'prod24', name: 'Digital Indicator with sensor', category: 'Electrical Instruments Calibration Services', price: 1500, status: 'active', range: '-80 to1200 degree C', resolution: '0.1 C', isNabl: true, location: 'Site' },
 ];
+
+    

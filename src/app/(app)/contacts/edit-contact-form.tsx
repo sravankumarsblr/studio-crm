@@ -27,7 +27,21 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { salutations, companies as staticCompanies, type Contact, type Company, departments } from "@/lib/data";
+import { 
+    salutations, 
+    companies as staticCompanies, 
+    type Contact, 
+    type Company, 
+    departments,
+    jobTitles,
+    contactNumberTypes,
+    seniorities,
+    educationalBackgrounds,
+    ageGroups,
+    genders,
+    languages,
+    digitalOpennessLevels
+} from "@/lib/data";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AddCompanyDialog } from "../companies/add-company-dialog";
 
@@ -38,8 +52,15 @@ const editContactSchema = z.object({
   lastName: z.string().min(1, "Last name is required."),
   email: z.string().email("Please enter a valid email."),
   mobile: z.string().min(1, "Mobile number is required."),
-  designation: z.string().min(1, "Designation is required."),
+  contactNumberType: z.enum(contactNumberTypes).optional(),
+  jobTitle: z.enum(jobTitles).optional(),
   department: z.string().min(1, "Department is required."),
+  seniority: z.enum(seniorities).optional(),
+  educationalBackground: z.enum(educationalBackgrounds).optional(),
+  ageGroup: z.enum(ageGroups).optional(),
+  gender: z.enum(genders).optional(),
+  language: z.enum(languages).optional(),
+  opennessToDigital: z.enum(digitalOpennessLevels).optional(),
 });
 
 export type EditContactFormValues = z.infer<typeof editContactSchema>;
@@ -66,8 +87,15 @@ export function EditContactForm({
       lastName: contact.lastName,
       email: contact.email,
       mobile: contact.mobile,
-      designation: contact.designation,
+      contactNumberType: contact.contactNumberType,
+      jobTitle: contact.jobTitle,
       department: contact.department,
+      seniority: contact.seniority,
+      educationalBackground: contact.educationalBackground,
+      ageGroup: contact.ageGroup,
+      gender: contact.gender,
+      language: contact.language,
+      opennessToDigital: contact.opennessToDigital,
     },
   });
   
@@ -177,44 +205,171 @@ export function EditContactForm({
               </FormItem>
             )}
           />
-           <FormField
-            control={form.control}
-            name="mobile"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Mobile Number</FormLabel>
-                <FormControl><Input placeholder="e.g., 9876543210" {...field} /></FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-           <FormField
-            control={form.control}
-            name="designation"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Designation</FormLabel>
-                <FormControl><Input placeholder="e.g., Sales Director" {...field} /></FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="department"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Department</FormLabel>
-                 <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <FormControl><SelectTrigger><SelectValue placeholder="Select a department" /></SelectTrigger></FormControl>
-                  <SelectContent>
-                    {departments.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+           <div className="grid grid-cols-2 gap-4">
+               <FormField
+                control={form.control}
+                name="mobile"
+                render={({ field }) => (
+                <FormItem>
+                    <FormLabel>Mobile Number</FormLabel>
+                    <FormControl><Input placeholder="e.g., 9876543210" {...field} /></FormControl>
+                    <FormMessage />
+                </FormItem>
+                )}
+                />
+                <FormField
+                control={form.control}
+                name="contactNumberType"
+                render={({ field }) => (
+                <FormItem>
+                    <FormLabel>Number Type</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl><SelectTrigger><SelectValue placeholder="Select number type" /></SelectTrigger></FormControl>
+                    <SelectContent>
+                        {contactNumberTypes.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}
+                    </SelectContent>
+                    </Select>
+                    <FormMessage />
+                </FormItem>
+                )}
+                />
+           </div>
+           <div className="grid grid-cols-2 gap-4">
+            <FormField
+                control={form.control}
+                name="jobTitle"
+                render={({ field }) => (
+                <FormItem>
+                    <FormLabel>Job Title</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl><SelectTrigger><SelectValue placeholder="Select job title" /></SelectTrigger></FormControl>
+                    <SelectContent>
+                        {jobTitles.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}
+                    </SelectContent>
+                    </Select>
+                    <FormMessage />
+                </FormItem>
+                )}
+            />
+            <FormField
+                control={form.control}
+                name="department"
+                render={({ field }) => (
+                <FormItem>
+                    <FormLabel>Department</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl><SelectTrigger><SelectValue placeholder="Select a department" /></SelectTrigger></FormControl>
+                    <SelectContent>
+                        {departments.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}
+                    </SelectContent>
+                    </Select>
+                    <FormMessage />
+                </FormItem>
+                )}
+            />
+           </div>
+           <div className="grid grid-cols-2 gap-4">
+            <FormField
+                control={form.control}
+                name="seniority"
+                render={({ field }) => (
+                <FormItem>
+                    <FormLabel>Seniority</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl><SelectTrigger><SelectValue placeholder="Select seniority level" /></SelectTrigger></FormControl>
+                    <SelectContent>
+                        {seniorities.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}
+                    </SelectContent>
+                    </Select>
+                    <FormMessage />
+                </FormItem>
+                )}
+            />
+            <FormField
+                control={form.control}
+                name="educationalBackground"
+                render={({ field }) => (
+                <FormItem>
+                    <FormLabel>Education</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl><SelectTrigger><SelectValue placeholder="Select education" /></SelectTrigger></FormControl>
+                    <SelectContent>
+                        {educationalBackgrounds.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}
+                    </SelectContent>
+                    </Select>
+                    <FormMessage />
+                </FormItem>
+                )}
+            />
+           </div>
+            <div className="grid grid-cols-2 gap-4">
+                <FormField
+                control={form.control}
+                name="ageGroup"
+                render={({ field }) => (
+                <FormItem>
+                    <FormLabel>Age Group</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl><SelectTrigger><SelectValue placeholder="Select age group" /></SelectTrigger></FormControl>
+                    <SelectContent>
+                        {ageGroups.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}
+                    </SelectContent>
+                    </Select>
+                    <FormMessage />
+                </FormItem>
+                )}
+                />
+                <FormField
+                control={form.control}
+                name="gender"
+                render={({ field }) => (
+                <FormItem>
+                    <FormLabel>Gender</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl><SelectTrigger><SelectValue placeholder="Select gender" /></SelectTrigger></FormControl>
+                    <SelectContent>
+                        {genders.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}
+                    </SelectContent>
+                    </Select>
+                    <FormMessage />
+                </FormItem>
+                )}
+            />
+            </div>
+             <div className="grid grid-cols-2 gap-4">
+                <FormField
+                control={form.control}
+                name="language"
+                render={({ field }) => (
+                <FormItem>
+                    <FormLabel>Language</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl><SelectTrigger><SelectValue placeholder="Select language" /></SelectTrigger></FormControl>
+                    <SelectContent>
+                        {languages.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}
+                    </SelectContent>
+                    </Select>
+                    <FormMessage />
+                </FormItem>
+                )}
+            />
+                <FormField
+                control={form.control}
+                name="opennessToDigital"
+                render={({ field }) => (
+                <FormItem>
+                    <FormLabel>Digital Tool Openness</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl><SelectTrigger><SelectValue placeholder="Select level" /></SelectTrigger></FormControl>
+                    <SelectContent>
+                        {digitalOpennessLevels.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}
+                    </SelectContent>
+                    </Select>
+                    <FormMessage />
+                </FormItem>
+                )}
+            />
+            </div>
           <div className="flex justify-end gap-2 pt-4">
             <Button type="button" variant="outline" onClick={onCancel}>
               Cancel
@@ -232,3 +387,4 @@ export function EditContactForm({
   );
 }
 
+    

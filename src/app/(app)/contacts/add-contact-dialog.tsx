@@ -19,33 +19,29 @@ export function AddContactDialog({
 }: {
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
-  onContactAdded: (newContact: Contact) => void;
+  onContactAdded: (newContact: Omit<Contact, 'id' | 'status' | 'avatar'> & { companyId?: string }) => void;
   companyId?: string;
 }) {
   const handleSave = (data: AddContactFormValues) => {
-    const contactToAdd: Contact = {
-      ...data,
-      id: `con${new Date().getTime()}`,
-      status: "active",
-      avatar: "https://placehold.co/32x32.png",
-    };
-    onContactAdded(contactToAdd);
+    onContactAdded(data);
     setIsOpen(false);
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="sm:max-w-lg max-h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>Add New Contact</DialogTitle>
           <DialogDescription>
             Enter the details for the new contact.
           </DialogDescription>
         </DialogHeader>
-        <div className="py-4">
+        <div className="flex-1 overflow-y-auto -mr-6 pr-6 py-4">
           <AddContactForm onSave={handleSave} onCancel={() => setIsOpen(false)} companyId={companyId} />
         </div>
       </DialogContent>
     </Dialog>
   );
 }
+
+    

@@ -40,8 +40,15 @@ export default function ContactsPage() {
     ));
   };
 
-  const handleContactAdded = (newContact: Contact) => {
-    setContacts(prev => [...prev, newContact]);
+  const handleContactAdded = (newContact: Omit<Contact, 'id' | 'status' | 'avatar'> & { companyId?: string }) => {
+    const contactToAdd: Contact = {
+        ...newContact,
+        id: `con${new Date().getTime()}`,
+        status: "active",
+        avatar: "https://placehold.co/32x32.png",
+        companyId: newContact.companyId || '',
+    };
+    setContacts(prev => [...prev, contactToAdd]);
   };
 
   const handleContactUpdated = (updatedContact: Contact) => {
@@ -131,7 +138,8 @@ export default function ContactsPage() {
                     <TableHead>Name</TableHead>
                     <TableHead>Email</TableHead>
                     <TableHead>Company</TableHead>
-                    <TableHead>Designation</TableHead>
+                    <TableHead>Job Title</TableHead>
+                    <TableHead>Seniority</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
@@ -148,7 +156,8 @@ export default function ContactsPage() {
                       <TableCell className="font-medium">{contact.salutation} {contact.firstName} {contact.lastName}</TableCell>
                       <TableCell>{contact.email}</TableCell>
                       <TableCell>{getCompanyName(contact.companyId)}</TableCell>
-                      <TableCell>{contact.designation}</TableCell>
+                      <TableCell>{contact.jobTitle}</TableCell>
+                      <TableCell>{contact.seniority}</TableCell>
                       <TableCell>
                          <Switch
                           id={`status-${contact.id}`}
@@ -222,3 +231,5 @@ export default function ContactsPage() {
     </>
   );
 }
+
+    
