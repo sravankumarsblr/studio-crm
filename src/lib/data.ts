@@ -78,6 +78,7 @@ export const digitalOpennessLevels = ['Manageable', 'Open', 'No Knowledge'] as c
 
 export type Contact = {
   id: string;
+  name: string;
   salutation: 'Mr.' | 'Ms.' | 'Mrs.' | 'Dr.';
   firstName: string;
   lastName: string;
@@ -147,22 +148,14 @@ export type Quote = {
   poStatus?: 'Received' | 'Acceptance Mail' | 'On Phone';
 };
 
-export type Opportunity = {
+export type Invoice = {
   id: string;
-  name: string;
-  ownerId: string;
-  createdById: string;
-  companyName: string;
-  contactName: string;
-  stage: 'Qualification' | 'Proposal' | 'Negotiation';
-  status: 'New' | 'In Progress' | 'Won' | 'Lost';
-  value: number;
-  closeDate: string;
-  createdDate: string;
-  winProbability: number;
-  source: typeof leadSources[number];
-  quotes: Quote[];
-  lineItems: LineItem[];
+  number: string;
+  date: string;
+  amount: number;
+  status: 'Invoiced' | 'Paid' | 'Overdue';
+  documentName?: string;
+  raisedById: string;
 };
 
 export type Milestone = {
@@ -172,9 +165,8 @@ export type Milestone = {
   assignedToId: string;
   amount: number;
   status: 'Pending' | 'In Progress' | 'Completed';
-  invoiceStatus: 'Not Invoiced' | 'Invoiced' | 'Paid';
-  invoiceNumber?: string;
-  invoiceRaisedById?: string;
+  invoiceStatus: 'Not Invoiced' | 'Partially Invoiced' | 'Invoiced' | 'Paid';
+  invoices: Invoice[];
 };
 
 export type Contract = {
@@ -279,12 +271,12 @@ export const companies: Company[] = [
 ];
 
 export const contacts: Contact[] = [
-  { id: 'con1', salutation: 'Mr.', firstName: 'Vikram', lastName: 'Patel', email: 'vikram.p@acpl.co.in', mobile: '9820098200', companyId: 'com1', department: 'Procurement', status: 'active', avatar: 'https://placehold.co/32x32.png', jobTitle: 'Purchase manager', seniority: 'Middle manager', contactNumberType: 'Professional' },
-  { id: 'con2', salutation: 'Ms.', firstName: 'Sneha', lastName: 'Reddy', email: 'sneha.r@vimaanaero.com', mobile: '9848098480', companyId: 'com2', department: 'R&D', status: 'active', avatar: 'https://placehold.co/32x32.png', jobTitle: 'Quality manager', seniority: 'Executive', contactNumberType: 'Professional' },
-  { id: 'con3', salutation: 'Mr.', firstName: 'Deepak', lastName: 'Kumar', email: 'deepak.k@sanjeevanimed.com', mobile: '9811098110', companyId: 'com3', department: 'QA/QC', status: 'inactive', avatar: 'https://placehold.co/32x32.png', jobTitle: 'Maintenance head', seniority: 'Middle manager', contactNumberType: 'Personal' },
-  { id: 'con4', salutation: 'Ms.', firstName: 'Isha', lastName: 'Singh', email: 'isha.s@navacharlabs.com', mobile: '9890098900', companyId: 'com4', department: 'Operations', status: 'active', avatar: 'https://placehold.co/32x32.png', jobTitle: 'CEO', seniority: 'Director', contactNumberType: 'Professional' },
-  { id: 'con5', salutation: 'Mr.', firstName: 'Amit', lastName: 'Desai', email: 'amit.d@bharatpetro.com', mobile: '9821098210', companyId: 'com5', department: 'Engineering', status: 'active', avatar: 'https://placehold.co/32x32.png', jobTitle: 'Maintenance head', seniority: 'Middle manager', contactNumberType: 'Professional' },
-  { id: 'con6', salutation: 'Dr.', firstName: 'Neha', lastName: 'Rao', email: 'neha.r@jivabio.com', mobile: '9885098850', companyId: 'com6', department: 'R&D', status: 'inactive', avatar: 'https://placehold.co/32x32.png', jobTitle: 'Quality manager', seniority: 'Director', contactNumberType: 'Personal' },
+  { id: 'con1', name: 'Vikram Patel', salutation: 'Mr.', firstName: 'Vikram', lastName: 'Patel', email: 'vikram.p@acpl.co.in', mobile: '9820098200', companyId: 'com1', department: 'Procurement', status: 'active', avatar: 'https://placehold.co/32x32.png', jobTitle: 'Purchase manager', seniority: 'Middle manager', contactNumberType: 'Professional' },
+  { id: 'con2', name: 'Sneha Reddy', salutation: 'Ms.', firstName: 'Sneha', lastName: 'Reddy', email: 'sneha.r@vimaanaero.com', mobile: '9848098480', companyId: 'com2', department: 'R&D', status: 'active', avatar: 'https://placehold.co/32x32.png', jobTitle: 'Quality manager', seniority: 'Executive', contactNumberType: 'Professional' },
+  { id: 'con3', name: 'Deepak Kumar', salutation: 'Mr.', firstName: 'Deepak', lastName: 'Kumar', email: 'deepak.k@sanjeevanimed.com', mobile: '9811098110', companyId: 'com3', department: 'QA/QC', status: 'inactive', avatar: 'https://placehold.co/32x32.png', jobTitle: 'Maintenance head', seniority: 'Middle manager', contactNumberType: 'Personal' },
+  { id: 'con4', name: 'Isha Singh', salutation: 'Ms.', firstName: 'Isha', lastName: 'Singh', email: 'isha.s@navacharlabs.com', mobile: '9890098900', companyId: 'com4', department: 'Operations', status: 'active', avatar: 'https://placehold.co/32x32.png', jobTitle: 'CEO', seniority: 'Director', contactNumberType: 'Professional' },
+  { id: 'con5', name: 'Amit Desai', salutation: 'Mr.', firstName: 'Amit', lastName: 'Desai', email: 'amit.d@bharatpetro.com', mobile: '9821098210', companyId: 'com5', department: 'Engineering', status: 'active', avatar: 'https://placehold.co/32x32.png', jobTitle: 'Maintenance head', seniority: 'Middle manager', contactNumberType: 'Professional' },
+  { id: 'con6', name: 'Neha Rao', salutation: 'Dr.', firstName: 'Neha', lastName: 'Rao', email: 'neha.r@jivabio.com', mobile: '9885098850', companyId: 'com6', department: 'R&D', status: 'inactive', avatar: 'https://placehold.co/32x32.png', jobTitle: 'Quality manager', seniority: 'Director', contactNumberType: 'Personal' },
 ];
 
 export const leads: Lead[] = [
@@ -410,9 +402,11 @@ export const contracts: Contract[] = [
     paymentCycle: 'Credit 45days',
     paymentMethod: 'Cheque',
     milestones: [
-      { id: 'm1', name: 'Initial On-site Calibration', dueDate: '2024-07-15', status: 'Completed', invoiceStatus: 'Paid', amount: 1100000, assignedToId: 'user3', invoiceNumber: 'INV-001', invoiceRaisedById: 'user2' },
-      { id: 'm2', name: 'Mid-term Review & Report', dueDate: '2025-01-15', status: 'Pending', invoiceStatus: 'Not Invoiced', amount: 550000, assignedToId: 'user3' },
-      { id: 'm3', name: 'Final On-site Calibration', dueDate: '2025-06-15', status: 'Pending', invoiceStatus: 'Not Invoiced', amount: 550000, assignedToId: 'user3' }
+      { id: 'm1', name: 'Initial On-site Calibration', dueDate: '2024-07-15', status: 'Completed', invoiceStatus: 'Paid', amount: 1100000, assignedToId: 'user3', invoices: [
+        { id: 'inv-1', number: 'INV-001', date: '2024-07-16', amount: 1100000, status: 'Paid', raisedById: 'user2' }
+      ]},
+      { id: 'm2', name: 'Mid-term Review & Report', dueDate: '2025-01-15', status: 'Pending', invoiceStatus: 'Not Invoiced', amount: 550000, assignedToId: 'user3', invoices: [] },
+      { id: 'm3', name: 'Final On-site Calibration', dueDate: '2025-06-15', status: 'Pending', invoiceStatus: 'Not Invoiced', amount: 550000, assignedToId: 'user3', invoices: [] }
     ]
   }
 ];

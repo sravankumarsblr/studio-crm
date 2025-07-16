@@ -9,14 +9,14 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { RaiseInvoiceForm, type RaiseInvoiceFormValues } from "./raise-invoice-form";
-import type { Milestone } from "@/lib/data";
+import type { Milestone, Invoice } from "@/lib/data";
 import { useToast } from "@/hooks/use-toast";
 
 type RaiseInvoiceDialogProps = {
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
   milestone: Milestone;
-  onInvoiceRaised: (milestoneId: string, invoiceNumber: string) => void;
+  onInvoiceRaised: (milestoneId: string, newInvoice: Omit<Invoice, 'id' | 'raisedById'>) => void;
 };
 
 export function RaiseInvoiceDialog({ 
@@ -28,27 +28,39 @@ export function RaiseInvoiceDialog({
   const { toast } = useToast();
 
   const handleSave = (data: RaiseInvoiceFormValues) => {
-    onInvoiceRaised(milestone.id, data.invoiceNumber);
+    const newInvoice: Omit<Invoice, 'id' | 'raisedById'> = {
+        number: data.invoiceNumber,
+        amount: data.invoiceAmount,
+        date: new Date().toISOString().split('T')[0],
+        status: 'Invoiced',
+        documentName: data.invoiceDocument?.name,
+    };
+    onInvoiceRaised(milestone.id, newInvoice);
     toast({
       title: "Invoice Raised",
       description: `Invoice ${data.invoiceNumber} has been raised for milestone "${milestone.name}".`,
     });
     setIsOpen(false);
   };
+  
+  const totalInvoiced = milestone.invoices.reduce((sum, inv) => sum + inv.amount, 0);
+  const remainingAmount = milestone.amount - totalInvoiced;
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Raise Invoice for Milestone</DialogTitle>
           <DialogDescription>
-            Enter the invoice number for "{milestone.name}". The invoice amount will be ₹{milestone.amount.toLocaleString('en-IN')}.
+            Raise a full or partial invoice for "{milestone.name}".
+            The remaining amount on this milestone is ₹{remainingAmount.toLocaleString('en-IN')}.
           </DialogDescription>
         </DialogHeader>
         <div className="py-4">
           <RaiseInvoiceForm
             onSave={handleSave} 
             onCancel={() => setIsOpen(false)}
+            remainingAmount={remainingAmount}
           />
         </div>
       </DialogContent>

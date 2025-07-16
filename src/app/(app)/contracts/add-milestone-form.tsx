@@ -28,6 +28,7 @@ const addMilestoneSchema = z.object({
   dueDate: z.string().min(1, "Due date is required."),
   assignedToId: z.string().min(1, "Assignee is required."),
   amount: z.coerce.number().positive("Amount must be positive."),
+  status: z.enum(['Pending', 'In Progress', 'Completed']),
 });
 
 export type AddMilestoneFormValues = z.infer<typeof addMilestoneSchema>;
@@ -52,7 +53,8 @@ export function AddMilestoneForm({ onSave, onCancel, contractValue, existingMile
       name: "",
       dueDate: "",
       assignedToId: "",
-      amount: '',
+      amount: '' as any,
+      status: 'Pending',
     },
   });
 

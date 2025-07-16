@@ -3,13 +3,13 @@
 
 import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { ArrowLeft, Edit, FileText, IndianRupee, Building2, Calendar, CheckCircle, Clock, FilePlus, Milestone as MilestoneIcon, Briefcase, Hash, FileCheck2, User, MoreHorizontal, PlusCircle, Upload } from 'lucide-react';
+import { ArrowLeft, Edit, FileText, IndianRupee, Building2, Calendar, CheckCircle, Clock, FilePlus, Milestone as MilestoneIcon, Briefcase, Hash, FileCheck2, User, MoreHorizontal, PlusCircle, Upload, Circle, FileWarning } from 'lucide-react';
 
 import { Header } from '@/components/header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { contracts as initialContracts, companies, opportunities, products, users, Milestone, Quote, Contract } from '@/lib/data';
+import { contracts as initialContracts, companies, opportunities, products, users, Milestone, Quote, Contract, Invoice } from '@/lib/data';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Separator } from '@/components/ui/separator';
 import { Progress } from '@/components/ui/progress';
@@ -31,12 +31,13 @@ const contractStatusVariant: { [key: string]: "default" | "secondary" | "destruc
 const milestoneStatusConfig = {
     'Completed': { variant: "default", icon: CheckCircle, label: "Completed", progress: 100 },
     'In Progress': { variant: "secondary", icon: Clock, label: "In Progress", progress: 50 },
-    'Pending': { variant: "outline", icon: Clock, label: "Pending", progress: 0 },
+    'Pending': { variant: "outline", icon: Circle, label: "Pending", progress: 0 },
 } as const;
 
 const invoiceStatusConfig = {
     'Paid': { variant: "default", label: "Paid" },
     'Invoiced': { variant: "secondary", label: "Invoiced" },
+    'Partially Invoiced': { variant: "outline", label: "Partially Invoiced" },
     'Not Invoiced': { variant: "outline", label: "Not Invoiced" },
 } as const;
 
@@ -59,9 +60,9 @@ export default function ContractDetailPage() {
   const opportunity = opportunities.find(o => o.id === contract?.opportunityId);
   const acceptedQuote = opportunity?.quotes.find(q => q.status === 'Accepted');
   
-  const handleMilestoneAdded = (newMilestone: Omit<Milestone, 'id'>) => {
+  const handleMilestoneAdded = (newMilestone: Omit<Milestone, 'id' | 'invoices'>) => {
     if (contract) {
-        const milestoneToAdd = { ...newMilestone, id: `m${Date.now()}`};
+        const milestoneToAdd = { ...newMilestone, id: `m${Date.now()}`, invoices: []};
         setContract({ ...contract, milestones: [...contract.milestones, milestoneToAdd] });
     }
   };
@@ -72,16 +73,26 @@ export default function ContractDetailPage() {
     }
   };
 
-  const handleInvoiceRaised = (milestoneId: string, invoiceNumber: string) => {
+  const handleInvoiceRaised = (milestoneId: string, newInvoice: Omit<Invoice, 'id' | 'raisedById'>) => {
     if (contract) {
         const updatedMilestones = contract.milestones.map(m => {
             if (m.id === milestoneId) {
-                return {
-                    ...m,
-                    invoiceStatus: 'Invoiced' as const,
-                    invoiceNumber: invoiceNumber,
-                    invoiceRaisedById: users.find(u => u.role === 'Admin')?.id // Placeholder
+                const newInvoiceWithId: Invoice = {
+                    ...newInvoice,
+                    id: `inv-${Date.now()}`,
+                    raisedById: users.find(u => u.role === 'Admin')?.id || 'user1',
                 }
+                const updatedInvoices = [...m.invoices, newInvoiceWithId];
+                const totalInvoiced = updatedInvoices.reduce((sum, inv) => sum + inv.amount, 0);
+                
+                let newInvoiceStatus: Milestone['invoiceStatus'] = 'Not Invoiced';
+                if (totalInvoiced >= m.amount) {
+                    newInvoiceStatus = 'Invoiced';
+                } else if (totalInvoiced > 0) {
+                    newInvoiceStatus = 'Partially Invoiced';
+                }
+
+                return { ...m, invoices: updatedInvoices, invoiceStatus: newInvoiceStatus };
             }
             return m;
         });
@@ -111,6 +122,8 @@ export default function ContractDetailPage() {
   }
   
   const getAssigneeName = (userId: string) => users.find(u => u.id === userId)?.name || 'N/A';
+  
+  const getMilestoneTotalInvoiced = (milestone: Milestone) => milestone.invoices.reduce((sum, inv) => sum + inv.amount, 0);
 
   return (
     <>
@@ -187,9 +200,8 @@ export default function ContractDetailPage() {
                         <TableHeader>
                             <TableRow>
                                 <TableHead>Milestone</TableHead>
-                                <TableHead>Assigned To</TableHead>
-                                <TableHead>Due Date</TableHead>
                                 <TableHead>Amount</TableHead>
+                                <TableHead>Due Date</TableHead>
                                 <TableHead>Progress</TableHead>
                                 <TableHead>Invoice Status</TableHead>
                                 <TableHead className="text-right">Actions</TableHead>
@@ -199,12 +211,18 @@ export default function ContractDetailPage() {
                             {contract.milestones.map((milestone) => {
                                 const mStatus = milestoneStatusConfig[milestone.status];
                                 const iStatus = invoiceStatusConfig[milestone.invoiceStatus];
+                                const totalInvoiced = getMilestoneTotalInvoiced(milestone);
                                 return (
                                 <TableRow key={milestone.id}>
-                                    <TableCell className="font-medium">{milestone.name}</TableCell>
-                                    <TableCell>{getAssigneeName(milestone.assignedToId)}</TableCell>
+                                    <TableCell className="font-medium">
+                                        <p>{milestone.name}</p>
+                                        <p className="text-xs text-muted-foreground">Assigned to: {getAssigneeName(milestone.assignedToId)}</p>
+                                    </TableCell>
+                                    <TableCell>
+                                        <p>₹{milestone.amount.toLocaleString('en-IN')}</p>
+                                        {totalInvoiced > 0 && <p className="text-xs text-muted-foreground">Invoiced: ₹{totalInvoiced.toLocaleString('en-IN')}</p>}
+                                    </TableCell>
                                     <TableCell>{milestone.dueDate}</TableCell>
-                                    <TableCell>₹{milestone.amount.toLocaleString('en-IN')}</TableCell>
                                     <TableCell><Progress value={mStatus.progress} className="h-2" /></TableCell>
                                      <TableCell>
                                         <Badge variant={iStatus.variant as any}>{iStatus.label}</Badge>
@@ -216,7 +234,7 @@ export default function ContractDetailPage() {
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent>
                                                 <DropdownMenuItem>Edit</DropdownMenuItem>
-                                                <DropdownMenuItem onClick={() => openRaiseInvoiceDialog(milestone)} disabled={milestone.invoiceStatus !== 'Not Invoiced'}>
+                                                <DropdownMenuItem onClick={() => openRaiseInvoiceDialog(milestone)} disabled={milestone.invoiceStatus === 'Invoiced'}>
                                                     Raise Invoice
                                                 </DropdownMenuItem>
                                                 <DropdownMenuItem className="text-destructive">Delete</DropdownMenuItem>

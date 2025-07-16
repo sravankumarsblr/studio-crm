@@ -18,7 +18,7 @@ type AddMilestoneDialogProps = {
   contractId: string;
   contractValue: number;
   existingMilestoneTotal: number;
-  onMilestoneAdded: (newMilestone: Omit<Milestone, 'id'>) => void;
+  onMilestoneAdded: (newMilestone: Omit<Milestone, 'id' | 'invoices'>) => void;
 };
 
 export function AddMilestoneDialog({ 
@@ -31,9 +31,8 @@ export function AddMilestoneDialog({
   const { toast } = useToast();
 
   const handleSave = (data: AddMilestoneFormValues) => {
-    const newMilestone: Omit<Milestone, 'id'> = {
+    const newMilestone: Omit<Milestone, 'id' | 'invoices'> = {
         ...data,
-        status: 'Pending',
         invoiceStatus: 'Not Invoiced',
     };
     onMilestoneAdded(newMilestone);
