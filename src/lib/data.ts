@@ -23,6 +23,21 @@ export const serviceDependencies = ['One-time', 'Annual contract (AMC)', 'Multi-
 export const productServicePortfolios = ['Manufacturing', 'Trading', 'R&D', 'Service provider'] as const;
 export const annualSpends = ['High', 'Medium', 'Low value clients'] as const;
 
+// New Profiling Enums
+export const decisionCycles = ['Quick', 'Long approval process'] as const;
+export const serviceExpectations = ['Speed', 'Price sensitivity', 'Technical depth'] as const;
+export const preferences = ['Onsite', 'At lab'] as const;
+export const paymentCycles = ['Immediate', 'Advance payment', 'Credit 30days', 'Credit 45days', 'Credit 60days'] as const;
+export const paymentMethods = ['Cheque', 'NEFT', 'Online portal'] as const;
+export const usageProfiles = ['Regular calibration users', 'Occasional users'] as const;
+export const certificateFormats = ['High', 'Medium', 'Low value clients'] as const;
+export const auditSupportOptions = ['Continuous', 'One time', 'Not Needed'] as const;
+export const premiumServiceOptions = ['Yes', 'No'] as const;
+export const relationshipLengths = ['New', 'Long Term Client >10 years', 'Trusted Client>2 years'] as const;
+export const engagementLevels = ['Continuous', 'Calls', 'Mails'] as const;
+export const loyaltyAdvocacyOptions = ['References', 'Testimonials'] as const;
+
+
 export type Company = {
   id: string;
   name: string;
@@ -31,13 +46,25 @@ export type Company = {
   website: string;
   numberOfEmployees: string;
   status: 'active' | 'inactive';
-  // New Profiling Fields
+  // Profiling Fields
   ownershipType?: typeof ownershipTypes[number];
   businessStage?: typeof businessStages[number];
   accreditations?: (typeof accreditationsStandards[number])[];
   serviceDependency?: typeof serviceDependencies[number];
   productServicePortfolio?: typeof productServicePortfolios[number];
   annualSpend?: typeof annualSpends[number];
+  decisionCycle?: typeof decisionCycles[number];
+  serviceExpectations?: typeof serviceExpectations[number];
+  preferences?: typeof preferences[number];
+  paymentCycle?: typeof paymentCycles[number];
+  paymentMethod?: typeof paymentMethods[number];
+  usageProfile?: typeof usageProfiles[number];
+  certificateFormat?: typeof certificateFormats[number];
+  auditSupport?: typeof auditSupportOptions[number];
+  willingToPayPremium?: typeof premiumServiceOptions[number];
+  relationshipLength?: typeof relationshipLengths[number];
+  engagementLevel?: typeof engagementLevels[number];
+  loyaltyAdvocacy?: (typeof loyaltyAdvocacyOptions[number])[];
 };
 
 export type Contact = {
@@ -133,9 +160,6 @@ export type Milestone = {
   invoiceRaisedById?: string;
 };
 
-export const paymentCycles = ['Immediate', 'Advance payment', 'Credit 30days', 'Credit 45days', 'Credit 60days'];
-export const paymentMethods = ['Cheque', 'NEFT', 'Online portal'];
-
 export type Contract = {
   id: string;
   opportunityId: string;
@@ -199,12 +223,42 @@ export const users: User[] = [
 ];
 
 export const companies: Company[] = [
-  { id: 'com1', name: 'Accurate Calibration Pvt. Ltd.', industry: 'Engineering', logo: 'https://placehold.co/40x40.png', website: 'https://acpl.co.in', numberOfEmployees: '100-200', status: 'active', ownershipType: 'Private', businessStage: 'Mature', accreditations: ['ISO 9001', 'ISO 17025'], serviceDependency: 'Annual contract (AMC)', productServicePortfolio: 'Service provider', annualSpend: 'High' },
-  { id: 'com2', name: 'Vimaan Aerospace Solutions', industry: 'Aerospace', logo: 'https://placehold.co/40x40.png', website: 'https://vimaanaero.com', numberOfEmployees: '500+', status: 'active', ownershipType: 'Public', businessStage: 'Mature', accreditations: ['ISO 9001'], serviceDependency: 'Multi-year', productServicePortfolio: 'Manufacturing', annualSpend: 'High' },
-  { id: 'com3', name: 'Sanjeevani MedTech', industry: 'Medical Devices', logo: 'https://placehold.co/40x40.png', website: 'https://sanjeevanimed.com', numberOfEmployees: '50-100', status: 'inactive', ownershipType: 'SME', businessStage: 'Growth', accreditations: ['ISO 17025', 'GMP'], serviceDependency: 'On Demand', productServicePortfolio: 'R&D', annualSpend: 'Medium' },
-  { id: 'com4', name: 'Navachar Tech Labs', industry: 'R&D labs', logo: 'https://placehold.co/40x40.png', website: 'https://navacharlabs.com', numberOfEmployees: '20-50', status: 'active', ownershipType: 'Startup', businessStage: 'Startup', serviceDependency: 'Turnkey', productServicePortfolio: 'R&D', annualSpend: 'Low value clients' },
-  { id: 'com5', name: 'Bharat Petrochem', industry: 'Power', logo: 'https://placehold.co/40x40.png', website: 'https://bharatpetro.com', numberOfEmployees: '1000+', status: 'active', ownershipType: 'Government', businessStage: 'Mature', accreditations: ['ISO 9001'], serviceDependency: 'Annual contract (AMC)', productServicePortfolio: 'Manufacturing', annualSpend: 'High' },
-  { id: 'com6', name: 'Jiva Bio-Sciences', industry: 'Pharma', logo: 'https://placehold.co/40x40.png', website: 'https://jivabio.com', numberOfEmployees: '200-500', status: 'inactive', ownershipType: 'Multinational', businessStage: 'Growth', accreditations: ['GMP'], serviceDependency: 'Multi-year', productServicePortfolio: 'R&D', annualSpend: 'Medium' },
+  { 
+    id: 'com1', name: 'Accurate Calibration Pvt. Ltd.', industry: 'Engineering', logo: 'https://placehold.co/40x40.png', website: 'https://acpl.co.in', numberOfEmployees: '100-200', status: 'active', 
+    ownershipType: 'Private', businessStage: 'Mature', accreditations: ['ISO 9001', 'ISO 17025'], serviceDependency: 'Annual contract (AMC)', productServicePortfolio: 'Service provider', annualSpend: 'High',
+    decisionCycle: 'Long approval process', serviceExpectations: 'Technical depth', preferences: 'Onsite', paymentCycle: 'Credit 45days', paymentMethod: 'Cheque', usageProfile: 'Regular calibration users',
+    certificateFormat: 'High', auditSupport: 'Continuous', willingToPayPremium: 'Yes', relationshipLength: 'Long Term Client >10 years', engagementLevel: 'Continuous', loyaltyAdvocacy: ['References', 'Testimonials']
+  },
+  { 
+    id: 'com2', name: 'Vimaan Aerospace Solutions', industry: 'Aerospace', logo: 'https://placehold.co/40x40.png', website: 'https://vimaanaero.com', numberOfEmployees: '500+', status: 'active', 
+    ownershipType: 'Public', businessStage: 'Mature', accreditations: ['ISO 9001'], serviceDependency: 'Multi-year', productServicePortfolio: 'Manufacturing', annualSpend: 'High',
+    decisionCycle: 'Quick', serviceExpectations: 'Speed', preferences: 'Onsite', paymentCycle: 'Credit 60days', paymentMethod: 'Online portal', usageProfile: 'Regular calibration users',
+    certificateFormat: 'High', auditSupport: 'Continuous', willingToPayPremium: 'Yes', relationshipLength: 'Trusted Client>2 years', engagementLevel: 'Mails', loyaltyAdvocacy: ['Testimonials']
+  },
+  { 
+    id: 'com3', name: 'Sanjeevani MedTech', industry: 'Medical Devices', logo: 'https://placehold.co/40x40.png', website: 'https://sanjeevanimed.com', numberOfEmployees: '50-100', status: 'inactive', 
+    ownershipType: 'SME', businessStage: 'Growth', accreditations: ['ISO 17025', 'GMP'], serviceDependency: 'On Demand', productServicePortfolio: 'R&D', annualSpend: 'Medium',
+    decisionCycle: 'Quick', serviceExpectations: 'Price sensitivity', preferences: 'At lab', paymentCycle: 'Advance payment', paymentMethod: 'NEFT', usageProfile: 'Occasional users',
+    certificateFormat: 'Medium', auditSupport: 'One time', willingToPayPremium: 'No', relationshipLength: 'New', engagementLevel: 'Calls', loyaltyAdvocacy: []
+  },
+  { 
+    id: 'com4', name: 'Navachar Tech Labs', industry: 'R&D labs', logo: 'https://placehold.co/40x40.png', website: 'https://navacharlabs.com', numberOfEmployees: '20-50', status: 'active', 
+    ownershipType: 'Startup', businessStage: 'Startup', serviceDependency: 'Turnkey', productServicePortfolio: 'R&D', annualSpend: 'Low value clients',
+    decisionCycle: 'Quick', serviceExpectations: 'Technical depth', preferences: 'Onsite', paymentCycle: 'Immediate', paymentMethod: 'Online portal', usageProfile: 'Occasional users',
+    certificateFormat: 'Low value clients', auditSupport: 'Not Needed', willingToPayPremium: 'No', relationshipLength: 'New', engagementLevel: 'Mails'
+  },
+  { 
+    id: 'com5', name: 'Bharat Petrochem', industry: 'Power', logo: 'https://placehold.co/40x40.png', website: 'https://bharatpetro.com', numberOfEmployees: '1000+', status: 'active', 
+    ownershipType: 'Government', businessStage: 'Mature', accreditations: ['ISO 9001'], serviceDependency: 'Annual contract (AMC)', productServicePortfolio: 'Manufacturing', annualSpend: 'High',
+    decisionCycle: 'Long approval process', serviceExpectations: 'Speed', preferences: 'Onsite', paymentCycle: 'Credit 30days', paymentMethod: 'Cheque', usageProfile: 'Regular calibration users',
+    certificateFormat: 'High', auditSupport: 'Continuous', willingToPayPremium: 'No', relationshipLength: 'Trusted Client>2 years', engagementLevel: 'Continuous', loyaltyAdvocacy: ['References']
+  },
+  { 
+    id: 'com6', name: 'Jiva Bio-Sciences', industry: 'Pharma', logo: 'https://placehold.co/40x40.png', website: 'https://jivabio.com', numberOfEmployees: '200-500', status: 'inactive', 
+    ownershipType: 'Multinational', businessStage: 'Growth', accreditations: ['GMP'], serviceDependency: 'Multi-year', productServicePortfolio: 'R&D', annualSpend: 'Medium',
+    decisionCycle: 'Long approval process', serviceExpectations: 'Technical depth', preferences: 'At lab', paymentCycle: 'Credit 60days', paymentMethod: 'NEFT', usageProfile: 'Regular calibration users',
+    certificateFormat: 'Medium', auditSupport: 'One time', willingToPayPremium: 'Yes', relationshipLength: 'Long Term Client >10 years', engagementLevel: 'Mails', loyaltyAdvocacy: ['Testimonials']
+  },
 ];
 
 export const contacts: Contact[] = [

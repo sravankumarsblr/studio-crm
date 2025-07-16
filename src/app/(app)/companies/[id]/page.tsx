@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowLeft, Building, Users, Globe, ExternalLink, Edit } from 'lucide-react';
+import { ArrowLeft, Building, Users, Globe, ExternalLink, Edit, Workflow, Clock, ShieldCheck, HeartHandshake, Box, Sigma, Sparkles, Banknote, CalendarDays, Wallet, Ear, FileArchive, HelpCircle, Star, Handshake, Mail } from 'lucide-react';
 
 import { Header } from '@/components/header';
 import { Button } from '@/components/ui/button';
@@ -15,6 +15,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { companies, contacts as allContacts, opportunities as allOpportunities, leads as allLeads, type Company, type Contact, type Opportunity, type Lead } from '@/lib/data';
 import { EditCompanyDialog } from '../edit-company-dialog';
 import { EditProfilingDialog } from '../edit-profiling-dialog';
+import { Separator } from '@/components/ui/separator';
 
 const InfoCard = ({ icon: Icon, title, children }: { icon: React.ElementType, title: string, children: React.ReactNode }) => (
     <div className="flex items-start gap-4">
@@ -99,22 +100,49 @@ export default function CompanyDetailPage() {
                        <Card>
                             <CardHeader className="flex-row justify-between items-start">
                                 <div>
-                                    <CardTitle>Firmographic Profiling</CardTitle>
-                                    <CardDescription>Detailed classification of the company.</CardDescription>
+                                    <CardTitle>Company Profiling</CardTitle>
+                                    <CardDescription>Detailed classification and behavioral information.</CardDescription>
                                 </div>
                                 <Button variant="outline" size="sm" onClick={() => setIsEditProfilingOpen(true)}><Edit className="mr-2 h-4 w-4"/>Edit Profiling</Button>
                             </CardHeader>
-                            <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                <InfoCard icon={Building} title="Ownership Type">{company.ownershipType || 'N/A'}</InfoCard>
-                                <InfoCard icon={Building} title="Stage of Business">{company.businessStage || 'N/A'}</InfoCard>
-                                <InfoCard icon={Building} title="Product/Service Portfolio">{company.productServicePortfolio || 'N/A'}</InfoCard>
-                                <InfoCard icon={Building} title="Service Dependency/Renewals">{company.serviceDependency || 'N/A'}</InfoCard>
-                                <InfoCard icon={Building} title="Annual Spend Category">{company.annualSpend || 'N/A'}</InfoCard>
-                                <InfoCard icon={Building} title="Accreditations">
-                                    <div className="flex flex-wrap gap-2">
-                                        {company.accreditations?.length ? company.accreditations.map(acc => <Badge key={acc} variant="secondary">{acc}</Badge>) : 'N/A'}
+                            <CardContent className="space-y-6">
+                                <div>
+                                    <h4 className="font-semibold mb-4">Firmographic</h4>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                        <InfoCard icon={Building} title="Ownership Type">{company.ownershipType || 'N/A'}</InfoCard>
+                                        <InfoCard icon={Workflow} title="Stage of Business">{company.businessStage || 'N/A'}</InfoCard>
+                                        <InfoCard icon={Box} title="Product/Service Portfolio">{company.productServicePortfolio || 'N/A'}</InfoCard>
+                                        <InfoCard icon={HeartHandshake} title="Service Dependency/Renewals">{company.serviceDependency || 'N/A'}</InfoCard>
+                                        <InfoCard icon={Sigma} title="Annual Spend Category">{company.annualSpend || 'N/A'}</InfoCard>
+                                        <InfoCard icon={ShieldCheck} title="Accreditations">
+                                            <div className="flex flex-wrap gap-2">
+                                                {company.accreditations?.length ? company.accreditations.map(acc => <Badge key={acc} variant="secondary">{acc}</Badge>) : 'N/A'}
+                                            </div>
+                                        </InfoCard>
                                     </div>
-                                </InfoCard>
+                                </div>
+                                <Separator />
+                                <div>
+                                    <h4 className="font-semibold mb-4">Behavioral & Relational</h4>
+                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                        <InfoCard icon={Clock} title="Decision Cycle">{company.decisionCycle || 'N/A'}</InfoCard>
+                                        <InfoCard icon={Sparkles} title="Service Expectations">{company.serviceExpectations || 'N/A'}</InfoCard>
+                                        <InfoCard icon={Wallet} title="Preferences">{company.preferences || 'N/A'}</InfoCard>
+                                        <InfoCard icon={CalendarDays} title="Payment Cycle">{company.paymentCycle || 'N/A'}</InfoCard>
+                                        <InfoCard icon={Banknote} title="Payment Method">{company.paymentMethod || 'N/A'}</InfoCard>
+                                        <InfoCard icon={Ear} title="Usage Profile">{company.usageProfile || 'N/A'}</InfoCard>
+                                        <InfoCard icon={FileArchive} title="Certificate Formats">{company.certificateFormat || 'N/A'}</InfoCard>
+                                        <InfoCard icon={HelpCircle} title="Audit Support">{company.auditSupport || 'N/A'}</InfoCard>
+                                        <InfoCard icon={Star} title="Willingness to Pay Premium">{company.willingToPayPremium || 'N/A'}</InfoCard>
+                                        <InfoCard icon={Handshake} title="Length of Relationship">{company.relationshipLength || 'N/A'}</InfoCard>
+                                        <InfoCard icon={Mail} title="Level of Engagement">{company.engagementLevel || 'N/A'}</InfoCard>
+                                        <InfoCard icon={Users} title="Loyalty / Advocacy">
+                                            <div className="flex flex-wrap gap-2">
+                                                {company.loyaltyAdvocacy?.length ? company.loyaltyAdvocacy.map(item => <Badge key={item} variant="secondary">{item}</Badge>) : 'N/A'}
+                                            </div>
+                                        </InfoCard>
+                                    </div>
+                                </div>
                             </CardContent>
                        </Card>
                     </TabsContent>
