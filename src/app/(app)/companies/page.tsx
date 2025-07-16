@@ -66,7 +66,9 @@ export default function CompaniesPage() {
                       <Image src={company.logo} alt={company.name} width={40} height={40} className="rounded-md" data-ai-hint="logo" />
                     </TableCell>
                     <TableCell className="font-medium">
-                      {company.name}
+                        <Link href={`/companies/${company.id}`} className="hover:underline text-primary">
+                          {company.name}
+                        </Link>
                     </TableCell>
                     <TableCell>{company.industry}</TableCell>
                     <TableCell>
@@ -91,8 +93,11 @@ export default function CompaniesPage() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
+                          <DropdownMenuItem asChild>
+                            <Link href={`/companies/${company.id}`}>View Details</Link>
+                          </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => handleEditClick(company)}>
-                            Edit
+                            Edit Basic Info
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>

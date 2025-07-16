@@ -16,6 +16,13 @@ export type User = {
   department: string;
 };
 
+export const ownershipTypes = ['Private', 'Public', 'Government', 'Multinational', 'SME', 'Startup'] as const;
+export const businessStages = ['Startup', 'Growth', 'Mature'] as const;
+export const accreditationsStandards = ['ISO 9001', 'ISO 17025', 'GMP'] as const;
+export const serviceDependencies = ['One-time', 'Annual contract (AMC)', 'Multi-year', 'On Demand', 'Turnkey'] as const;
+export const productServicePortfolios = ['Manufacturing', 'Trading', 'R&D', 'Service provider'] as const;
+export const annualSpends = ['High', 'Medium', 'Low value clients'] as const;
+
 export type Company = {
   id: string;
   name: string;
@@ -24,6 +31,13 @@ export type Company = {
   website: string;
   numberOfEmployees: string;
   status: 'active' | 'inactive';
+  // New Profiling Fields
+  ownershipType?: typeof ownershipTypes[number];
+  businessStage?: typeof businessStages[number];
+  accreditations?: (typeof accreditationsStandards[number])[];
+  serviceDependency?: typeof serviceDependencies[number];
+  productServicePortfolio?: typeof productServicePortfolios[number];
+  annualSpend?: typeof annualSpends[number];
 };
 
 export type Contact = {
@@ -185,12 +199,12 @@ export const users: User[] = [
 ];
 
 export const companies: Company[] = [
-  { id: 'com1', name: 'Accurate Calibration Pvt. Ltd.', industry: 'Engineering', logo: 'https://placehold.co/40x40.png', website: 'https://acpl.co.in', numberOfEmployees: '100-200', status: 'active' },
-  { id: 'com2', name: 'Vimaan Aerospace Solutions', industry: 'Aerospace', logo: 'https://placehold.co/40x40.png', website: 'https://vimaanaero.com', numberOfEmployees: '500+', status: 'active' },
-  { id: 'com3', name: 'Sanjeevani MedTech', industry: 'Medical Devices', logo: 'https://placehold.co/40x40.png', website: 'https://sanjeevanimed.com', numberOfEmployees: '50-100', status: 'inactive' },
-  { id: 'com4', name: 'Navachar Tech Labs', industry: 'R&D labs', logo: 'https://placehold.co/40x40.png', website: 'https://navacharlabs.com', numberOfEmployees: '20-50', status: 'active' },
-  { id: 'com5', name: 'Bharat Petrochem', industry: 'Power', logo: 'https://placehold.co/40x40.png', website: 'https://bharatpetro.com', numberOfEmployees: '1000+', status: 'active' },
-  { id: 'com6', name: 'Jiva Bio-Sciences', industry: 'Pharma', logo: 'https://placehold.co/40x40.png', website: 'https://jivabio.com', numberOfEmployees: '200-500', status: 'inactive' },
+  { id: 'com1', name: 'Accurate Calibration Pvt. Ltd.', industry: 'Engineering', logo: 'https://placehold.co/40x40.png', website: 'https://acpl.co.in', numberOfEmployees: '100-200', status: 'active', ownershipType: 'Private', businessStage: 'Mature', accreditations: ['ISO 9001', 'ISO 17025'], serviceDependency: 'Annual contract (AMC)', productServicePortfolio: 'Service provider', annualSpend: 'High' },
+  { id: 'com2', name: 'Vimaan Aerospace Solutions', industry: 'Aerospace', logo: 'https://placehold.co/40x40.png', website: 'https://vimaanaero.com', numberOfEmployees: '500+', status: 'active', ownershipType: 'Public', businessStage: 'Mature', accreditations: ['ISO 9001'], serviceDependency: 'Multi-year', productServicePortfolio: 'Manufacturing', annualSpend: 'High' },
+  { id: 'com3', name: 'Sanjeevani MedTech', industry: 'Medical Devices', logo: 'https://placehold.co/40x40.png', website: 'https://sanjeevanimed.com', numberOfEmployees: '50-100', status: 'inactive', ownershipType: 'SME', businessStage: 'Growth', accreditations: ['ISO 17025', 'GMP'], serviceDependency: 'On Demand', productServicePortfolio: 'R&D', annualSpend: 'Medium' },
+  { id: 'com4', name: 'Navachar Tech Labs', industry: 'R&D labs', logo: 'https://placehold.co/40x40.png', website: 'https://navacharlabs.com', numberOfEmployees: '20-50', status: 'active', ownershipType: 'Startup', businessStage: 'Startup', serviceDependency: 'Turnkey', productServicePortfolio: 'R&D', annualSpend: 'Low value clients' },
+  { id: 'com5', name: 'Bharat Petrochem', industry: 'Power', logo: 'https://placehold.co/40x40.png', website: 'https://bharatpetro.com', numberOfEmployees: '1000+', status: 'active', ownershipType: 'Government', businessStage: 'Mature', accreditations: ['ISO 9001'], serviceDependency: 'Annual contract (AMC)', productServicePortfolio: 'Manufacturing', annualSpend: 'High' },
+  { id: 'com6', name: 'Jiva Bio-Sciences', industry: 'Pharma', logo: 'https://placehold.co/40x40.png', website: 'https://jivabio.com', numberOfEmployees: '200-500', status: 'inactive', ownershipType: 'Multinational', businessStage: 'Growth', accreditations: ['GMP'], serviceDependency: 'Multi-year', productServicePortfolio: 'R&D', annualSpend: 'Medium' },
 ];
 
 export const contacts: Contact[] = [
