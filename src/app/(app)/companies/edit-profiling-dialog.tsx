@@ -29,7 +29,7 @@ export function EditProfilingDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="sm:max-w-3xl">
         <DialogHeader>
           <DialogTitle>Edit Company Profiling</DialogTitle>
           <DialogDescription>
