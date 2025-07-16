@@ -14,7 +14,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { companies, contacts as allContacts, opportunities as allOpportunities, leads as allLeads, type Company, type Contact, type Opportunity, type Lead } from '@/lib/data';
 import { EditCompanyDialog } from '../edit-company-dialog';
-import { EditProfilingDialog } from './edit-profiling-dialog';
+import { EditProfilingDialog } from '../edit-profiling-dialog';
 
 const InfoCard = ({ icon: Icon, title, children }: { icon: React.ElementType, title: string, children: React.ReactNode }) => (
     <div className="flex items-start gap-4">
