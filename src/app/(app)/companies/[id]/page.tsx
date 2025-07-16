@@ -21,7 +21,7 @@ const InfoCard = ({ icon: Icon, title, children }: { icon: React.ElementType, ti
         <Icon className="w-5 h-5 mt-1 text-muted-foreground" />
         <div>
             <p className="text-sm text-muted-foreground">{title}</p>
-            <p className="text-base font-medium">{children}</p>
+            <div className="text-base font-medium">{children}</div>
         </div>
     </div>
 );
