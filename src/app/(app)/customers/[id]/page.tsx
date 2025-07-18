@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowLeft, Building, Users, Globe, ExternalLink, Edit, Workflow, Clock, ShieldCheck, HeartHandshake, Box, Sigma, Sparkles, Banknote, CalendarDays, Wallet, Ear, FileArchive, HelpCircle, Star, Handshake, Mail } from 'lucide-react';
+import { ArrowLeft, Building, Users, Globe, ExternalLink, Edit, Workflow, Clock, ShieldCheck, HeartHandshake, Box, Sigma, Sparkles, Banknote, CalendarDays, Wallet, Ear, FileArchive, HelpCircle, Star, Handshake, Mail, PlusCircle } from 'lucide-react';
 
 import { Header } from '@/components/header';
 import { Button } from '@/components/ui/button';
@@ -16,6 +16,7 @@ import { companies as allCustomers, contacts as allContacts, opportunities as al
 import { EditCustomerDialog } from '../edit-customer-dialog';
 import { EditProfilingDialog } from '../edit-profiling-dialog';
 import { Separator } from '@/components/ui/separator';
+import { AddContactDialog } from '@/app/(app)/contacts/add-contact-dialog';
 
 const InfoCard = ({ icon: Icon, title, children }: { icon: React.ElementType, title: string, children: React.ReactNode }) => (
     <div className="flex items-start gap-4">
@@ -35,14 +36,27 @@ export default function CustomerDetailPage() {
   const [customer, setCustomer] = useState<Customer | undefined>(() => allCustomers.find(c => c.id === customerId));
   const [isEditCustomerOpen, setIsEditCustomerOpen] = useState(false);
   const [isEditProfilingOpen, setIsEditProfilingOpen] = useState(false);
+  const [isAddContactOpen, setIsAddContactOpen] = useState(false);
+  const [contacts, setContacts] = useState<Contact[]>(() => allContacts.filter(c => c.companyId === customerId));
 
-  const contacts = allContacts.filter(c => c.companyId === customerId);
+
   const opportunities = allOpportunities.filter(o => o.companyName === customer?.name);
   const leads = allLeads.filter(l => l.companyName === customer?.name);
 
   const handleCustomerUpdated = (updatedCustomer: Customer) => {
     setCustomer(updatedCustomer);
   }
+
+  const handleContactAdded = (newContact: Omit<Contact, 'id' | 'status' | 'avatar'>) => {
+    const contactToAdd: Contact = {
+        ...newContact,
+        id: `con${new Date().getTime()}`,
+        status: "active",
+        avatar: "https://placehold.co/32x32.png",
+    };
+    setContacts(prev => [...prev, contactToAdd]);
+  };
+
 
   if (!customer) {
     return (
@@ -56,7 +70,7 @@ export default function CustomerDetailPage() {
     <>
         <div className="flex flex-col h-full">
             <Header title="">
-                <div className="flex items-center gap-2 mr-auto">
+                <div className="flex items-center gap-4 mr-auto">
                     <Button variant="ghost" size="icon" onClick={() => router.push('/customers')}>
                         <ArrowLeft />
                     </Button>
@@ -66,6 +80,7 @@ export default function CustomerDetailPage() {
                         <p className="text-sm text-muted-foreground">{customer.industry}</p>
                     </div>
                 </div>
+                <Button variant="outline" onClick={() => setIsAddContactOpen(true)}><PlusCircle className="mr-2 h-4 w-4"/> New Contact</Button>
                 <Button variant="outline" onClick={() => setIsEditCustomerOpen(true)}><Edit className="mr-2"/> Edit Basic Info</Button>
             </Header>
 
@@ -181,6 +196,12 @@ export default function CustomerDetailPage() {
             setIsOpen={setIsEditProfilingOpen}
             customer={customer}
             onCustomerUpdated={handleCustomerUpdated}
+        />
+        <AddContactDialog 
+            isOpen={isAddContactOpen}
+            setIsOpen={setIsAddContactOpen}
+            onContactAdded={handleContactAdded}
+            companyId={customer.id}
         />
     </>
   );

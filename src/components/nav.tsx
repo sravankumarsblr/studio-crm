@@ -39,18 +39,18 @@ import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "./ui/collap
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/customers", label: "Customers", icon: Building2 },
+  { href: "/contacts", label: "Contacts", icon: Phone },
   { href: "/leads", label: "Leads", icon: UsersIcon },
   { href: "/deals", label: "Opportunities", icon: Briefcase },
   { href: "/contracts", label: "Contracts", icon: FileText },
   { href: "/invoices", label: "Invoices", icon: IndianRupee },
-  { href: "/customers", label: "Customers", icon: Building2 },
-  { href: "/contacts", label: "Contacts", icon: Phone },
   { href: "/products", label: "Products & Services", icon: Package },
 ];
 
 const adminNavItems = [
-  { href: "/admin/users", label: "Users", icon: UsersIcon },
   { href: "/admin/roles", label: "Roles", icon: UserCog },
+  { href: "/admin/users", label: "Users", icon: UsersIcon },
 ]
 
 export default function Nav() {
