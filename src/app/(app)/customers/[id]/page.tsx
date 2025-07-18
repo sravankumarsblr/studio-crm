@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -12,11 +12,12 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { companies as allCustomers, contacts as allContacts, opportunities as allOpportunities, leads as allLeads, type Company as Customer, type Contact, type Opportunity, type Lead } from '@/lib/data';
+import { companies as allCustomers, contacts as allContacts, opportunities as allOpportunities, contracts as allContracts, type Company as Customer, type Contact, type Opportunity, type Contract, type Invoice } from '@/lib/data';
 import { EditCustomerDialog } from '../edit-customer-dialog';
 import { EditProfilingDialog } from '../edit-profiling-dialog';
 import { Separator } from '@/components/ui/separator';
 import { AddContactDialog } from '@/app/(app)/contacts/add-contact-dialog';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 const InfoCard = ({ icon: Icon, title, children }: { icon: React.ElementType, title: string, children: React.ReactNode }) => (
     <div className="flex items-start gap-4">
@@ -39,9 +40,19 @@ export default function CustomerDetailPage() {
   const [isAddContactOpen, setIsAddContactOpen] = useState(false);
   const [contacts, setContacts] = useState<Contact[]>(() => allContacts.filter(c => c.companyId === customerId));
 
-
   const opportunities = allOpportunities.filter(o => o.companyName === customer?.name);
-  const leads = allLeads.filter(l => l.companyName === customer?.name);
+  const contracts = allContracts.filter(c => c.companyName === customer?.name);
+  const invoices = useMemo(() => {
+    return contracts.flatMap(contract => 
+      contract.milestones.flatMap(milestone => 
+        milestone.invoices.map(invoice => ({
+          ...invoice,
+          contractId: contract.id,
+          contractTitle: contract.contractTitle,
+        }))
+      )
+    );
+  }, [contracts]);
 
   const handleCustomerUpdated = (updatedCustomer: Customer) => {
     setCustomer(updatedCustomer);
@@ -57,7 +68,6 @@ export default function CustomerDetailPage() {
     setContacts(prev => [...prev, contactToAdd]);
   };
 
-
   if (!customer) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -65,6 +75,33 @@ export default function CustomerDetailPage() {
       </div>
     );
   }
+  
+  const getOpportunityStatusVariant = (status: Opportunity['status']) => {
+    if (status === 'Won') return 'default';
+    if (status === 'Lost') return 'destructive';
+    if (status === 'New') return 'outline';
+    return 'secondary';
+  };
+  
+  const getContractStatusVariant = (status: Contract['status']) => {
+    switch (status) {
+      case 'Active': return 'default';
+      case 'Renewed': return 'default';
+      case 'Draft': return 'secondary';
+      case 'Terminated': return 'destructive';
+      case 'Expired': return 'outline';
+      default: return 'outline';
+    }
+  };
+  
+  const getInvoiceStatusVariant = (status: Invoice['status']) => {
+    switch (status) {
+      case 'Paid': return 'default';
+      case 'Invoiced': return 'secondary';
+      case 'Overdue': return 'destructive';
+      default: return 'outline';
+    }
+  };
 
   return (
     <>
@@ -90,7 +127,9 @@ export default function CustomerDetailPage() {
                         <TabsTrigger value="overview">Overview</TabsTrigger>
                         <TabsTrigger value="profiling">Profiling</TabsTrigger>
                         <TabsTrigger value="contacts">Contacts ({contacts.length})</TabsTrigger>
-                        <TabsTrigger value="deals">Deals ({opportunities.length})</TabsTrigger>
+                        <TabsTrigger value="opportunities">Opportunities ({opportunities.length})</TabsTrigger>
+                        <TabsTrigger value="contracts">Contracts ({contracts.length})</TabsTrigger>
+                        <TabsTrigger value="invoices">Invoices ({invoices.length})</TabsTrigger>
                     </TabsList>
 
                     <TabsContent value="overview">
@@ -172,14 +211,100 @@ export default function CustomerDetailPage() {
                        </Card>
                     </TabsContent>
 
-                     <TabsContent value="deals">
-                       <Card>
-                            <CardHeader><CardTitle>Deals with {customer.name}</CardTitle></CardHeader>
+                    <TabsContent value="opportunities">
+                        <Card>
+                            <CardHeader><CardTitle>Opportunities with {customer.name}</CardTitle></CardHeader>
                             <CardContent>
-                                {/* Deals Table/List Here */}
-                                <p>Deals list coming soon.</p>
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead>Opportunity</TableHead>
+                                            <TableHead>Value</TableHead>
+                                            <TableHead>Stage</TableHead>
+                                            <TableHead>Status</TableHead>
+                                            <TableHead>Close Date</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {opportunities.map(opp => (
+                                            <TableRow key={opp.id}>
+                                                <TableCell className="font-medium">
+                                                    <Link href={`/deals/${opp.id}`} className="text-primary hover:underline">{opp.name}</Link>
+                                                </TableCell>
+                                                <TableCell>₹{opp.value.toLocaleString('en-IN')}</TableCell>
+                                                <TableCell><Badge variant="secondary">{opp.stage}</Badge></TableCell>
+                                                <TableCell><Badge variant={getOpportunityStatusVariant(opp.status)}>{opp.status}</Badge></TableCell>
+                                                <TableCell>{opp.closeDate}</TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
                             </CardContent>
-                       </Card>
+                        </Card>
+                    </TabsContent>
+
+                    <TabsContent value="contracts">
+                        <Card>
+                            <CardHeader><CardTitle>Contracts with {customer.name}</CardTitle></CardHeader>
+                            <CardContent>
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead>Contract Title</TableHead>
+                                            <TableHead>Value</TableHead>
+                                            <TableHead>Status</TableHead>
+                                            <TableHead>Start Date</TableHead>
+                                            <TableHead>End Date</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {contracts.map(con => (
+                                            <TableRow key={con.id}>
+                                                <TableCell className="font-medium">
+                                                    <Link href={`/contracts/${con.id}`} className="text-primary hover:underline">{con.contractTitle}</Link>
+                                                </TableCell>
+                                                <TableCell>₹{con.value.toLocaleString('en-IN')}</TableCell>
+                                                <TableCell><Badge variant={getContractStatusVariant(con.status)}>{con.status}</Badge></TableCell>
+                                                <TableCell>{con.startDate}</TableCell>
+                                                <TableCell>{con.endDate}</TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </CardContent>
+                        </Card>
+                    </TabsContent>
+                    
+                    <TabsContent value="invoices">
+                        <Card>
+                            <CardHeader><CardTitle>Invoices for {customer.name}</CardTitle></CardHeader>
+                            <CardContent>
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead>Invoice #</TableHead>
+                                            <TableHead>Contract</TableHead>
+                                            <TableHead>Amount</TableHead>
+                                            <TableHead>Status</TableHead>
+                                            <TableHead>Date</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {invoices.map(inv => (
+                                            <TableRow key={inv.id}>
+                                                <TableCell className="font-medium">{inv.invoiceNumber}</TableCell>
+                                                <TableCell>
+                                                     <Link href={`/contracts/${inv.contractId}`} className="text-primary hover:underline">{inv.contractTitle}</Link>
+                                                </TableCell>
+                                                <TableCell>₹{inv.amount.toLocaleString('en-IN')}</TableCell>
+                                                <TableCell><Badge variant={getInvoiceStatusVariant(inv.status)}>{inv.status}</Badge></TableCell>
+                                                <TableCell>{inv.date}</TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </CardContent>
+                        </Card>
                     </TabsContent>
                 </Tabs>
             </main>
