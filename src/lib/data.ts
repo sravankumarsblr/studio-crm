@@ -148,6 +148,12 @@ export type Quote = {
   poStatus?: 'Received' | 'Acceptance Mail' | 'On Phone';
 };
 
+export type InvoiceLineItem = {
+  productId: string;
+  quantity: number;
+  unitPrice: number;
+};
+
 export type Invoice = {
   id: string;
   invoiceNumber: string;
@@ -156,6 +162,7 @@ export type Invoice = {
   status: 'Invoiced' | 'Paid' | 'Overdue';
   documentName?: string;
   raisedById: string;
+  lineItems: InvoiceLineItem[];
 };
 
 export type Milestone = {
@@ -422,7 +429,7 @@ export const contracts: Contract[] = [
     paymentMethod: 'Cheque',
     milestones: [
       { id: 'm1', name: 'Initial On-site Calibration', dueDate: '2024-07-15', status: 'Completed', invoiceStatus: 'Paid', amount: 1100000, assignedToId: 'user3', invoices: [
-        { id: 'inv-1', invoiceNumber: 'INV-2024-001', date: '2024-07-16', amount: 1100000, status: 'Paid', raisedById: 'user2' }
+        { id: 'inv-1', invoiceNumber: 'INV-2024-001', date: '2024-07-16', amount: 1100000, status: 'Paid', raisedById: 'user2', lineItems: [{ productId: 'prod3', quantity: 13, unitPrice: 84615.38 }] }
       ], productIds: ['prod3'] },
       { id: 'm2', name: 'Mid-term Review & Report', dueDate: '2025-01-15', status: 'Pending', invoiceStatus: 'Not Invoiced', amount: 550000, assignedToId: 'user3', invoices: [], productIds: ['prod3'] },
       { id: 'm3', name: 'Final On-site Calibration', dueDate: '2025-06-15', status: 'Pending', invoiceStatus: 'Not Invoiced', amount: 550000, assignedToId: 'user3', invoices: [], productIds: ['prod3'] }

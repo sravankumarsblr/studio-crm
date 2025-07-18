@@ -137,15 +137,15 @@ export function SelectMilestoneDialog({ isOpen, setIsOpen, onInvoiceRaised }: Se
         </DialogContent>
       </Dialog>
 
-      {selectedMilestone && (
+      {selectedMilestone && selectedContract && (
         <RaiseInvoiceDialog
           isOpen={isRaiseInvoiceOpen}
           setIsOpen={setIsRaiseInvoiceOpen}
           milestone={selectedMilestone}
+          contract={selectedContract}
           onInvoiceRaised={handleInvoiceRaisedAndClose}
         />
       )}
     </>
   );
 }
-

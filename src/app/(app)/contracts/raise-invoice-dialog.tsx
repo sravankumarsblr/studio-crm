@@ -9,13 +9,14 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { RaiseInvoiceForm, type RaiseInvoiceFormValues } from "./raise-invoice-form";
-import type { Milestone, Invoice } from "@/lib/data";
+import type { Milestone, Invoice, Contract } from "@/lib/data";
 import { useToast } from "@/hooks/use-toast";
 
 type RaiseInvoiceDialogProps = {
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
   milestone: Milestone;
+  contract: Contract;
   onInvoiceRaised: (milestoneId: string, newInvoice: Omit<Invoice, 'id' | 'raisedById'>) => void;
 };
 
@@ -23,17 +24,21 @@ export function RaiseInvoiceDialog({
     isOpen, 
     setIsOpen, 
     milestone,
+    contract,
     onInvoiceRaised,
 }: RaiseInvoiceDialogProps) {
   const { toast } = useToast();
 
   const handleSave = (data: RaiseInvoiceFormValues) => {
+    const totalAmount = data.lineItems.reduce((acc, item) => acc + (item.quantity * item.unitPrice), 0);
+    
     const newInvoice: Omit<Invoice, 'id' | 'raisedById'> = {
         invoiceNumber: data.invoiceNumber,
-        amount: data.invoiceAmount,
+        amount: totalAmount,
         date: new Date().toISOString().split('T')[0],
         status: 'Invoiced',
         documentName: data.invoiceDocument?.name,
+        lineItems: data.lineItems,
     };
     onInvoiceRaised(milestone.id, newInvoice);
     toast({
@@ -48,7 +53,7 @@ export function RaiseInvoiceDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="sm:max-w-3xl max-h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>Raise Invoice for Milestone</DialogTitle>
           <DialogDescription>
@@ -56,10 +61,12 @@ export function RaiseInvoiceDialog({
             The remaining amount on this milestone is ₹{remainingAmount.toLocaleString('en-IN')}.
           </DialogDescription>
         </DialogHeader>
-        <div className="py-4">
+        <div className="flex-1 overflow-y-auto -mr-6 pr-6 py-4">
           <RaiseInvoiceForm
             onSave={handleSave} 
             onCancel={() => setIsOpen(false)}
+            milestone={milestone}
+            contract={contract}
             remainingAmount={remainingAmount}
           />
         </div>

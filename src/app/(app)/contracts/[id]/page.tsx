@@ -271,6 +271,7 @@ export default function ContractDetailPage() {
             isOpen={isRaiseInvoiceOpen}
             setIsOpen={setIsRaiseInvoiceOpen}
             milestone={selectedMilestone}
+            contract={contract}
             onInvoiceRaised={handleInvoiceRaised}
         />
     )}
