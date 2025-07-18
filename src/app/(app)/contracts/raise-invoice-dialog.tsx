@@ -29,7 +29,7 @@ export function RaiseInvoiceDialog({
 
   const handleSave = (data: RaiseInvoiceFormValues) => {
     const newInvoice: Omit<Invoice, 'id' | 'raisedById'> = {
-        number: data.invoiceNumber,
+        invoiceNumber: data.invoiceNumber,
         amount: data.invoiceAmount,
         date: new Date().toISOString().split('T')[0],
         status: 'Invoiced',

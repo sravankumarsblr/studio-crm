@@ -16,7 +16,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Shield,
-  UserCog
+  UserCog,
+  IndianRupee
 } from "lucide-react";
 import { 
   Sidebar, 
@@ -41,6 +42,7 @@ const navItems = [
   { href: "/leads", label: "Leads", icon: UsersIcon },
   { href: "/deals", label: "Opportunities", icon: Briefcase },
   { href: "/contracts", label: "Contracts", icon: FileText },
+  { href: "/invoices", label: "Invoices", icon: IndianRupee },
   { href: "/customers", label: "Customers", icon: Building2 },
   { href: "/contacts", label: "Contacts", icon: Phone },
   { href: "/products", label: "Products & Services", icon: Package },

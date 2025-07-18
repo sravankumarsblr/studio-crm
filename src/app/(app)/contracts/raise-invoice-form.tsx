@@ -74,14 +74,15 @@ export function RaiseInvoiceForm({ onSave, onCancel, remainingAmount }: RaiseInv
         <FormField
           control={form.control}
           name="invoiceDocument"
-          render={({ field }) => (
+          render={({ field: { onChange, ...rest} }) => (
             <FormItem>
               <FormLabel>Attach Invoice (PDF)</FormLabel>
               <FormControl>
                 <Input 
                   type="file" 
                   accept=".pdf" 
-                  onChange={(e) => field.onChange(e.target.files ? e.target.files[0] : null)}
+                  onChange={(e) => onChange(e.target.files ? e.target.files[0] : null)}
+                  {...rest}
                 />
               </FormControl>
               <FormMessage />
