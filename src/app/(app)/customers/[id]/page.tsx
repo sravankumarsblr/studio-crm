@@ -5,7 +5,8 @@ import { useState, useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowLeft, Building, Users, Globe, ExternalLink, Edit, Workflow, Clock, ShieldCheck, HeartHandshake, Box, Sigma, Sparkles, Banknote, CalendarDays, Wallet, Ear, FileArchive, HelpCircle, Star, Handshake, Mail, PlusCircle } from 'lucide-react';
+import { ArrowLeft, Building, Users, Globe, ExternalLink, Edit, Workflow, Clock, ShieldCheck, HeartHandshake, Box, Sigma, Sparkles, Banknote, CalendarDays, Wallet, Ear, FileArchive, HelpCircle, Star, Handshake, Mail, PlusCircle, IndianRupee, ThumbsUp, ThumbsDown, Target } from 'lucide-react';
+import { differenceInDays, parseISO } from 'date-fns';
 
 import { Header } from '@/components/header';
 import { Button } from '@/components/ui/button';
@@ -27,6 +28,19 @@ const InfoCard = ({ icon: Icon, title, children }: { icon: React.ElementType, ti
             <div className="text-base font-medium">{children}</div>
         </div>
     </div>
+);
+
+const StatCard = ({ title, value, subtext, icon: Icon }: { title: string, value: string, subtext?: string, icon: React.ElementType }) => (
+    <Card>
+        <CardHeader className="flex flex-row items-baseline justify-between pb-2">
+            <CardTitle className="text-sm font-medium">{title}</CardTitle>
+            <Icon className="w-4 h-4 text-muted-foreground" />
+        </CardHeader>
+        <CardContent>
+            <div className="text-2xl font-bold">{value}</div>
+            {subtext && <p className="text-xs text-muted-foreground">{subtext}</p>}
+        </CardContent>
+    </Card>
 );
 
 export default function CustomerDetailPage() {
@@ -53,6 +67,36 @@ export default function CustomerDetailPage() {
       )
     );
   }, [contracts]);
+  
+  const customerStats = useMemo(() => {
+    const openOpportunities = opportunities.filter(o => o.status === 'New' || o.status === 'In Progress');
+    const wonOpportunities = opportunities.filter(o => o.status === 'Won');
+    const lostOpportunities = opportunities.filter(o => o.status === 'Lost');
+    
+    const pipelineValue = openOpportunities.reduce((sum, o) => sum + o.value, 0);
+    const wonValue = wonOpportunities.reduce((sum, o) => sum + o.value, 0);
+    const lostValue = lostOpportunities.reduce((sum, o) => sum + o.value, 0);
+
+    const conversionRate = opportunities.length > 0 && (wonOpportunities.length + lostOpportunities.length > 0)
+      ? wonOpportunities.length / (wonOpportunities.length + lostOpportunities.length)
+      : 0;
+
+    const timeToWinDays = wonOpportunities.length > 0 
+      ? Math.round(wonOpportunities.reduce((sum, o) => sum + differenceInDays(parseISO(o.closeDate), parseISO(o.createdDate)), 0) / wonOpportunities.length)
+      : 0;
+
+    return {
+        pipelineValue,
+        wonValue,
+        lostValue,
+        conversionRate,
+        timeToWinDays,
+        openCount: openOpportunities.length,
+        wonCount: wonOpportunities.length,
+        lostCount: lostOpportunities.length,
+    }
+  }, [opportunities]);
+
 
   const handleCustomerUpdated = (updatedCustomer: Customer) => {
     setCustomer(updatedCustomer);
@@ -132,7 +176,14 @@ export default function CustomerDetailPage() {
                         <TabsTrigger value="invoices">Invoices ({invoices.length})</TabsTrigger>
                     </TabsList>
 
-                    <TabsContent value="overview">
+                    <TabsContent value="overview" className="space-y-6">
+                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+                            <StatCard title="Pipeline Value" value={`₹${customerStats.pipelineValue.toLocaleString('en-IN')}`} subtext={`${customerStats.openCount} Open Opportunities`} icon={IndianRupee} />
+                            <StatCard title="Opportunities Won" value={`₹${customerStats.wonValue.toLocaleString('en-IN')}`} subtext={`${customerStats.wonCount} Opportunities`} icon={ThumbsUp} />
+                            <StatCard title="Opportunities Lost" value={`₹${customerStats.lostValue.toLocaleString('en-IN')}`} subtext={`${customerStats.lostCount} Opportunities`} icon={ThumbsDown} />
+                            <StatCard title="Conversion Rate" value={`${(customerStats.conversionRate * 100).toFixed(1)}%`} subtext="Based on won & lost deals" icon={Target} />
+                            <StatCard title="Avg. Time to Win" value={`${customerStats.timeToWinDays}`} subtext="days" icon={Clock} />
+                       </div>
                        <Card>
                             <CardHeader>
                                 <CardTitle>Customer Overview</CardTitle>
@@ -331,3 +382,5 @@ export default function CustomerDetailPage() {
     </>
   );
 }
+
+    
