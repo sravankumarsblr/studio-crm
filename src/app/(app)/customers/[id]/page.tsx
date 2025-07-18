@@ -69,6 +69,9 @@ export default function CustomerDetailPage() {
   }, [contracts]);
   
   const customerStats = useMemo(() => {
+    if (!customer) {
+        return { pipelineValue: 0, wonValue: 0, lostValue: 0, conversionRate: 0, timeToWinDays: 0, openCount: 0, wonCount: 0, lostCount: 0 };
+    }
     const openOpportunities = opportunities.filter(o => o.status === 'New' || o.status === 'In Progress');
     const wonOpportunities = opportunities.filter(o => o.status === 'Won');
     const lostOpportunities = opportunities.filter(o => o.status === 'Lost');
@@ -95,7 +98,7 @@ export default function CustomerDetailPage() {
         wonCount: wonOpportunities.length,
         lostCount: lostOpportunities.length,
     }
-  }, [opportunities]);
+  }, [opportunities, customer]);
 
 
   const handleCustomerUpdated = (updatedCustomer: Customer) => {
@@ -165,7 +168,15 @@ export default function CustomerDetailPage() {
                 <Button variant="outline" onClick={() => setIsEditCustomerOpen(true)}><Edit className="mr-2"/> Edit Basic Info</Button>
             </Header>
 
-            <main className="flex-1 overflow-y-auto p-4 sm:p-6">
+            <main className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+                    <StatCard title="Pipeline Value" value={`₹${customerStats.pipelineValue.toLocaleString('en-IN')}`} subtext={`${customerStats.openCount} Open Opportunities`} icon={IndianRupee} />
+                    <StatCard title="Opportunities Won" value={`₹${customerStats.wonValue.toLocaleString('en-IN')}`} subtext={`${customerStats.wonCount} Opportunities`} icon={ThumbsUp} />
+                    <StatCard title="Opportunities Lost" value={`₹${customerStats.lostValue.toLocaleString('en-IN')}`} subtext={`${customerStats.lostCount} Opportunities`} icon={ThumbsDown} />
+                    <StatCard title="Conversion Rate" value={`${(customerStats.conversionRate * 100).toFixed(1)}%`} subtext="Based on won & lost deals" icon={Target} />
+                    <StatCard title="Avg. Time to Win" value={`${customerStats.timeToWinDays}`} subtext="days" icon={Clock} />
+                </div>
+                
                 <Tabs defaultValue="overview">
                     <TabsList className="mb-4">
                         <TabsTrigger value="overview">Overview</TabsTrigger>
@@ -176,14 +187,7 @@ export default function CustomerDetailPage() {
                         <TabsTrigger value="invoices">Invoices ({invoices.length})</TabsTrigger>
                     </TabsList>
 
-                    <TabsContent value="overview" className="space-y-6">
-                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-                            <StatCard title="Pipeline Value" value={`₹${customerStats.pipelineValue.toLocaleString('en-IN')}`} subtext={`${customerStats.openCount} Open Opportunities`} icon={IndianRupee} />
-                            <StatCard title="Opportunities Won" value={`₹${customerStats.wonValue.toLocaleString('en-IN')}`} subtext={`${customerStats.wonCount} Opportunities`} icon={ThumbsUp} />
-                            <StatCard title="Opportunities Lost" value={`₹${customerStats.lostValue.toLocaleString('en-IN')}`} subtext={`${customerStats.lostCount} Opportunities`} icon={ThumbsDown} />
-                            <StatCard title="Conversion Rate" value={`${(customerStats.conversionRate * 100).toFixed(1)}%`} subtext="Based on won & lost deals" icon={Target} />
-                            <StatCard title="Avg. Time to Win" value={`${customerStats.timeToWinDays}`} subtext="days" icon={Clock} />
-                       </div>
+                    <TabsContent value="overview">
                        <Card>
                             <CardHeader>
                                 <CardTitle>Customer Overview</CardTitle>
@@ -382,5 +386,3 @@ export default function CustomerDetailPage() {
     </>
   );
 }
-
-    
