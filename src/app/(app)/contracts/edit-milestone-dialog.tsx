@@ -8,35 +8,39 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { AddMilestoneForm, type AddMilestoneFormValues } from "./add-milestone-form";
+import { EditMilestoneForm, type EditMilestoneFormValues } from "./edit-milestone-form";
 import type { Milestone, Contract } from "@/lib/data";
 import { useToast } from "@/hooks/use-toast";
 
-type AddMilestoneDialogProps = {
+type EditMilestoneDialogProps = {
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
+  milestone: Milestone;
   contract: Contract;
-  onMilestoneAdded: (newMilestone: Omit<Milestone, 'id' | 'invoices'>) => void;
+  onMilestoneUpdated: (updatedMilestone: Milestone) => void;
 };
 
-export function AddMilestoneDialog({ 
+export function EditMilestoneDialog({ 
     isOpen, 
     setIsOpen, 
-    onMilestoneAdded,
+    milestone,
     contract,
-}: AddMilestoneDialogProps) {
+    onMilestoneUpdated,
+}: EditMilestoneDialogProps) {
   const { toast } = useToast();
-  const existingMilestoneTotal = contract.milestones.reduce((acc, m) => acc + m.amount, 0);
+  const existingMilestoneTotal = contract.milestones
+    .filter(m => m.id !== milestone.id)
+    .reduce((acc, m) => acc + m.amount, 0);
 
-  const handleSave = (data: AddMilestoneFormValues) => {
-    const newMilestone: Omit<Milestone, 'id' | 'invoices'> = {
+  const handleSave = (data: EditMilestoneFormValues) => {
+    const updatedMilestone: Milestone = {
+        ...milestone,
         ...data,
-        invoiceStatus: 'Not Invoiced',
     };
-    onMilestoneAdded(newMilestone);
+    onMilestoneUpdated(updatedMilestone);
     toast({
-      title: "Milestone Added",
-      description: `The milestone "${data.name}" has been added to the contract.`,
+      title: "Milestone Updated",
+      description: `The milestone "${data.name}" has been updated.`,
     });
     setIsOpen(false);
   };
@@ -45,16 +49,17 @@ export function AddMilestoneDialog({
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className="sm:max-w-2xl max-h-[90vh] flex flex-col">
         <DialogHeader>
-          <DialogTitle>Add New Milestone</DialogTitle>
+          <DialogTitle>Edit Milestone</DialogTitle>
           <DialogDescription>
-            Define a new milestone and associate products for this contract.
+            Update the details for milestone: "{milestone.name}".
           </DialogDescription>
         </DialogHeader>
         <div className="py-4 flex-1 overflow-y-auto -mr-6 pr-6">
-          <AddMilestoneForm
+          <EditMilestoneForm
             onSave={handleSave} 
             onCancel={() => setIsOpen(false)}
             contract={contract}
+            milestone={milestone}
             existingMilestoneTotal={existingMilestoneTotal}
           />
         </div>

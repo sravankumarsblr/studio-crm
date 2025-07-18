@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { ArrowLeft, Edit, FileText, IndianRupee, Building2, Calendar, CheckCircle, Clock, FilePlus, Milestone as MilestoneIcon, Briefcase, Hash, FileCheck2, User, MoreHorizontal, PlusCircle, Upload, Circle, FileWarning } from 'lucide-react';
+import { ArrowLeft, Edit, FileText, IndianRupee, Briefcase, PlusCircle, Milestone as MilestoneIcon, Upload, Package } from 'lucide-react';
 
 import { Header } from '@/components/header';
 import { Button } from '@/components/ui/button';
@@ -12,13 +12,13 @@ import { Badge } from '@/components/ui/badge';
 import { contracts as initialContracts, companies, opportunities, products, users, Milestone, Quote, Contract, Invoice } from '@/lib/data';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Separator } from '@/components/ui/separator';
-import { Progress } from '@/components/ui/progress';
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { AddMilestoneDialog } from '../add-milestone-dialog';
 import { EditContractDialog } from '../edit-contract-dialog';
 import { RaiseInvoiceDialog } from '../raise-invoice-dialog';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { MilestoneCard } from '../milestone-card';
+import { EditMilestoneDialog } from '../edit-milestone-dialog';
+
 
 const contractStatusVariant: { [key: string]: "default" | "secondary" | "destructive" | "outline" } = {
   'Active': 'default',
@@ -28,20 +28,6 @@ const contractStatusVariant: { [key: string]: "default" | "secondary" | "destruc
   'Expired': 'outline',
 };
 
-const milestoneStatusConfig = {
-    'Completed': { variant: "default", icon: CheckCircle, label: "Completed", progress: 100 },
-    'In Progress': { variant: "secondary", icon: Clock, label: "In Progress", progress: 50 },
-    'Pending': { variant: "outline", icon: Circle, label: "Pending", progress: 0 },
-} as const;
-
-const invoiceStatusConfig = {
-    'Paid': { variant: "default", label: "Paid" },
-    'Invoiced': { variant: "secondary", label: "Invoiced" },
-    'Partially Invoiced': { variant: "outline", label: "Partially Invoiced" },
-    'Not Invoiced': { variant: "outline", label: "Not Invoiced" },
-} as const;
-
-
 export default function ContractDetailPage() {
   const router = useRouter();
   const params = useParams();
@@ -49,6 +35,7 @@ export default function ContractDetailPage() {
   
   const [contract, setContract] = useState(() => initialContracts.find((c) => c.id === contractId));
   const [isAddMilestoneOpen, setIsAddMilestoneOpen] = useState(false);
+  const [isEditMilestoneOpen, setIsEditMilestoneOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isRaiseInvoiceOpen, setIsRaiseInvoiceOpen] = useState(false);
   const [selectedMilestone, setSelectedMilestone] = useState<Milestone | null>(null);
@@ -65,6 +52,14 @@ export default function ContractDetailPage() {
         const milestoneToAdd = { ...newMilestone, id: `m${Date.now()}`, invoices: []};
         setContract({ ...contract, milestones: [...contract.milestones, milestoneToAdd] });
     }
+  };
+
+  const handleMilestoneUpdated = (updatedMilestone: Milestone) => {
+    if (contract) {
+      const updatedMilestones = contract.milestones.map(m => m.id === updatedMilestone.id ? updatedMilestone : m);
+      setContract({ ...contract, milestones: updatedMilestones });
+    }
+    setSelectedMilestone(null);
   };
 
   const handleContractUpdated = (updatedData: Partial<Contract>) => {
@@ -102,11 +97,14 @@ export default function ContractDetailPage() {
 
   const handleFileUpload = () => {
     if (!contractFile || !contract) return;
-    // In a real app, this would be an API call.
-    // Here, we'll just simulate the upload by updating the state.
     setContract({ ...contract, documentName: contractFile.name });
     setContractFile(null); // Clear the file input
   };
+
+  const openEditMilestoneDialog = (milestone: Milestone) => {
+    setSelectedMilestone(milestone);
+    setIsEditMilestoneOpen(true);
+  }
   
   const openRaiseInvoiceDialog = (milestone: Milestone) => {
     setSelectedMilestone(milestone);
@@ -121,9 +119,10 @@ export default function ContractDetailPage() {
     );
   }
   
-  const getAssigneeName = (userId: string) => users.find(u => u.id === userId)?.name || 'N/A';
-  
-  const getMilestoneTotalInvoiced = (milestone: Milestone) => milestone.invoices.reduce((sum, inv) => sum + inv.amount, 0);
+  const contractLineItemsWithDetails = contract.lineItems.map(item => {
+    const product = products.find(p => p.id === item.productId);
+    return { ...item, product };
+  });
 
   return (
     <>
@@ -144,48 +143,6 @@ export default function ContractDetailPage() {
       </Header>
 
       <main className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <Card>
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                    <CardTitle className="text-sm font-medium">Contract Value</CardTitle>
-                    <IndianRupee className="w-4 h-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                    <div className="text-2xl font-bold">₹{contract.value.toLocaleString('en-IN')}</div>
-                    <p className="text-xs text-muted-foreground">PO Number: {contract.poNumber}</p>
-                </CardContent>
-            </Card>
-            <Card>
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                    <CardTitle className="text-sm font-medium">Status</CardTitle>
-                    <FileText className="w-4 h-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                    <Badge variant={contractStatusVariant[contract.status]} className="text-base">{contract.status}</Badge>
-                </CardContent>
-            </Card>
-            <Card>
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                    <CardTitle className="text-sm font-medium">Contract Period</CardTitle>
-                    <Calendar className="w-4 h-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                    <div className="text-lg font-semibold">{contract.startDate} to {contract.endDate}</div>
-                </CardContent>
-            </Card>
-             <Card>
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                    <CardTitle className="text-sm font-medium">Linked Opportunity</CardTitle>
-                    <Briefcase className="w-4 h-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                     <Button variant="link" asChild className="p-0 h-auto text-base text-left whitespace-normal leading-snug">
-                        <a href={`/deals/${contract.opportunityId}`}>{opportunity.name}</a>
-                    </Button>
-                </CardContent>
-            </Card>
-        </div>
-
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
             <Card className="lg:col-span-3">
                 <CardHeader className="flex flex-row justify-between items-center">
@@ -195,112 +152,69 @@ export default function ContractDetailPage() {
                     </div>
                     <Button onClick={() => setIsAddMilestoneOpen(true)}><PlusCircle className="mr-2 h-4 w-4" /> Add Milestone</Button>
                 </CardHeader>
-                 <CardContent>
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Milestone</TableHead>
-                                <TableHead>Amount</TableHead>
-                                <TableHead>Due Date</TableHead>
-                                <TableHead>Progress</TableHead>
-                                <TableHead>Invoice Status</TableHead>
-                                <TableHead className="text-right">Actions</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {contract.milestones.map((milestone) => {
-                                const mStatus = milestoneStatusConfig[milestone.status];
-                                const iStatus = invoiceStatusConfig[milestone.invoiceStatus];
-                                const totalInvoiced = getMilestoneTotalInvoiced(milestone);
-                                return (
-                                <TableRow key={milestone.id}>
-                                    <TableCell className="font-medium">
-                                        <p>{milestone.name}</p>
-                                        <p className="text-xs text-muted-foreground">Assigned to: {getAssigneeName(milestone.assignedToId)}</p>
-                                    </TableCell>
-                                    <TableCell>
-                                        <p>₹{milestone.amount.toLocaleString('en-IN')}</p>
-                                        {totalInvoiced > 0 && <p className="text-xs text-muted-foreground">Invoiced: ₹{totalInvoiced.toLocaleString('en-IN')}</p>}
-                                    </TableCell>
-                                    <TableCell>{milestone.dueDate}</TableCell>
-                                    <TableCell><Progress value={mStatus.progress} className="h-2" /></TableCell>
-                                     <TableCell>
-                                        <Badge variant={iStatus.variant as any}>{iStatus.label}</Badge>
-                                    </TableCell>
-                                    <TableCell className="text-right">
-                                        <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                                <Button variant="ghost" size="icon"><MoreHorizontal className="h-4 w-4" /></Button>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent>
-                                                <DropdownMenuItem>Edit</DropdownMenuItem>
-                                                <DropdownMenuItem onClick={() => openRaiseInvoiceDialog(milestone)} disabled={milestone.invoiceStatus === 'Invoiced'}>
-                                                    Raise Invoice
-                                                </DropdownMenuItem>
-                                                <DropdownMenuItem className="text-destructive">Delete</DropdownMenuItem>
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
-                                    </TableCell>
-                                </TableRow>
-                            )})}
-                        </TableBody>
-                    </Table>
+                <CardContent className="space-y-4">
+                    {contract.milestones.map((milestone) => (
+                      <MilestoneCard 
+                        key={milestone.id} 
+                        milestone={milestone} 
+                        onEdit={() => openEditMilestoneDialog(milestone)}
+                        onRaiseInvoice={() => openRaiseInvoiceDialog(milestone)}
+                      />
+                    ))}
+                    {contract.milestones.length === 0 && (
+                      <div className="text-center text-muted-foreground p-8 border-2 border-dashed rounded-lg">
+                        No milestones added yet.
+                      </div>
+                    )}
                 </CardContent>
             </Card>
              <Card className="lg:col-span-2">
                 <CardHeader>
-                    <CardTitle>Contract Documents &amp; Details</CardTitle>
+                    <CardTitle>Contract Details</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4 text-sm">
-                    {acceptedQuote && (
-                        <div>
-                        <h4 className="font-medium mb-2 text-muted-foreground">Source Documents</h4>
-                        <div className="space-y-3 p-3 rounded-md border bg-muted/50">
-                             <div className="flex justify-between items-center">
-                                <span className="text-muted-foreground">Source Quote</span>
-                                <Button variant="link" size="sm" className="p-0 h-auto">{acceptedQuote.quoteNumber}</Button>
-                            </div>
-                            <div className="flex justify-between items-center">
-                                <span className="text-muted-foreground">PO Number</span>
-                                <span className="font-medium">{acceptedQuote.poNumber}</span>
-                            </div>
-                            {acceptedQuote.poDocumentName && (
-                                <div className="flex justify-between items-center">
-                                    <span className="text-muted-foreground">PO Document</span>
-                                    <Button variant="link" size="sm" className="p-0 h-auto">{acceptedQuote.poDocumentName}</Button>
-                                </div>
-                            )}
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-1">
+                            <p className="text-muted-foreground">Contract Value</p>
+                            <p className="font-bold text-lg">₹{contract.value.toLocaleString('en-IN')}</p>
                         </div>
+                        <div className="space-y-1">
+                            <p className="text-muted-foreground">Status</p>
+                            <Badge variant={contractStatusVariant[contract.status]} className="text-base">{contract.status}</Badge>
+                        </div>
+                        <div className="space-y-1 col-span-2">
+                            <p className="text-muted-foreground">Contract Period</p>
+                            <p className="font-medium">{contract.startDate} to {contract.endDate}</p>
+                        </div>
+                         <div className="space-y-1 col-span-2">
+                            <p className="text-muted-foreground">Linked Opportunity</p>
+                            <Button variant="link" asChild className="p-0 h-auto text-left whitespace-normal leading-snug">
+                              <a href={`/deals/${contract.opportunityId}`}>{opportunity.name}</a>
+                            </Button>
+                        </div>
+                    </div>
+                    <Separator/>
+                    {acceptedQuote && (
+                        <div className="space-y-2">
+                            <h4 className="font-medium text-muted-foreground">Source Documents</h4>
+                            <div className="flex justify-between items-center"><span >PO Number</span><span className="font-medium">{acceptedQuote.poNumber}</span></div>
+                            {acceptedQuote.poDocumentName && (<div className="flex justify-between items-center"><span>PO Document</span><Button variant="link" size="sm" className="p-0 h-auto">{acceptedQuote.poDocumentName}</Button></div>)}
                         </div>
                     )}
                     <Separator/>
-                     <div>
-                        <h4 className="font-medium mb-2 text-muted-foreground">Contract Agreement</h4>
-                        <div className="space-y-2 p-3 rounded-md border bg-muted/50">
-                            {contract.documentName ? (
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-2">
-                                    <FileText className="h-4 w-4" />
-                                    <span className="font-medium">{contract.documentName}</span>
-                                </div>
-                                <Button variant="ghost" size="sm">Download</Button>
-                            </div>
-                            ) : (
-                            <div className="flex items-center gap-2">
-                                <Input 
-                                    id="contract-upload" 
-                                    type="file" 
-                                    accept=".pdf" 
-                                    className="text-xs flex-1"
-                                    onChange={(e) => setContractFile(e.target.files ? e.target.files[0] : null)}
-                                />
-                                <Button size="sm" onClick={handleFileUpload} disabled={!contractFile}>
-                                    <Upload className="mr-2 h-4 w-4" />
-                                    Upload
-                                </Button>
-                            </div>
-                            )}
+                     <div className="space-y-2">
+                        <h4 className="font-medium text-muted-foreground">Contract Agreement</h4>
+                        {contract.documentName ? (
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2"><FileText className="h-4 w-4" /><span className="font-medium">{contract.documentName}</span></div>
+                            <Button variant="ghost" size="sm">Download</Button>
                         </div>
+                        ) : (
+                        <div className="flex items-center gap-2">
+                            <Input id="contract-upload" type="file" accept=".pdf" className="text-xs flex-1" onChange={(e) => setContractFile(e.target.files ? e.target.files[0] : null)} />
+                            <Button size="sm" onClick={handleFileUpload} disabled={!contractFile}><Upload className="mr-2 h-4 w-4" />Upload</Button>
+                        </div>
+                        )}
                     </div>
                     <Separator/>
                      <div className="flex items-start gap-3">
@@ -310,30 +224,20 @@ export default function ContractDetailPage() {
                             <p className="font-medium whitespace-pre-wrap">{contract.scopeOfWork}</p>
                         </div>
                     </div>
-                    <Separator className="my-4"/>
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Product</TableHead>
-                                <TableHead>Qty</TableHead>
-                                <TableHead className="text-right">Total</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {contract.lineItems.map((item) => {
-                                const product = products.find(p => p.id === item.productId);
-                                if (!product) return null;
-                                const total = product.price * item.quantity;
-                                return (
-                                    <TableRow key={item.productId}>
-                                        <TableCell className="font-medium">{product.name}</TableCell>
-                                        <TableCell>{item.quantity}</TableCell>
-                                        <TableCell className="text-right">₹{total.toLocaleString('en-IN')}</TableCell>
-                                    </TableRow>
-                                );
-                            })}
-                        </TableBody>
-                    </Table>
+                    <Separator/>
+                    <div>
+                      <h4 className="font-medium text-muted-foreground flex items-center gap-2 mb-2"><Package className="h-4 w-4"/>Products in Contract</h4>
+                      <Table>
+                          <TableHeader><TableRow><TableHead>Product</TableHead><TableHead>Qty</TableHead><TableHead className="text-right">Total</TableHead></TableRow></TableHeader>
+                          <TableBody>
+                              {contractLineItemsWithDetails.map((item) => {
+                                  if (!item.product) return null;
+                                  const total = item.product.price * item.quantity;
+                                  return (<TableRow key={item.productId}><TableCell className="font-medium">{item.product.name}</TableCell><TableCell>{item.quantity}</TableCell><TableCell className="text-right">₹{total.toLocaleString('en-IN')}</TableCell></TableRow>);
+                              })}
+                          </TableBody>
+                      </Table>
+                    </div>
                 </CardContent>
             </Card>
         </div>
@@ -342,11 +246,18 @@ export default function ContractDetailPage() {
     <AddMilestoneDialog 
         isOpen={isAddMilestoneOpen} 
         setIsOpen={setIsAddMilestoneOpen} 
-        contractId={contract.id}
-        contractValue={contract.value}
-        existingMilestoneTotal={contract.milestones.reduce((acc, m) => acc + m.amount, 0)}
+        contract={contract}
         onMilestoneAdded={handleMilestoneAdded}
     />
+    {selectedMilestone && (
+      <EditMilestoneDialog
+        isOpen={isEditMilestoneOpen}
+        setIsOpen={setIsEditMilestoneOpen}
+        milestone={selectedMilestone}
+        contract={contract}
+        onMilestoneUpdated={handleMilestoneUpdated}
+      />
+    )}
     {contract && (
         <EditContractDialog
             isOpen={isEditOpen}

@@ -1,13 +1,13 @@
 
 "use client";
 
-import { useForm, useFieldArray } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { CalendarIcon, Check, ChevronsUpDown } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import { users, products, type Contract } from "@/lib/data";
+import { users, products, type Contract, type Milestone } from "@/lib/data";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -27,7 +27,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 
-const addMilestoneSchema = z.object({
+const editMilestoneSchema = z.object({
   name: z.string().min(1, "Milestone name is required."),
   dueDate: z.string().min(1, "Due date is required."),
   assignedToId: z.string().min(1, "Assignee is required."),
@@ -36,35 +36,36 @@ const addMilestoneSchema = z.object({
   productIds: z.array(z.string()).min(1, "At least one product must be selected."),
 });
 
-export type AddMilestoneFormValues = z.infer<typeof addMilestoneSchema>;
+export type EditMilestoneFormValues = z.infer<typeof editMilestoneSchema>;
 
-type AddMilestoneFormProps = {
-  onSave: (data: AddMilestoneFormValues) => void;
+type EditMilestoneFormProps = {
+  onSave: (data: EditMilestoneFormValues) => void;
   onCancel: () => void;
   contract: Contract;
+  milestone: Milestone;
   existingMilestoneTotal: number;
 };
 
-export function AddMilestoneForm({ onSave, onCancel, contract, existingMilestoneTotal }: AddMilestoneFormProps) {
+export function EditMilestoneForm({ onSave, onCancel, contract, milestone, existingMilestoneTotal }: EditMilestoneFormProps) {
   const [ownerOpen, setOwnerOpen] = useState(false);
   const remainingValue = contract.value - existingMilestoneTotal;
 
-  const form = useForm<AddMilestoneFormValues>({
-    resolver: zodResolver(addMilestoneSchema.refine(data => data.amount <= remainingValue, {
+  const form = useForm<EditMilestoneFormValues>({
+    resolver: zodResolver(editMilestoneSchema.refine(data => data.amount <= remainingValue, {
         message: `Amount cannot exceed the remaining contract value of ₹${remainingValue.toLocaleString('en-IN')}`,
         path: ['amount'],
     })),
     defaultValues: {
-      name: "",
-      dueDate: "",
-      assignedToId: "",
-      amount: '' as any,
-      status: 'Pending',
-      productIds: [],
+      name: milestone.name,
+      dueDate: milestone.dueDate,
+      assignedToId: milestone.assignedToId,
+      amount: milestone.amount,
+      status: milestone.status,
+      productIds: milestone.productIds || [],
     },
   });
 
-  const onSubmit = (values: AddMilestoneFormValues) => {
+  const onSubmit = (values: EditMilestoneFormValues) => {
     onSave(values);
   };
   
@@ -179,7 +180,7 @@ export function AddMilestoneForm({ onSave, onCancel, contract, existingMilestone
         <p className="text-sm text-muted-foreground pt-2">Remaining allocatable value: ₹{remainingValue.toLocaleString('en-IN')}</p>
         <div className="flex justify-end gap-2 pt-4">
           <Button type="button" variant="outline" onClick={onCancel}>Cancel</Button>
-          <Button type="submit">Add Milestone</Button>
+          <Button type="submit">Save Changes</Button>
         </div>
       </form>
     </Form>

@@ -167,6 +167,7 @@ export type Milestone = {
   status: 'Pending' | 'In Progress' | 'Completed';
   invoiceStatus: 'Not Invoiced' | 'Partially Invoiced' | 'Invoiced' | 'Paid';
   invoices: Invoice[];
+  productIds: string[];
 };
 
 export type Contract = {
@@ -286,6 +287,24 @@ export const leads: Lead[] = [
   { id: 'lead4', name: 'Enquiry for Old System Upgrade', ownerId: 'user4', createdById: 'user1', companyName: 'Navachar Tech Labs', contactName: 'Isha Singh', value: 500000, status: 'Junk', source: 'Coldcall', createdDate: '2024-05-22', lineItems: [], leadData: { industry: 'R&D', companySize: 75, pastPurchases: 0, websiteVisits: 0, reason: 'Budget constraints' } },
 ];
 
+export type Opportunity = {
+  id: string;
+  name: string;
+  ownerId: string;
+  createdById: string;
+  companyName: string;
+  contactName: string;
+  stage: 'Qualification' | 'Proposal' | 'Negotiation';
+  status: 'New' | 'In Progress' | 'Won' | 'Lost';
+  value: number;
+  createdDate: string;
+  closeDate: string;
+  winProbability: number;
+  source: typeof leadSources[number];
+  lineItems: LineItem[];
+  quotes: Quote[];
+};
+
 export const opportunities: Opportunity[] = [
   { 
     id: 'deal1', 
@@ -404,9 +423,9 @@ export const contracts: Contract[] = [
     milestones: [
       { id: 'm1', name: 'Initial On-site Calibration', dueDate: '2024-07-15', status: 'Completed', invoiceStatus: 'Paid', amount: 1100000, assignedToId: 'user3', invoices: [
         { id: 'inv-1', number: 'INV-001', date: '2024-07-16', amount: 1100000, status: 'Paid', raisedById: 'user2' }
-      ]},
-      { id: 'm2', name: 'Mid-term Review & Report', dueDate: '2025-01-15', status: 'Pending', invoiceStatus: 'Not Invoiced', amount: 550000, assignedToId: 'user3', invoices: [] },
-      { id: 'm3', name: 'Final On-site Calibration', dueDate: '2025-06-15', status: 'Pending', invoiceStatus: 'Not Invoiced', amount: 550000, assignedToId: 'user3', invoices: [] }
+      ], productIds: ['prod3'] },
+      { id: 'm2', name: 'Mid-term Review & Report', dueDate: '2025-01-15', status: 'Pending', invoiceStatus: 'Not Invoiced', amount: 550000, assignedToId: 'user3', invoices: [], productIds: ['prod3'] },
+      { id: 'm3', name: 'Final On-site Calibration', dueDate: '2025-06-15', status: 'Pending', invoiceStatus: 'Not Invoiced', amount: 550000, assignedToId: 'user3', invoices: [], productIds: ['prod3'] }
     ]
   }
 ];
