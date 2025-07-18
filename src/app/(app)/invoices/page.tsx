@@ -5,7 +5,7 @@ import { useState, useMemo } from "react";
 import Link from "next/link";
 import { Header } from "@/components/header";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { contracts as allContracts, type Contract, type Invoice, type Milestone } from "@/lib/data";
+import { contracts as initialContracts, type Contract, type Invoice, type Milestone } from "@/lib/data";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
@@ -24,6 +24,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal } from "lucide-react";
+import { SelectMilestoneDialog } from "./select-milestone-dialog";
+import { users } from "@/lib/data";
 
 type InvoiceListItem = Invoice & {
   contractId: string;
@@ -33,7 +35,8 @@ type InvoiceListItem = Invoice & {
 };
 
 export default function InvoicesPage() {
-  const [contracts, setContracts] = useState<Contract[]>(allContracts);
+  const [contracts, setContracts] = useState<Contract[]>(initialContracts);
+  const [isSelectMilestoneOpen, setIsSelectMilestoneOpen] = useState(false);
   
   const allInvoices = useMemo((): InvoiceListItem[] => {
     return contracts.flatMap(contract => 
@@ -86,13 +89,45 @@ export default function InvoicesPage() {
     setStatusFilter('');
     setCurrentPage(1);
   };
+  
+  const handleInvoiceRaised = (contractId: string, milestoneId: string, newInvoice: Omit<Invoice, 'id' | 'raisedById'>) => {
+    setContracts(prevContracts => {
+        return prevContracts.map(contract => {
+            if (contract.id === contractId) {
+                const updatedMilestones = contract.milestones.map(m => {
+                    if (m.id === milestoneId) {
+                        const newInvoiceWithId: Invoice = {
+                            ...newInvoice,
+                            id: `inv-${Date.now()}`,
+                            raisedById: users.find(u => u.role === 'Admin')?.id || 'user1',
+                        }
+                        const updatedInvoices = [...m.invoices, newInvoiceWithId];
+                        const totalInvoiced = updatedInvoices.reduce((sum, inv) => sum + inv.amount, 0);
+                        
+                        let newInvoiceStatus: Milestone['invoiceStatus'] = 'Not Invoiced';
+                        if (totalInvoiced >= m.amount) {
+                            newInvoiceStatus = 'Invoiced';
+                        } else if (totalInvoiced > 0) {
+                            newInvoiceStatus = 'Partially Invoiced';
+                        }
+                        return { ...m, invoices: updatedInvoices, invoiceStatus: newInvoiceStatus };
+                    }
+                    return m;
+                });
+                return { ...contract, milestones: updatedMilestones };
+            }
+            return contract;
+        });
+    });
+  }
+
 
   const invoiceStatuses = [...new Set(allInvoices.map(i => i.status))];
 
   return (
     <>
       <div className="flex flex-col h-full w-full">
-        <Header title="Invoices" />
+        <Header title="Invoices" actionText="Add Invoice" onActionClick={() => setIsSelectMilestoneOpen(true)} />
         <main className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 w-full max-w-screen-2xl mx-auto">
           
           <Collapsible className="space-y-4">
@@ -204,6 +239,11 @@ export default function InvoicesPage() {
           </Card>
         </main>
       </div>
+       <SelectMilestoneDialog
+        isOpen={isSelectMilestoneOpen}
+        setIsOpen={setIsSelectMilestoneOpen}
+        onInvoiceRaised={handleInvoiceRaised}
+      />
     </>
   );
 }
