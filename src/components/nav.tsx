@@ -41,7 +41,7 @@ const navItems = [
   { href: "/leads", label: "Leads", icon: UsersIcon },
   { href: "/deals", label: "Opportunities", icon: Briefcase },
   { href: "/contracts", label: "Contracts", icon: FileText },
-  { href: "/companies", label: "Companies", icon: Building2 },
+  { href: "/customers", label: "Customers", icon: Building2 },
   { href: "/contacts", label: "Contacts", icon: Phone },
   { href: "/products", label: "Products & Services", icon: Package },
 ];

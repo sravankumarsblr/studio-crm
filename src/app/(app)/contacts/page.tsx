@@ -4,7 +4,7 @@
 import { useState, useMemo } from "react";
 import { Header } from "@/components/header";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { contacts as initialContacts, companies, type Contact } from "@/lib/data";
+import { contacts as initialContacts, companies as customers, type Contact } from "@/lib/data";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { MoreHorizontal, ListFilter } from "lucide-react";
@@ -25,13 +25,13 @@ export default function ContactsPage() {
 
   const [nameFilter, setNameFilter] = useState("");
   const [emailFilter, setEmailFilter] = useState("");
-  const [companyFilter, setCompanyFilter] = useState("");
+  const [customerFilter, setCustomerFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage] = useState(10);
 
-  const getCompanyName = (companyId: string) => {
-    return companies.find(c => c.id === companyId)?.name || 'N/A';
+  const getCustomerName = (customerId: string) => {
+    return customers.find(c => c.id === customerId)?.name || 'N/A';
   }
 
   const handleStatusChange = (contactId: string, newStatus: boolean) => {
@@ -66,11 +66,11 @@ export default function ContactsPage() {
         const fullName = `${contact.salutation} ${contact.firstName} ${contact.lastName}`;
         if (nameFilter && !fullName.toLowerCase().includes(nameFilter.toLowerCase())) return false;
         if (emailFilter && !contact.email.toLowerCase().includes(emailFilter.toLowerCase())) return false;
-        if (companyFilter && contact.companyId !== companyFilter) return false;
+        if (customerFilter && contact.companyId !== customerFilter) return false;
         if (statusFilter && contact.status !== statusFilter) return false;
         return true;
     });
-  }, [contacts, nameFilter, emailFilter, companyFilter, statusFilter]);
+  }, [contacts, nameFilter, emailFilter, customerFilter, statusFilter]);
 
   const paginatedContacts = useMemo(() => {
     const startIndex = (currentPage - 1) * rowsPerPage;
@@ -82,7 +82,7 @@ export default function ContactsPage() {
   const handleClearFilters = () => {
     setNameFilter('');
     setEmailFilter('');
-    setCompanyFilter('');
+    setCustomerFilter('');
     setStatusFilter('');
     setCurrentPage(1);
   };
@@ -111,10 +111,10 @@ export default function ContactsPage() {
                 <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                   <Input placeholder="Filter by name..." value={nameFilter} onChange={e => setNameFilter(e.target.value)} />
                   <Input placeholder="Filter by email..." value={emailFilter} onChange={e => setEmailFilter(e.target.value)} />
-                  <Select value={companyFilter} onValueChange={setCompanyFilter}>
-                    <SelectTrigger><SelectValue placeholder="Filter by company..." /></SelectTrigger>
+                  <Select value={customerFilter} onValueChange={setCustomerFilter}>
+                    <SelectTrigger><SelectValue placeholder="Filter by customer..." /></SelectTrigger>
                     <SelectContent>
-                      {companies.map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
+                      {customers.map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
                     </SelectContent>
                   </Select>
                   <Select value={statusFilter} onValueChange={setStatusFilter}>
@@ -137,7 +137,7 @@ export default function ContactsPage() {
                     <TableHead className="w-[60px]">Avatar</TableHead>
                     <TableHead>Name</TableHead>
                     <TableHead>Email</TableHead>
-                    <TableHead>Company</TableHead>
+                    <TableHead>Customer</TableHead>
                     <TableHead>Job Title</TableHead>
                     <TableHead>Seniority</TableHead>
                     <TableHead>Status</TableHead>
@@ -155,7 +155,7 @@ export default function ContactsPage() {
                       </TableCell>
                       <TableCell className="font-medium">{contact.salutation} {contact.firstName} {contact.lastName}</TableCell>
                       <TableCell>{contact.email}</TableCell>
-                      <TableCell>{getCompanyName(contact.companyId)}</TableCell>
+                      <TableCell>{getCustomerName(contact.companyId)}</TableCell>
                       <TableCell>{contact.jobTitle}</TableCell>
                       <TableCell>{contact.seniority}</TableCell>
                       <TableCell>
@@ -231,5 +231,3 @@ export default function ContactsPage() {
     </>
   );
 }
-
-    

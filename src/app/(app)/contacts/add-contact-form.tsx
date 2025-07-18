@@ -29,8 +29,8 @@ import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { 
     salutations, 
-    companies as staticCompanies, 
-    type Company, 
+    companies as staticCustomers, 
+    type Company as Customer, 
     departments,
     jobTitles,
     contactNumberTypes,
@@ -42,11 +42,11 @@ import {
     digitalOpennessLevels
 } from "@/lib/data";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { AddCompanyDialog } from "../companies/add-company-dialog";
+import { AddCustomerDialog } from "../customers/add-customer-dialog";
 
 
 const addContactSchema = z.object({
-  companyId: z.string().min(1, "Company is required."),
+  companyId: z.string().min(1, "Customer is required."),
   salutation: z.string().min(1, "Salutation is required.") as z.ZodSchema<'Mr.' | 'Ms.' | 'Mrs.' | 'Dr.'>,
   firstName: z.string().min(1, "First name is required."),
   lastName: z.string().min(1, "Last name is required."),
@@ -74,9 +74,9 @@ export function AddContactForm({
   onCancel: () => void;
   companyId?: string;
 }) {
-  const [companyOpen, setCompanyOpen] = useState(false);
-  const [isAddCompanyOpen, setIsAddCompanyOpen] = useState(false);
-  const [companies, setCompanies] = useState<Company[]>(staticCompanies);
+  const [customerOpen, setCustomerOpen] = useState(false);
+  const [isAddCustomerOpen, setIsAddCustomerOpen] = useState(false);
+  const [customers, setCustomers] = useState<Customer[]>(staticCustomers);
 
   const form = useForm<AddContactFormValues>({
     resolver: zodResolver(addContactSchema),
@@ -91,10 +91,10 @@ export function AddContactForm({
     },
   });
 
-  const handleCompanyCreated = (newCompany: Company) => {
-    setCompanies(prev => [...prev, newCompany]);
-    form.setValue("companyId", newCompany.id, { shouldValidate: true });
-    setCompanyOpen(false);
+  const handleCustomerCreated = (newCustomer: Customer) => {
+    setCustomers(prev => [...prev, newCustomer]);
+    form.setValue("companyId", newCustomer.id, { shouldValidate: true });
+    setCustomerOpen(false);
   };
 
   const onSubmit = (values: AddContactFormValues) => {
@@ -110,28 +110,28 @@ export function AddContactForm({
             name="companyId"
             render={({ field }) => (
               <FormItem className="flex flex-col">
-                <FormLabel>Company</FormLabel>
-                <Popover open={companyOpen} onOpenChange={setCompanyOpen}>
+                <FormLabel>Customer</FormLabel>
+                <Popover open={customerOpen} onOpenChange={setCustomerOpen}>
                   <PopoverTrigger asChild>
                     <FormControl>
                       <Button variant="outline" role="combobox" className={cn("w-full justify-between", !field.value && "text-muted-foreground")} disabled={!!companyId}>
-                        {field.value ? companies.find((c) => c.id === field.value)?.name : "Select company"}
+                        {field.value ? customers.find((c) => c.id === field.value)?.name : "Select customer"}
                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                       </Button>
                     </FormControl>
                   </PopoverTrigger>
                   <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
                     <Command>
-                      <CommandInput placeholder="Search company..." />
+                      <CommandInput placeholder="Search customer..." />
                       <CommandList>
-                        <CommandEmpty>No company found.</CommandEmpty>
+                        <CommandEmpty>No customer found.</CommandEmpty>
                          <CommandGroup>
-                           <CommandItem onSelect={() => { setIsAddCompanyOpen(true); setCompanyOpen(false);}} className="cursor-pointer">
+                           <CommandItem onSelect={() => { setIsAddCustomerOpen(true); setCustomerOpen(false);}} className="cursor-pointer">
                               <PlusCircle className="mr-2 h-4 w-4" />
-                              <span>Add New Company</span>
+                              <span>Add New Customer</span>
                            </CommandItem>
-                          {companies.map((c) => (
-                            <CommandItem value={c.name} key={c.id} onSelect={() => {form.setValue("companyId", c.id, { shouldValidate: true }); setCompanyOpen(false);}}>
+                          {customers.map((c) => (
+                            <CommandItem value={c.name} key={c.id} onSelect={() => {form.setValue("companyId", c.id, { shouldValidate: true }); setCustomerOpen(false);}}>
                               <Check className={cn("mr-2 h-4 w-4", c.id === field.value ? "opacity-100" : "opacity-0")} />
                               {c.name}
                             </CommandItem>
@@ -370,13 +370,11 @@ export function AddContactForm({
           </div>
         </form>
       </Form>
-      <AddCompanyDialog
-        isOpen={isAddCompanyOpen}
-        setIsOpen={setIsAddCompanyOpen}
-        onCompanyCreated={handleCompanyCreated}
+      <AddCustomerDialog
+        isOpen={isAddCustomerOpen}
+        setIsOpen={setIsAddCustomerOpen}
+        onCustomerCreated={handleCustomerCreated}
       />
     </>
   );
 }
-
-    

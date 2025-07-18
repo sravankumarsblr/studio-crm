@@ -437,5 +437,3 @@ export const products: Product[] = [
   { id: 'prod23', name: 'Wet & Dry Thermometer', category: 'Electrical Instruments Calibration Services', price: 1500, status: 'active', range: '-80 to1200 degree C', resolution: '1 C', isNabl: true, location: 'Lab' },
   { id: 'prod24', name: 'Digital Indicator with sensor', category: 'Electrical Instruments Calibration Services', price: 1500, status: 'active', range: '-80 to1200 degree C', resolution: '0.1 C', isNabl: true, location: 'Site' },
 ];
-
-    
