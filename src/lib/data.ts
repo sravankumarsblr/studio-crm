@@ -361,14 +361,17 @@ export const opportunities: Opportunity[] = [
     contactName: 'Vikram Patel', 
     stage: 'Negotiation', 
     status: 'Won',
-    value: 2200000, 
+    value: 2315000, 
     createdDate: '2024-05-20',
     closeDate: '2024-06-15', 
     winProbability: 1,
     source: 'Just Dial',
-    lineItems: [{ productId: 'prod3', quantity: 26 }], 
+    lineItems: [
+        { productId: 'prod3', quantity: 26 },
+        { productId: 'prod21', quantity: 2 }
+    ], 
     quotes: [
-      { id: 'qt4', opportunityId: 'deal3', quoteNumber: 'QT-2024-004', date: '2024-06-01', expiryDate: '2024-07-01', preparedBy: 'Aryan Sharma', status: 'Accepted', poNumber: 'PO-ACPL-1138', poValue: 2200000, poDate: '2024-06-14', poDocumentName: 'PO-ACPL-1138.pdf', poStatus: 'Received', lineItems: [{ productId: 'prod3', quantity: 26, unitPrice: 85000, discount: { type: 'fixed', value: 10000 } }] }
+      { id: 'qt4', opportunityId: 'deal3', quoteNumber: 'QT-2024-004', date: '2024-06-01', expiryDate: '2024-07-01', preparedBy: 'Aryan Sharma', status: 'Accepted', poNumber: 'PO-ACPL-1138', poValue: 2230000, poDate: '2024-06-14', poDocumentName: 'PO-ACPL-1138.pdf', poStatus: 'Received', lineItems: [{ productId: 'prod3', quantity: 26, unitPrice: 85000, discount: { type: 'fixed', value: 10000 } }] }
     ] 
   },
   { 
@@ -416,23 +419,35 @@ export const contracts: Contract[] = [
     poNumber: 'PO-ACPL-1138',
     contractTitle: 'Service Agreement for Accurate Calibration',
     companyName: 'Accurate Calibration Pvt. Ltd.',
-    value: 2200000,
+    value: 2230000,
     startDate: '2024-07-01',
     endDate: '2025-06-30',
     effectiveDate: '2024-07-01',
     status: 'Active',
     type: 'Retainer',
-    scopeOfWork: 'Annual calibration and verification for all torque wrenches at the main facility. Includes two on-site visits and unlimited remote support.',
+    scopeOfWork: 'Annual calibration and verification for all torque wrenches, sound level meters and multimeters at the main facility. Includes two on-site visits and unlimited remote support.',
     documentName: 'Contract_Agreement_ACPL.pdf',
-    lineItems: [{ productId: 'prod3', quantity: 26 }],
+    lineItems: [
+        { productId: 'prod3', quantity: 26 },
+        { productId: 'prod21', quantity: 2 },
+        { productId: 'prod10', quantity: 15 },
+    ],
     paymentCycle: 'Credit 45days',
     paymentMethod: 'Cheque',
     milestones: [
-      { id: 'm1', name: 'Initial On-site Calibration', dueDate: '2024-07-15', status: 'Completed', invoiceStatus: 'Paid', amount: 1100000, assignedToId: 'user3', invoices: [
-        { id: 'inv-1', invoiceNumber: 'INV-2024-001', date: '2024-07-16', amount: 1100000, status: 'Paid', raisedById: 'user2', lineItems: [{ productId: 'prod3', quantity: 13, unitPrice: 84615.38 }] }
-      ], productIds: ['prod3'] },
-      { id: 'm2', name: 'Mid-term Review & Report', dueDate: '2025-01-15', status: 'Pending', invoiceStatus: 'Not Invoiced', amount: 550000, assignedToId: 'user3', invoices: [], productIds: ['prod3'] },
-      { id: 'm3', name: 'Final On-site Calibration', dueDate: '2025-06-15', status: 'Pending', invoiceStatus: 'Not Invoiced', amount: 550000, assignedToId: 'user3', invoices: [], productIds: ['prod3'] }
+      { id: 'm1', name: 'Initial On-site Calibration', dueDate: '2024-07-15', status: 'Completed', invoiceStatus: 'Paid', amount: 1100000, assignedToId: 'user3', 
+        invoices: [
+          { 
+            id: 'inv-1', invoiceNumber: 'INV-2024-001', date: '2024-07-16', amount: 1100000, status: 'Paid', raisedById: 'user2', 
+            lineItems: [
+              { productId: 'prod3', quantity: 13, unitPrice: 84615.38 }
+            ] 
+          }
+        ], 
+        productIds: ['prod3'] 
+      },
+      { id: 'm2', name: 'Mid-term Review & Report', dueDate: '2025-01-15', status: 'Pending', invoiceStatus: 'Not Invoiced', amount: 565000, assignedToId: 'user3', invoices: [], productIds: ['prod3', 'prod10'] },
+      { id: 'm3', name: 'Final On-site Calibration', dueDate: '2025-06-15', status: 'Pending', invoiceStatus: 'Not Invoiced', amount: 565000, assignedToId: 'user3', invoices: [], productIds: ['prod21', 'prod10'] }
     ]
   }
 ];
