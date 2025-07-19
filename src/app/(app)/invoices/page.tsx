@@ -127,7 +127,7 @@ export default function InvoicesPage() {
   return (
     <>
       <div className="flex flex-col h-full w-full">
-        <Header title="Invoices" actionText="Add Invoice" onActionClick={() => setIsSelectMilestoneOpen(true)} />
+        <Header title="Invoices" actionText="Raise Invoice" onActionClick={() => setIsSelectMilestoneOpen(true)} />
         <main className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 w-full max-w-screen-2xl mx-auto">
           
           <Collapsible className="space-y-4">
