@@ -160,8 +160,8 @@ export default function CustomerDetailPage() {
                     </Button>
                     <Image src={customer.logo} alt={customer.name} width={40} height={40} className="rounded-md" data-ai-hint="logo" />
                     <div>
-                        <h1 className="text-2xl font-bold text-foreground font-headline">{customer.name}</h1>
-                        <p className="text-sm text-muted-foreground">{customer.industry}</p>
+                        <p className="text-sm font-semibold text-muted-foreground">Customer 360&deg;</p>
+                        <h1 className="text-2xl font-bold text-foreground font-headline -mt-1">{customer.name}</h1>
                     </div>
                 </div>
                 <Button variant="outline" onClick={() => setIsAddContactOpen(true)}><PlusCircle className="mr-2 h-4 w-4"/> New Contact</Button>
