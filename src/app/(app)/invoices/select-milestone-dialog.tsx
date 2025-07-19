@@ -8,6 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -17,6 +18,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Checkbox } from "@/components/ui/checkbox";
 
 type SelectMilestoneDialogProps = {
   isOpen: boolean;
@@ -29,12 +31,27 @@ export function SelectMilestoneDialog({ isOpen, setIsOpen, onInvoiceRaised }: Se
   const [selectedMilestone, setSelectedMilestone] = useState<Milestone | null>(null);
   const [isRaiseInvoiceOpen, setIsRaiseInvoiceOpen] = useState(false);
   const [contractOpen, setContractOpen] = useState(false);
+  const [stagedMilestones, setStagedMilestones] = useState<Milestone[]>([]);
 
-  const handleSelectMilestone = (milestone: Milestone) => {
-    setSelectedMilestone(milestone);
-    setIsRaiseInvoiceOpen(true);
-    // Don't close this dialog yet, so it re-opens if the raise invoice dialog is cancelled.
+
+  const handleRaiseInvoiceClick = () => {
+    if (stagedMilestones.length === 1) {
+      setSelectedMilestone(stagedMilestones[0]);
+      setIsRaiseInvoiceOpen(true);
+    } else {
+      // Logic for multi-milestone invoice can be expanded here
+      console.log("Multi-milestone invoicing is not yet fully supported.");
+    }
   };
+  
+  const handleToggleStagedMilestone = (milestone: Milestone) => {
+    setStagedMilestones((prev) =>
+      prev.some(m => m.id === milestone.id)
+        ? prev.filter((m) => m.id !== milestone.id)
+        : [...prev, milestone]
+    );
+  };
+
 
   const handleInvoiceRaisedAndClose = (milestoneId: string, newInvoice: Omit<Invoice, 'id' | 'raisedById'>) => {
     if (selectedContract) {
@@ -44,6 +61,7 @@ export function SelectMilestoneDialog({ isOpen, setIsOpen, onInvoiceRaised }: Se
     setIsRaiseInvoiceOpen(false);
     setSelectedMilestone(null);
     setSelectedContract(null);
+    setStagedMilestones([]);
     setIsOpen(false);
   };
   
@@ -51,6 +69,7 @@ export function SelectMilestoneDialog({ isOpen, setIsOpen, onInvoiceRaised }: Se
     if (!open) {
         setSelectedContract(null);
         setSelectedMilestone(null);
+        setStagedMilestones([]);
     }
     setIsOpen(open);
   }
@@ -62,11 +81,11 @@ export function SelectMilestoneDialog({ isOpen, setIsOpen, onInvoiceRaised }: Se
   return (
     <>
       <Dialog open={isOpen} onOpenChange={handleDialogClose}>
-        <DialogContent className="sm:max-w-2xl">
+        <DialogContent className="sm:max-w-3xl">
           <DialogHeader>
-            <DialogTitle>Select a Milestone to Invoice</DialogTitle>
+            <DialogTitle>Select Milestone(s) to Invoice</DialogTitle>
             <DialogDescription>
-              Choose a contract, then select an invoiceable milestone.
+              Choose a contract, then select one or more invoiceable milestones.
             </DialogDescription>
           </DialogHeader>
           <div className="py-4 space-y-4">
@@ -89,6 +108,7 @@ export function SelectMilestoneDialog({ isOpen, setIsOpen, onInvoiceRaised }: Se
                             key={contract.id}
                             onSelect={() => {
                                 setSelectedContract(contract);
+                                setStagedMilestones([]);
                                 setContractOpen(false);
                             }}
                             >
@@ -106,34 +126,49 @@ export function SelectMilestoneDialog({ isOpen, setIsOpen, onInvoiceRaised }: Se
                 <Table>
                     <TableHeader>
                         <TableRow>
+                            <TableHead className="w-[50px]"></TableHead>
                             <TableHead>Milestone</TableHead>
                             <TableHead>Amount</TableHead>
-                            <TableHead>Invoice Status</TableHead>
-                            <TableHead></TableHead>
+                            <TableHead>Invoiced</TableHead>
+                            <TableHead>Balance</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {invoiceableMilestones.length === 0 && (
                             <TableRow>
-                                <TableCell colSpan={4} className="h-24 text-center">
+                                <TableCell colSpan={5} className="h-24 text-center">
                                     {selectedContract ? "No invoiceable milestones." : "Please select a contract."}
                                 </TableCell>
                             </TableRow>
                         )}
-                        {invoiceableMilestones.map(milestone => (
+                        {invoiceableMilestones.map(milestone => {
+                          const invoicedAmount = milestone.invoices.reduce((sum, inv) => sum + inv.amount, 0);
+                          const balanceAmount = milestone.amount - invoicedAmount;
+                          return (
                             <TableRow key={milestone.id}>
+                                <TableCell>
+                                    <Checkbox
+                                        checked={stagedMilestones.some(m => m.id === milestone.id)}
+                                        onCheckedChange={() => handleToggleStagedMilestone(milestone)}
+                                    />
+                                </TableCell>
                                 <TableCell className="font-medium">{milestone.name}</TableCell>
                                 <TableCell>₹{milestone.amount.toLocaleString('en-IN')}</TableCell>
-                                <TableCell>{milestone.invoiceStatus}</TableCell>
-                                <TableCell className="text-right">
-                                    <Button size="sm" onClick={() => handleSelectMilestone(milestone)}>Select</Button>
-                                </TableCell>
+                                <TableCell>₹{invoicedAmount.toLocaleString('en-IN')}</TableCell>
+                                <TableCell>₹{balanceAmount.toLocaleString('en-IN')}</TableCell>
                             </TableRow>
-                        ))}
+                          );
+                        })}
                     </TableBody>
                 </Table>
             </div>
           </div>
+           <DialogFooter>
+            <Button variant="outline" onClick={() => handleDialogClose(false)}>Cancel</Button>
+            <Button onClick={handleRaiseInvoiceClick} disabled={stagedMilestones.length === 0 || stagedMilestones.length > 1}>
+              Raise Invoice for Selected
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 
