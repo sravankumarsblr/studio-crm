@@ -124,6 +124,11 @@ export default function ContractDetailPage() {
     return { ...item, product };
   });
 
+  const totalInvoiced = contract.milestones.reduce((total, milestone) => {
+    return total + milestone.invoices.reduce((sum, inv) => sum + inv.amount, 0);
+  }, 0);
+  const balanceAmount = contract.value - totalInvoiced;
+
   return (
     <>
       <div className="flex flex-col h-full">
@@ -181,6 +186,14 @@ export default function ContractDetailPage() {
                         <div className="space-y-1">
                             <p className="text-muted-foreground">Status</p>
                             <Badge variant={contractStatusVariant[contract.status]} className="text-base">{contract.status}</Badge>
+                        </div>
+                         <div className="space-y-1">
+                            <p className="text-muted-foreground">Total Invoiced</p>
+                            <p className="font-medium text-base">₹{totalInvoiced.toLocaleString('en-IN')}</p>
+                        </div>
+                         <div className="space-y-1">
+                            <p className="text-muted-foreground">Balance</p>
+                            <p className="font-medium text-base">₹{balanceAmount.toLocaleString('en-IN')}</p>
                         </div>
                         <div className="space-y-1 col-span-2">
                             <p className="text-muted-foreground">Contract Period</p>
