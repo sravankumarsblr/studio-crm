@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { products, type Product } from "@/lib/data";
+import { products } from "@/lib/data";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 
@@ -69,10 +69,6 @@ export function ProductSelectorDialog({
     setIsOpen(false);
   };
 
-  const getProductPrice = (product: Product) => {
-    return product.nablPrice ?? product.nonNablPrice ?? 0;
-  }
-
   return (
     <Dialog open={isOpen} onOpenChange={(open) => {
       if (!open) {
@@ -82,7 +78,7 @@ export function ProductSelectorDialog({
       }
       setIsOpen(open);
     }}>
-      <DialogContent className="sm:max-w-4xl h-[80vh] flex flex-col">
+      <DialogContent className="sm:max-w-5xl h-[80vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>Add Products</DialogTitle>
           <DialogDescription>
@@ -91,7 +87,7 @@ export function ProductSelectorDialog({
         </DialogHeader>
         <div className="grid grid-cols-4 gap-6 flex-1 overflow-hidden">
           <div className="col-span-1 border-r pr-4 overflow-y-auto">
-            <h4 className="text-sm font-medium mb-2">Categories</h4>
+            <h4 className="text-sm font-medium mb-2">Level - 1</h4>
             <RadioGroup value={selectedCategory} onValueChange={setSelectedCategory} className="space-y-1">
               {productCategories.map(category => (
                 <div key={category} className="flex items-center">
@@ -114,7 +110,8 @@ export function ProductSelectorDialog({
                     <TableHead className="w-[50px]"></TableHead>
                     <TableHead>Product</TableHead>
                     <TableHead>Category</TableHead>
-                    <TableHead className="text-right">Price</TableHead>
+                    <TableHead className="text-right">NABL Price</TableHead>
+                    <TableHead className="text-right">Non-NABL Price</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -128,7 +125,12 @@ export function ProductSelectorDialog({
                       </TableCell>
                       <TableCell className="font-medium">{product.name}</TableCell>
                       <TableCell>{product.category}</TableCell>
-                      <TableCell className="text-right">₹{getProductPrice(product).toLocaleString('en-IN')}</TableCell>
+                      <TableCell className="text-right">
+                        {product.nablPrice != null ? `₹${product.nablPrice.toLocaleString('en-IN')}` : '-'}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        {product.nonNablPrice != null ? `₹${product.nonNablPrice.toLocaleString('en-IN')}` : '-'}
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
