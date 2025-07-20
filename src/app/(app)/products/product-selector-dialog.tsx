@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { products } from "@/lib/data";
+import { products, type Product } from "@/lib/data";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 
@@ -69,6 +69,10 @@ export function ProductSelectorDialog({
     setIsOpen(false);
   };
 
+  const getProductPrice = (product: Product) => {
+    return product.nablPrice ?? product.nonNablPrice ?? 0;
+  }
+
   return (
     <Dialog open={isOpen} onOpenChange={(open) => {
       if (!open) {
@@ -124,7 +128,7 @@ export function ProductSelectorDialog({
                       </TableCell>
                       <TableCell className="font-medium">{product.name}</TableCell>
                       <TableCell>{product.category}</TableCell>
-                      <TableCell className="text-right">₹{product.price.toLocaleString('en-IN')}</TableCell>
+                      <TableCell className="text-right">₹{getProductPrice(product).toLocaleString('en-IN')}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
