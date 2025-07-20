@@ -69,7 +69,10 @@ export function EditMilestoneForm({ onSave, onCancel, contract, milestone, exist
     onSave(values);
   };
   
-  const contractProducts = contract.lineItems.map(item => products.find(p => p.id === item.productId)).filter(Boolean);
+  const contractLineItemsWithDetails = contract.lineItems.map(item => ({
+    ...item,
+    product: products.find(p => p.id === item.productId),
+  })).filter(item => item.product);
 
   return (
     <Form {...form}>
@@ -134,26 +137,26 @@ export function EditMilestoneForm({ onSave, onCancel, contract, milestone, exist
               </div>
               <ScrollArea className="h-40 w-full rounded-md border">
                 <div className="p-4 space-y-2">
-                {contractProducts.map((product) => (
+                {contractLineItemsWithDetails.map((item) => (
                   <FormField
-                    key={product!.id}
+                    key={item.productId}
                     control={form.control}
                     name="productIds"
                     render={({ field }) => {
                       return (
                         <FormItem
-                          key={product!.id}
+                          key={item.productId}
                           className="flex flex-row items-start space-x-3 space-y-0"
                         >
                           <FormControl>
                             <Checkbox
-                              checked={field.value?.includes(product!.id)}
+                              checked={field.value?.includes(item.productId)}
                               onCheckedChange={(checked) => {
                                 return checked
-                                  ? field.onChange([...field.value, product!.id])
+                                  ? field.onChange([...field.value, item.productId])
                                   : field.onChange(
                                       field.value?.filter(
-                                        (value) => value !== product!.id
+                                        (value) => value !== item.productId
                                       )
                                     )
                               }}
@@ -161,8 +164,8 @@ export function EditMilestoneForm({ onSave, onCancel, contract, milestone, exist
                           </FormControl>
                           <FormLabel className="font-normal w-full">
                             <div className="flex justify-between">
-                              <span>{product!.name}</span>
-                              <span className="text-muted-foreground">₹{product!.price.toLocaleString('en-IN')}</span>
+                              <span>{item.product!.name}</span>
+                              <span className="text-muted-foreground">₹{item.price.toLocaleString('en-IN')}</span>
                             </div>
                           </FormLabel>
                         </FormItem>
