@@ -31,7 +31,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Switch } from "@/components/ui/switch";
-import { leadSources, companies as staticCustomers, contacts as initialContacts, products, users, Company as Customer, Contact } from "@/lib/data";
+import { leadSources, companies as staticCustomers, contacts as initialContacts, products, users, Company as Customer, Contact, priceTypes, PriceType, LineItem } from "@/lib/data";
 import {
   Select,
   SelectContent,
@@ -59,6 +59,8 @@ const addLeadSchema = z.object({
   lineItems: z.array(z.object({
     productId: z.string().min(1),
     quantity: z.coerce.number().int().min(1, "Qty must be at least 1."),
+    priceType: z.enum(priceTypes),
+    price: z.coerce.number().min(0, "Price must be a positive number."),
   })).min(1, "Please add at least one product."),
   convertToOpportunity: z.boolean().default(false),
 }).refine(
@@ -110,7 +112,7 @@ export function AddLeadForm({
     },
   });
 
-  const { fields, append, remove } = useFieldArray({
+  const { fields, append, remove, update } = useFieldArray({
     control: form.control,
     name: "lineItems"
   });
@@ -121,8 +123,7 @@ export function AddLeadForm({
 
   useEffect(() => {
     const newTotal = lineItems.reduce((acc, item) => {
-        const product = products.find(p => p.id === item.productId);
-        return acc + (product ? product.price * item.quantity : 0);
+        return acc + (item.price * item.quantity);
     }, 0);
     setTotalValue(newTotal);
   }, [lineItems]);
@@ -178,7 +179,19 @@ export function AddLeadForm({
     
     const productsToAdd = newProductIds
       .filter(id => !fieldProductIds.includes(id))
-      .map(id => ({ productId: id, quantity: 1 }));
+      .map(id => {
+        const product = products.find(p => p.id === id);
+        // Default to NABL price if available, otherwise non-NABL, otherwise 0
+        const defaultPrice = product?.nablPrice ?? product?.nonNablPrice ?? 0;
+        const defaultPriceType: PriceType = product?.nablPrice ? 'NABL' : 'Non-NABL';
+        
+        return { 
+          productId: id, 
+          quantity: 1,
+          priceType: defaultPriceType,
+          price: defaultPrice,
+        };
+      });
     
     if (productsToAdd.length > 0) {
       append(productsToAdd);
@@ -192,6 +205,25 @@ export function AddLeadForm({
       indicesToRemove.sort((a, b) => b - a).forEach(index => remove(index));
     }
   };
+
+  const handlePriceTypeChange = (index: number, newPriceType: PriceType) => {
+    const product = products.find(p => p.id === lineItems[index].productId);
+    if (!product) return;
+    
+    let newPrice = 0;
+    if (newPriceType === 'NABL' && product.nablPrice) {
+        newPrice = product.nablPrice;
+    } else if (newPriceType === 'Non-NABL' && product.nonNablPrice) {
+        newPrice = product.nonNablPrice;
+    }
+
+    update(index, {
+        ...lineItems[index],
+        priceType: newPriceType,
+        price: newPrice
+    });
+  };
+
 
   const onSubmit = (values: AddLeadFormValues) => {
     onSave(values);
@@ -481,8 +513,8 @@ export function AddLeadForm({
                             <TableHeader>
                                 <TableRow>
                                     <TableHead>Product</TableHead>
-                                    <TableHead className="w-[100px]">Quantity</TableHead>
-                                    <TableHead className="w-[120px] text-right">Unit Price</TableHead>
+                                    <TableHead className="w-[100px]">Qty</TableHead>
+                                    <TableHead className="w-[220px]">Price Type</TableHead>
                                     <TableHead className="w-[120px] text-right">Total</TableHead>
                                     <TableHead className="w-[50px]"></TableHead>
                                 </TableRow>
@@ -497,22 +529,47 @@ export function AddLeadForm({
                                 )}
                                 {fields.map((field, index) => {
                                     const product = products.find(p => p.id === field.productId);
-                                    const price = product?.price ?? 0;
-                                    const total = price * field.quantity;
+                                    const total = field.price * field.quantity;
+                                    const isThirdParty = field.priceType.startsWith('Third Party');
                                     return (
                                         <TableRow key={field.id}>
-                                            <TableCell className="font-medium">{product?.name}</TableCell>
-                                            <TableCell>
+                                            <TableCell className="font-medium align-top pt-4">{product?.name}</TableCell>
+                                            <TableCell className="align-top pt-2">
                                                 <Input
                                                     type="number"
                                                     min="1"
                                                     {...form.register(`lineItems.${index}.quantity`)}
-                                                    className="h-8"
+                                                    className="h-9"
                                                 />
                                             </TableCell>
-                                            <TableCell className="text-right">₹{price.toLocaleString('en-IN')}</TableCell>
-                                            <TableCell className="text-right">₹{total.toLocaleString('en-IN')}</TableCell>
-                                            <TableCell>
+                                            <TableCell className="align-top pt-2">
+                                               <div className="flex items-start gap-2">
+                                                    <Select 
+                                                        value={field.priceType} 
+                                                        onValueChange={(value: PriceType) => handlePriceTypeChange(index, value)}
+                                                    >
+                                                        <SelectTrigger className="h-9">
+                                                            <SelectValue />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            {product?.nablPrice != null && <SelectItem value="NABL">NABL (₹{product.nablPrice})</SelectItem>}
+                                                            {product?.nonNablPrice != null && <SelectItem value="Non-NABL">Non-NABL (₹{product.nonNablPrice})</SelectItem>}
+                                                            <SelectItem value="Third Party NABL">Third Party NABL</SelectItem>
+                                                            <SelectItem value="Third Party Non-NABL">Third Party Non-NABL</SelectItem>
+                                                        </SelectContent>
+                                                    </Select>
+                                                    {isThirdParty && (
+                                                        <Input
+                                                            type="number"
+                                                            placeholder="Price"
+                                                            {...form.register(`lineItems.${index}.price`)}
+                                                            className="h-9 w-28"
+                                                        />
+                                                    )}
+                                               </div>
+                                            </TableCell>
+                                            <TableCell className="text-right align-top pt-4">₹{total.toLocaleString('en-IN')}</TableCell>
+                                            <TableCell className="align-top pt-2">
                                                 <Button variant="ghost" size="icon" onClick={() => remove(index)}>
                                                     <Trash2 className="h-4 w-4 text-destructive"/>
                                                 </Button>
