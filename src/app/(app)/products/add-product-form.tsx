@@ -44,12 +44,8 @@ const addProductSchema = z.object({
   nablRange: z.string().optional(),
   nonNablRange: z.string().optional(),
   masterRange: z.string().optional(),
-  thirdPartyNablRange: z.string().optional(),
-  thirdPartyNonNablRange: z.string().optional(),
   nablPrice: z.coerce.number().optional(),
   nonNablPrice: z.coerce.number().optional(),
-  thirdPartyNablPrice: z.coerce.number().optional(),
-  thirdPartyNonNablPrice: z.coerce.number().optional(),
 });
 
 export type AddProductFormValues = z.infer<typeof addProductSchema>;
@@ -244,38 +240,6 @@ export function AddProductForm({
               name="masterRange"
               render={({ field }) => (
                   <FormItem><FormLabel>Master Range</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
-              )}
-            />
-        </div>
-        <Separator />
-        <h4 className="font-medium text-sm">Third Party Pricing & Range</h4>
-         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-             <FormField
-              control={form.control}
-              name="thirdPartyNablRange"
-              render={({ field }) => (
-                  <FormItem><FormLabel>Third Party NABL Range</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
-              )}
-            />
-             <FormField
-              control={form.control}
-              name="thirdPartyNablPrice"
-              render={({ field }) => (
-                  <FormItem><FormLabel>Third Party NABL Price (INR)</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>
-              )}
-            />
-             <FormField
-              control={form.control}
-              name="thirdPartyNonNablRange"
-              render={({ field }) => (
-                  <FormItem><FormLabel>Third Party Non-NABL Range</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
-              )}
-            />
-             <FormField
-              control={form.control}
-              name="thirdPartyNonNablPrice"
-              render={({ field }) => (
-                  <FormItem><FormLabel>Third Party Non-NABL Price (INR)</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>
               )}
             />
         </div>

@@ -211,12 +211,8 @@ export type Product = {
   nablRange?: string;
   nonNablRange?: string;
   masterRange?: string;
-  thirdPartyNablRange?: string;
-  thirdPartyNonNablRange?: string;
   nablPrice?: number;
   nonNablPrice?: number;
-  thirdPartyNablPrice?: number;
-  thirdPartyNonNablPrice?: number;
 };
 
 export const departments = [
@@ -461,7 +457,7 @@ export const contracts: Contract[] = [
 ];
 
 export const products: Product[] = [
-  { id: 'prod1', name: 'Pressure Sensor XL-100', category: 'Sensors', status: 'active', isNabl: true, location: 'Both', nablPrice: 49900 },
+  { id: 'prod1', name: 'Pressure Sensor XL-100', category: 'Sensors', status: 'active', isNabl: true, location: 'Site & Lab', nablPrice: 49900 },
   { id: 'prod2', name: 'Precision Medical Scale MS-2', category: 'Scales', status: 'active', isNabl: true, location: 'Lab', nablPrice: 129900 },
   { id: 'prod3', name: 'Digital Torque Wrench TW-30', category: 'Tools', status: 'inactive', isNabl: false, location: 'Site', nonNablPrice: 85000 },
   { id: 'prod4', name: 'Automated Digital Pipette P-4A', category: 'Lab Equipment', status: 'active', isNabl: true, location: 'Lab', nablPrice: 60000 },
@@ -474,14 +470,14 @@ export const products: Product[] = [
   { id: 'prod11', name: 'High Voltage Probe Calibration', category: 'Electrical Instruments Calibration Services', status: 'active', isNabl: true, location: 'Lab', nablPrice: 12000 },
   { id: 'prod12', name: 'Vernier Caliper & Micrometer Calibration', category: 'Dimensional Calibration Services', status: 'active', isNabl: true, location: 'Lab', nablPrice: 6000 },
   { id: 'prod13', name: 'Gauge Block Calibration (NABL)', category: 'Dimensional Calibration Services', status: 'active', isNabl: true, location: 'Lab', nablPrice: 20000 },
-  { id: 'prod14', name: 'Digital Pressure Gauge Calibration', category: 'Pressure Gauge and Vacuum Gauges Calibration Services', status: 'active', isNabl: true, location: 'Both', nablPrice: 9000 },
+  { id: 'prod14', name: 'Digital Pressure Gauge Calibration', category: 'Pressure Gauge and Vacuum Gauges Calibration Services', status: 'active', isNabl: true, location: 'Site & Lab', nablPrice: 9000 },
   { id: 'prod15', name: 'Analog Vacuum Gauge Testing', category: 'Pressure Gauge and Vacuum Gauges Calibration Services', status: 'active', isNabl: false, location: 'Lab', nonNablPrice: 7000 },
   { id: 'prod16', name: 'Medical Autoclave Temperature Mapping', category: 'Autoclave Calibration Services', status: 'active', isNabl: true, location: 'Site', nablPrice: 30000 },
   { id: 'prod17', name: 'Pharmaceutical Autoclave Validation', category: 'Autoclave Calibration Services', status: 'active', isNabl: true, location: 'Site', nablPrice: 45000 },
   { id: 'prod18', name: 'Liquid Flow Meter Calibration (On-site)', category: 'Flow Meter Calibration Services', status: 'active', isNabl: true, location: 'Site', nablPrice: 50000 },
   { id: 'prod19', name: 'Gas Flow Meter Calibration (Lab)', category: 'Flow Meter Calibration Services', status: 'active', isNabl: true, location: 'Lab', nablPrice: 65000 },
   { id: 'prod20', name: 'Digital Tachometer Calibration', category: 'Tachometer & Sound Level Meter Calibration Services', status: 'active', isNabl: true, location: 'Lab', nablPrice: 8000 },
-  { id: 'prod21', name: 'Sound Level Meter Accuracy Test', category: 'Tachometer & Sound Level Meter Calibration Services', status: 'active', isNabl: true, location: 'Both', nablPrice: 10000, nonNablPrice: 8000 },
+  { id: 'prod21', name: 'Sound Level Meter Accuracy Test', category: 'Tachometer & Sound Level Meter Calibration Services', status: 'active', isNabl: true, location: 'Site & Lab', nablPrice: 10000, nonNablPrice: 8000 },
   { id: 'prod22', name: 'Glass Thermometer', category: 'Electrical Instruments Calibration Services', status: 'active', nablRange: '-80 to 250 degree C', isNabl: true, location: 'Lab', nablPrice: 1500 },
   { id: 'prod23', name: 'Wet & Dry Thermometer', category: 'Electrical Instruments Calibration Services', status: 'active', nablRange: '-80 to1200 degree C', isNabl: true, location: 'Lab', nablPrice: 1500 },
   { id: 'prod24', name: 'Digital Indicator with sensor', category: 'Electrical Instruments Calibration Services', status: 'active', nablRange: '-80 to1200 degree C', isNabl: true, location: 'Site & Lab', nablPrice: 1500 },
