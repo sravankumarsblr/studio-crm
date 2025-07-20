@@ -29,14 +29,14 @@ export function EditProductDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="sm:max-w-3xl">
+      <DialogContent className="sm:max-w-3xl max-h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>Edit Product</DialogTitle>
           <DialogDescription>
             Update the details for "{product.name}".
           </DialogDescription>
         </DialogHeader>
-        <div className="py-4">
+        <div className="flex-1 overflow-y-auto -mr-6 pr-6 py-4">
           <EditProductForm
             product={product}
             onSave={handleSave}
