@@ -64,6 +64,7 @@ export default function ProductsPage() {
 
   const handleProductUpdated = (updatedProduct: Product) => {
     setProducts(products.map(p => p.id === updatedProduct.id ? updatedProduct : p));
+    setSelectedProduct(null);
   };
 
   const handleEditClick = (product: Product) => {
@@ -140,12 +141,11 @@ export default function ProductsPage() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Product Name</TableHead>
-                    <TableHead>Category</TableHead>
-                    <TableHead>Range</TableHead>
-                    <TableHead>Resolution</TableHead>
-                    <TableHead>NABL</TableHead>
+                    <TableHead>Level - 1</TableHead>
                     <TableHead>Location</TableHead>
-                    <TableHead>Price (INR)</TableHead>
+                    <TableHead>NABL</TableHead>
+                    <TableHead>NABL Price</TableHead>
+                    <TableHead>Non-NABL Price</TableHead>
                     <TableHead className="w-[120px]">Status</TableHead>
                     <TableHead className="text-right w-[100px]">Actions</TableHead>
                   </TableRow>
@@ -155,15 +155,14 @@ export default function ProductsPage() {
                     <TableRow key={product.id}>
                       <TableCell className="font-medium">{product.name}</TableCell>
                       <TableCell>{product.category}</TableCell>
-                      <TableCell>{product.range || '-'}</TableCell>
-                      <TableCell>{product.resolution || '-'}</TableCell>
+                      <TableCell>{product.location}</TableCell>
                       <TableCell>
                         <Badge variant={product.isNabl ? "default" : "secondary"}>
                           {product.isNabl ? 'Yes' : 'No'}
                         </Badge>
                       </TableCell>
-                      <TableCell>{product.location}</TableCell>
-                      <TableCell>₹{product.price.toLocaleString('en-IN')}</TableCell>
+                      <TableCell>₹{product.nablPrice?.toLocaleString('en-IN') ?? '-'}</TableCell>
+                      <TableCell>₹{product.nonNablPrice?.toLocaleString('en-IN') ?? '-'}</TableCell>
                       <TableCell>
                         <Switch
                           id={`status-${product.id}`}
@@ -189,7 +188,7 @@ export default function ProductsPage() {
                     </TableRow>
                   )) : (
                      <TableRow>
-                        <TableCell colSpan={9} className="h-24 text-center">
+                        <TableCell colSpan={8} className="h-24 text-center">
                           No results found.
                         </TableCell>
                       </TableRow>
@@ -243,5 +242,3 @@ export default function ProductsPage() {
     </>
   );
 }
-
-    

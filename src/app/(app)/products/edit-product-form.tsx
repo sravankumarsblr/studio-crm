@@ -35,18 +35,23 @@ import {
 import type { Product } from "@/lib/data";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-
+import { Separator } from "@/components/ui/separator";
 
 const editProductSchema = z.object({
   name: z.string().min(1, "Product name is required."),
-  category: z.string().min(1, "Category is required."),
-  price: z.coerce.number().min(0, "Price must be a positive number."),
-  range: z.string().optional(),
-  resolution: z.string().optional(),
+  category: z.string().min(1, "Level - 1 is required."),
   isNabl: z.boolean().default(false),
-  location: z.enum(['Lab', 'Site', 'Both']),
+  location: z.enum(['Lab', 'Site', 'Site & Lab']),
+  nablRange: z.string().optional(),
+  nonNablRange: z.string().optional(),
+  masterRange: z.string().optional(),
+  thirdPartyNablRange: z.string().optional(),
+  thirdPartyNonNablRange: z.string().optional(),
+  nablPrice: z.coerce.number().optional(),
+  nonNablPrice: z.coerce.number().optional(),
+  thirdPartyNablPrice: z.coerce.number().optional(),
+  thirdPartyNonNablPrice: z.coerce.number().optional(),
 });
-
 
 export type EditProductFormValues = z.infer<typeof editProductSchema>;
 
@@ -80,11 +85,17 @@ export function EditProductForm({
     defaultValues: {
       name: product.name,
       category: product.category,
-      price: product.price,
-      range: product.range || "",
-      resolution: product.resolution || "",
+      nablPrice: product.nablPrice,
       isNabl: product.isNabl,
       location: product.location,
+      nonNablRange: product.nonNablRange,
+      nonNablPrice: product.nonNablPrice,
+      masterRange: product.masterRange,
+      nablRange: product.nablRange,
+      thirdPartyNablRange: product.thirdPartyNablRange,
+      thirdPartyNablPrice: product.thirdPartyNablPrice,
+      thirdPartyNonNablRange: product.thirdPartyNonNablRange,
+      thirdPartyNonNablPrice: product.thirdPartyNonNablPrice,
     },
   });
 
@@ -100,7 +111,7 @@ export function EditProductForm({
           name="category"
           render={({ field }) => (
             <FormItem className="flex flex-col">
-              <FormLabel>Category</FormLabel>
+              <FormLabel>Level - 1</FormLabel>
               <Popover open={categoryOpen} onOpenChange={setCategoryOpen}>
                 <PopoverTrigger asChild>
                   <FormControl>
@@ -112,18 +123,14 @@ export function EditProductForm({
                         !field.value && "text-muted-foreground"
                       )}
                     >
-                      {field.value
-                        ? productCategories.find(
-                            (category) => category === field.value
-                          )
-                        : "Select a category"}
+                      {field.value || "Select a level - 1"}
                       <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                     </Button>
                   </FormControl>
                 </PopoverTrigger>
                 <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
                   <Command>
-                    <CommandInput placeholder="Search category..." />
+                    <CommandInput placeholder="Search..." />
                     <CommandList className="max-h-52">
                       <CommandEmpty>No category found.</CommandEmpty>
                       <CommandGroup>
@@ -171,34 +178,6 @@ export function EditProductForm({
         />
         <div className="grid grid-cols-2 gap-4">
             <FormField
-            control={form.control}
-            name="range"
-            render={({ field }) => (
-                <FormItem>
-                <FormLabel>Range</FormLabel>
-                <FormControl>
-                    <Input placeholder="e.g., -80 to 250 C" {...field} />
-                </FormControl>
-                <FormMessage />
-                </FormItem>
-            )}
-            />
-            <FormField
-            control={form.control}
-            name="resolution"
-            render={({ field }) => (
-                <FormItem>
-                <FormLabel>Resolution</FormLabel>
-                <FormControl>
-                    <Input placeholder="e.g., 0.1 C" {...field} />
-                </FormControl>
-                <FormMessage />
-                </FormItem>
-            )}
-            />
-        </div>
-         <div className="grid grid-cols-2 gap-4">
-            <FormField
               control={form.control}
               name="location"
               render={({ field }) => (
@@ -213,47 +192,101 @@ export function EditProductForm({
                     <SelectContent>
                       <SelectItem value="Lab">Lab</SelectItem>
                       <SelectItem value="Site">Site</SelectItem>
-                      <SelectItem value="Both">Both</SelectItem>
+                      <SelectItem value="Site & Lab">Site & Lab</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
                 </FormItem>
               )}
             />
-             <FormField
+            <FormField
                 control={form.control}
-                name="price"
+                name="isNabl"
                 render={({ field }) => (
-                    <FormItem>
-                    <FormLabel>Price (INR)</FormLabel>
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm h-full">
+                    <div className="space-y-0.5">
+                      <FormLabel>NABL Accredited</FormLabel>
+                    </div>
                     <FormControl>
-                        <Input type="number" placeholder="e.g., 499" {...field} />
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
                     </FormControl>
-                    <FormMessage />
-                    </FormItem>
+                  </FormItem>
                 )}
+              />
+        </div>
+        <Separator/>
+         <div className="grid grid-cols-2 gap-4">
+            <FormField
+              control={form.control}
+              name="nablRange"
+              render={({ field }) => (
+                  <FormItem><FormLabel>NABL Range</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="nablPrice"
+              render={({ field }) => (
+                  <FormItem><FormLabel>NABL Price (INR)</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="nonNablRange"
+              render={({ field }) => (
+                  <FormItem><FormLabel>Non-NABL Range</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="nonNablPrice"
+              render={({ field }) => (
+                  <FormItem><FormLabel>Non-NABL Price (INR)</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>
+              )}
+            />
+             <FormField
+              control={form.control}
+              name="masterRange"
+              render={({ field }) => (
+                  <FormItem><FormLabel>Master Range</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
+              )}
             />
         </div>
-        <FormField
-            control={form.control}
-            name="isNabl"
-            render={({ field }) => (
-              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-                <div className="space-y-0.5">
-                  <FormLabel>NABL Accredited</FormLabel>
-                  <FormDescription>
-                    Is this service NABL accredited?
-                  </FormDescription>
-                </div>
-                <FormControl>
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
-                </FormControl>
-              </FormItem>
-            )}
-          />
+        <Separator />
+        <h4 className="font-medium text-sm">Third Party</h4>
+         <div className="grid grid-cols-2 gap-4">
+             <FormField
+              control={form.control}
+              name="thirdPartyNablRange"
+              render={({ field }) => (
+                  <FormItem><FormLabel>Third Party NABL Range</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
+              )}
+            />
+             <FormField
+              control={form.control}
+              name="thirdPartyNablPrice"
+              render={({ field }) => (
+                  <FormItem><FormLabel>Third Party NABL Price (INR)</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>
+              )}
+            />
+             <FormField
+              control={form.control}
+              name="thirdPartyNonNablRange"
+              render={({ field }) => (
+                  <FormItem><FormLabel>Third Party Non-NABL Range</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
+              )}
+            />
+             <FormField
+              control={form.control}
+              name="thirdPartyNonNablPrice"
+              render={({ field }) => (
+                  <FormItem><FormLabel>Third Party Non-NABL Price (INR)</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>
+              )}
+            />
+        </div>
         <div className="flex justify-end gap-2 pt-4">
           <Button type="button" variant="outline" onClick={onCancel}>
             Cancel
@@ -264,5 +297,3 @@ export function EditProductForm({
     </Form>
   );
 }
-
-    
