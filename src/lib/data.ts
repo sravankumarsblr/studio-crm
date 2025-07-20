@@ -101,7 +101,7 @@ export type Contact = {
   opennessToDigital?: typeof digitalOpennessLevels[number];
 };
 
-export const priceTypes = ['NABL', 'Non-NABL', 'Third Party NABL', 'Third Party Non-NABL'] as const;
+export const priceTypes = ['N/A', 'NABL', 'Non-NABL', 'Third Party NABL', 'Third Party Non-NABL'] as const;
 export type PriceType = typeof priceTypes[number];
 
 export type LineItem = {
@@ -467,7 +467,7 @@ export const products: Product[] = [
   { id: 'prod2', name: 'Precision Medical Scale MS-2', category: 'Scales', status: 'active', isNabl: true, location: 'Lab', resolution: '0.1 g', nablPrice: 129900 },
   { id: 'prod3', name: 'Digital Torque Wrench TW-30', category: 'Tools', status: 'inactive', isNabl: false, location: 'Site', resolution: '0.5 Nm', nonNablPrice: 85000 },
   { id: 'prod4', name: 'Automated Digital Pipette P-4A', category: 'Lab Equipment', status: 'active', isNabl: true, location: 'Lab', resolution: '0.01 µL', nablPrice: 60000 },
-  { id: 'prod5', name: 'CalTrack Software Suite', category: 'Tools', status: 'active', isNabl: false, location: 'Site & Lab', nonNablPrice: 250000 },
+  { id: 'prod5', name: 'CalTrack Software Suite', category: 'Tools', status: 'active', isNabl: false, location: 'Site & Lab', resolution: 'N/A', nonNablPrice: 250000 },
   { id: 'prod6', name: 'On-site Industrial Scale Calibration', category: 'Weighing Machine Calibration Services', status: 'active', isNabl: true, location: 'Site', resolution: '1 kg', nablPrice: 15000, nonNablPrice: 12000 },
   { id: 'prod7', name: 'Retail Weighing Scale Certification', category: 'Weighing Machine Calibration Services', status: 'active', isNabl: false, location: 'Site', resolution: '5 g', nonNablPrice: 5000 },
   { id: 'prod8', name: 'E1 Class Weight Box Calibration', category: 'Weight Calibration Services', status: 'active', isNabl: true, location: 'Lab', resolution: '0.1 mg', nablPrice: 25000 },

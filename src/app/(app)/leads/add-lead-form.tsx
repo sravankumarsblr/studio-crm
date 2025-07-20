@@ -188,7 +188,7 @@ export function AddLeadForm({
         return { 
           productId: id, 
           quantity: 1,
-          priceType: defaultPriceType,
+          priceType: defaultPrice,
           price: defaultPrice,
         };
       });
@@ -215,6 +215,8 @@ export function AddLeadForm({
         newPrice = product.nablPrice;
     } else if (newPriceType === 'Non-NABL' && product.nonNablPrice) {
         newPrice = product.nonNablPrice;
+    } else if (newPriceType === 'N/A') {
+        newPrice = 0;
     }
 
     update(index, {
@@ -530,7 +532,7 @@ export function AddLeadForm({
                                 {fields.map((field, index) => {
                                     const product = products.find(p => p.id === field.productId);
                                     const total = field.price * field.quantity;
-                                    const isThirdParty = field.priceType.startsWith('Third Party');
+                                    const isThirdParty = field.priceType?.startsWith('Third Party');
                                     return (
                                         <TableRow key={field.id}>
                                             <TableCell className="font-medium align-top pt-4">{product?.name}</TableCell>
@@ -552,10 +554,11 @@ export function AddLeadForm({
                                                             <SelectValue />
                                                         </SelectTrigger>
                                                         <SelectContent>
-                                                            {product?.nablPrice != null && <SelectItem value="NABL">NABL (₹{product.nablPrice.toLocaleString('en-IN')})</SelectItem>}
-                                                            {product?.nonNablPrice != null && <SelectItem value="Non-NABL">Non-NABL (₹{product.nonNablPrice.toLocaleString('en-IN')})</SelectItem>}
-                                                            <SelectItem value="Third Party NABL">Third Party NABL</SelectItem>
-                                                            <SelectItem value="Third Party Non-NABL">Third Party Non-NABL</SelectItem>
+                                                          {(product?.nablPrice == null && product?.nonNablPrice == null) && <SelectItem value="N/A">N/A</SelectItem>}
+                                                          {product?.nablPrice != null && <SelectItem value="NABL">NABL (₹{product.nablPrice.toLocaleString('en-IN')})</SelectItem>}
+                                                          {product?.nonNablPrice != null && <SelectItem value="Non-NABL">Non-NABL (₹{product.nonNablPrice.toLocaleString('en-IN')})</SelectItem>}
+                                                          <SelectItem value="Third Party NABL">Third Party NABL</SelectItem>
+                                                          <SelectItem value="Third Party Non-NABL">Third Party Non-NABL</SelectItem>
                                                         </SelectContent>
                                                     </Select>
                                                     {isThirdParty && (
