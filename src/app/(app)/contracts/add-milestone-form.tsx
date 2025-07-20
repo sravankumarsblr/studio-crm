@@ -26,6 +26,7 @@ import { useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
 
 const addMilestoneSchema = z.object({
   name: z.string().min(1, "Milestone name is required."),
@@ -152,7 +153,7 @@ export function AddMilestoneForm({ onSave, onCancel, contract, existingMilestone
                               checked={field.value?.includes(item.productId)}
                               onCheckedChange={(checked) => {
                                 return checked
-                                  ? field.onChange([...field.value, item.productId])
+                                  ? field.onChange([...(field.value || []), item.productId])
                                   : field.onChange(
                                       field.value?.filter(
                                         (value) => value !== item.productId
@@ -164,7 +165,10 @@ export function AddMilestoneForm({ onSave, onCancel, contract, existingMilestone
                           <FormLabel className="font-normal w-full">
                             <div className="flex justify-between">
                               <span>{item.product!.name}</span>
-                              <span className="text-muted-foreground">₹{item.price.toLocaleString('en-IN')}</span>
+                              <div className="flex items-center gap-2">
+                                <Badge variant="outline">{item.priceType}</Badge>
+                                <span className="text-muted-foreground">₹{item.price.toLocaleString('en-IN')}</span>
+                              </div>
                             </div>
                           </FormLabel>
                         </FormItem>
