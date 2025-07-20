@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -22,9 +22,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Switch } from "@/components/ui/switch";
-import type { Opportunity } from "@/lib/data";
+import type { Opportunity, Quote } from "@/lib/data";
 import { products } from "@/lib/data";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Separator } from "@/components/ui/separator";
@@ -40,9 +39,10 @@ const generateQuoteSchema = z.object({
     productId: z.string(),
     quantity: z.coerce.number(),
     unitPrice: z.coerce.number(),
-    discountType: z.enum(['none', 'percentage', 'fixed']).default('none'),
-    discountValue: z.coerce.number().optional(),
+    finalUnitPrice: z.coerce.number(),
   })).min(1, "A quote must have at least one product."),
+  gstRate: z.coerce.number().min(0).default(18),
+  showGst: z.boolean().default(true),
   attachPo: z.boolean().default(false),
   poNumber: z.string().optional(),
   poValue: z.coerce.number().optional(),
@@ -50,48 +50,21 @@ const generateQuoteSchema = z.object({
   poStatus: z.enum(poStatuses).optional(),
   poDocument: z.any().optional(),
 }).refine(data => {
-    for (const item of data.lineItems) {
-        if (item.discountType !== 'none' && (!item.discountValue || item.discountValue <= 0)) {
-            return false;
-        }
-    }
+    if (data.attachPo && !data.poNumber) return false;
     return true;
-}, {
-    message: "A positive discount value is required for the selected discount type.",
-    path: ["lineItems"],
-}).refine(data => {
-    if (data.attachPo && !data.poNumber) {
-        return false;
-    }
+}, { message: "PO number is required when attaching a PO.", path: ["poNumber"] })
+.refine(data => {
+    if (data.attachPo && (!data.poValue || data.poValue <= 0)) return false;
     return true;
-}, {
-    message: "PO number is required when attaching a PO.",
-    path: ["poNumber"],
-}).refine(data => {
-    if (data.attachPo && (!data.poValue || data.poValue <= 0)) {
-        return false;
-    }
+}, { message: "A positive PO value is required.", path: ["poValue"] })
+.refine(data => {
+    if (data.attachPo && !data.poDate) return false;
     return true;
-}, {
-    message: "A positive PO value is required.",
-    path: ["poValue"],
-}).refine(data => {
-    if (data.attachPo && !data.poDate) {
-        return false;
-    }
+}, { message: "PO date is required.", path: ["poDate"] })
+.refine(data => {
+    if (data.attachPo && !data.poStatus) return false;
     return true;
-}, {
-    message: "PO date is required.",
-    path: ["poDate"],
-}).refine(data => {
-    if (data.attachPo && !data.poStatus) {
-        return false;
-    }
-    return true;
-}, {
-    message: "PO Status is required when attaching a PO.",
-    path: ["poStatus"],
-});
+}, { message: "PO Status is required when attaching a PO.", path: ["poStatus"] });
 
 
 export type GenerateQuoteFormValues = z.infer<typeof generateQuoteSchema>;
@@ -109,15 +82,14 @@ export function GenerateQuoteForm({
     resolver: zodResolver(generateQuoteSchema),
     defaultValues: {
       expiryDate: "",
-      lineItems: opportunity.lineItems.map(item => {
-        return {
-          productId: item.productId,
-          quantity: item.quantity,
-          unitPrice: item.price,
-          discountType: 'none',
-          discountValue: 0,
-        }
-      }),
+      lineItems: opportunity.lineItems.map(item => ({
+        productId: item.productId,
+        quantity: item.quantity,
+        unitPrice: item.price,
+        finalUnitPrice: item.price, // Default final price is the original price
+      })),
+      gstRate: 18,
+      showGst: true,
       attachPo: false,
       poNumber: "",
       poValue: undefined,
@@ -136,21 +108,22 @@ export function GenerateQuoteForm({
   };
 
   const lineItems = form.watch("lineItems");
+  const gstRate = form.watch("gstRate");
   const attachPo = form.watch("attachPo");
 
   const totals = lineItems.reduce((acc, item) => {
-    const lineTotal = item.unitPrice * item.quantity;
-    let discountAmount = 0;
-    if (item.discountType === 'percentage') {
-      discountAmount = lineTotal * ((item.discountValue || 0) / 100);
-    } else if (item.discountType === 'fixed') {
-      discountAmount = item.discountValue || 0;
-    }
-    acc.subtotal += lineTotal;
+    const originalLineTotal = item.unitPrice * item.quantity;
+    const finalLineTotal = item.finalUnitPrice * item.quantity;
+    const discountAmount = originalLineTotal - finalLineTotal;
+
+    acc.subtotal += originalLineTotal;
     acc.discount += discountAmount;
-    acc.grandTotal += (lineTotal - discountAmount);
+    acc.totalBeforeGst += finalLineTotal;
     return acc;
-  }, { subtotal: 0, discount: 0, grandTotal: 0 });
+  }, { subtotal: 0, discount: 0, totalBeforeGst: 0 });
+
+  const gstAmount = totals.totalBeforeGst * (gstRate / 100);
+  const grandTotal = totals.totalBeforeGst + gstAmount;
 
   return (
     <Form {...form}>
@@ -162,21 +135,18 @@ export function GenerateQuoteForm({
                   <TableHeader>
                       <TableRow>
                           <TableHead>Product</TableHead>
-                          <TableHead className="w-[180px]">Discount</TableHead>
-                          <TableHead className="w-[120px] text-right">Line Total</TableHead>
+                          <TableHead className="w-[150px]">Final Unit Price (₹)</TableHead>
+                          <TableHead className="w-[150px] text-right">Discount</TableHead>
+                          <TableHead className="w-[150px] text-right">Line Total</TableHead>
                       </TableRow>
                   </TableHeader>
                   <TableBody>
                       {fields.map((field, index) => {
                           const product = products.find(p => p.id === field.productId);
                           const lineItem = lineItems[index];
-                          const lineTotal = lineItem.unitPrice * lineItem.quantity;
-                          let finalLineTotal = lineTotal;
-                          if (lineItem.discountType === 'percentage') {
-                            finalLineTotal -= lineTotal * ((lineItem.discountValue || 0) / 100);
-                          } else if (lineItem.discountType === 'fixed') {
-                            finalLineTotal -= (lineItem.discountValue || 0);
-                          }
+                          const originalLineTotal = lineItem.unitPrice * lineItem.quantity;
+                          const finalLineTotal = lineItem.finalUnitPrice * lineItem.quantity;
+                          const discountAmount = originalLineTotal - finalLineTotal;
 
                           return (
                               <TableRow key={field.id} className="align-top">
@@ -184,59 +154,23 @@ export function GenerateQuoteForm({
                                       <p>{product?.name}</p>
                                       <p className="text-xs text-muted-foreground">{lineItem.quantity} x ₹{lineItem.unitPrice.toLocaleString('en-IN')}</p>
                                   </TableCell>
-                                  <TableCell>
-                                      <FormField
+                                  <TableCell className="pt-2">
+                                     <FormField
                                         control={form.control}
-                                        name={`lineItems.${index}.discountType`}
+                                        name={`lineItems.${index}.finalUnitPrice`}
                                         render={({ field }) => (
-                                          <FormItem>
-                                            <FormControl>
-                                                <RadioGroup
-                                                    onValueChange={field.onChange}
-                                                    defaultValue={field.value}
-                                                    className="flex items-center space-x-2"
-                                                  >
-                                                    <FormItem className="flex items-center space-x-1 space-y-0">
-                                                      <RadioGroupItem value="none" id={`none-${index}`}/>
-                                                      <Label htmlFor={`none-${index}`} className="font-normal text-xs">N/A</Label>
-                                                    </FormItem>
-                                                    <FormItem className="flex items-center space-x-1 space-y-0">
-                                                      <RadioGroupItem value="percentage" id={`percentage-${index}`}/>
-                                                      <Label htmlFor={`percentage-${index}`} className="font-normal text-xs">%</Label>
-                                                    </FormItem>
-                                                    <FormItem className="flex items-center space-x-1 space-y-0">
-                                                      <RadioGroupItem value="fixed" id={`fixed-${index}`}/>
-                                                      <Label htmlFor={`fixed-${index}`} className="font-normal text-xs">₹</Label>
-                                                    </FormItem>
-                                                  </RadioGroup>
-                                            </FormControl>
-                                          </FormItem>
+                                            <Input 
+                                                type="number" 
+                                                className="h-9"
+                                                {...field}
+                                            />
                                         )}
                                       />
-                                       {lineItems[index].discountType !== 'none' && (
-                                          <FormField
-                                            control={form.control}
-                                            name={`lineItems.${index}.discountValue`}
-                                            render={({ field }) => (
-                                              <FormItem className="mt-1">
-                                                <FormControl>
-                                                  <Input 
-                                                    type="number" 
-                                                    className="h-8"
-                                                    placeholder="Value"
-                                                    {...field}
-                                                    value={field.value ?? ""}
-                                                  />
-                                                </FormControl>
-                                              </FormItem>
-                                            )}
-                                          />
-                                        )}
                                   </TableCell>
                                   <TableCell className="text-right pt-4">
-                                    {lineTotal !== finalLineTotal && (
-                                       <p className="text-xs line-through text-muted-foreground">₹{lineTotal.toLocaleString('en-IN')}</p>
-                                    )}
+                                    <p className="font-medium">₹{discountAmount.toLocaleString('en-IN')}</p>
+                                  </TableCell>
+                                  <TableCell className="text-right pt-4">
                                     <p className="font-medium">₹{finalLineTotal.toLocaleString('en-IN')}</p>
                                   </TableCell>
                               </TableRow>
@@ -254,9 +188,28 @@ export function GenerateQuoteForm({
                     <span>- ₹{totals.discount.toLocaleString('en-IN')}</span>
                   </div>
                    <Separator />
+                   <div className="flex justify-between font-bold">
+                    <span>Total Before Tax</span>
+                    <span>₹{totals.totalBeforeGst.toLocaleString('en-IN')}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <span>GST</span>
+                        <FormField
+                            control={form.control}
+                            name="gstRate"
+                            render={({ field }) => (
+                                <Input type="number" className="h-7 w-16" {...field} />
+                            )}
+                        />
+                        <span>%</span>
+                      </div>
+                      <span>+ ₹{gstAmount.toLocaleString('en-IN')}</span>
+                  </div>
+                   <Separator />
                    <div className="flex justify-between font-bold text-base">
                     <span>Grand Total</span>
-                    <span>₹{totals.grandTotal.toLocaleString('en-IN')}</span>
+                    <span>₹{grandTotal.toLocaleString('en-IN')}</span>
                   </div>
               </div>
           </div>
@@ -265,44 +218,63 @@ export function GenerateQuoteForm({
         <Separator />
 
         <div className="space-y-4">
-            <FormField
-              control={form.control}
-              name="expiryDate"
-              render={({ field }) => (
-                <FormItem className="flex flex-col">
-                  <FormLabel>Expiry Date</FormLabel>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant={"outline"}
-                          className={cn(
-                            "w-full text-left font-normal",
-                            !field.value && "text-muted-foreground"
-                          )}
-                        >
-                          {field.value ? (
-                            format(new Date(field.value), "PPP")
-                          ) : (
-                            <span>Pick a date</span>
-                          )}
-                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={field.value ? new Date(field.value) : undefined}
-                        onSelect={(date) => field.onChange(date?.toISOString().split('T')[0])}
-                        initialFocus
-                      />
-                    </PopoverContent>
-                  </Popover>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="grid grid-cols-2 gap-4">
+                <FormField
+                control={form.control}
+                name="expiryDate"
+                render={({ field }) => (
+                    <FormItem className="flex flex-col">
+                    <FormLabel>Expiry Date</FormLabel>
+                    <Popover>
+                        <PopoverTrigger asChild>
+                        <FormControl>
+                            <Button
+                            variant={"outline"}
+                            className={cn(
+                                "w-full text-left font-normal",
+                                !field.value && "text-muted-foreground"
+                            )}
+                            >
+                            {field.value ? (
+                                format(new Date(field.value), "PPP")
+                            ) : (
+                                <span>Pick a date</span>
+                            )}
+                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                            </Button>
+                        </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                            mode="single"
+                            selected={field.value ? new Date(field.value) : undefined}
+                            onSelect={(date) => field.onChange(date?.toISOString().split('T')[0])}
+                            initialFocus
+                        />
+                        </PopoverContent>
+                    </Popover>
+                    <FormMessage />
+                    </FormItem>
+                )}
+                />
+                 <FormField
+                    control={form.control}
+                    name="showGst"
+                    render={({ field }) => (
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm h-fit mt-auto">
+                        <div className="space-y-0.5">
+                        <FormLabel>Show GST on Quote</FormLabel>
+                        </div>
+                        <FormControl>
+                        <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                        />
+                        </FormControl>
+                    </FormItem>
+                    )}
+                />
+            </div>
           
           <FormField
             control={form.control}

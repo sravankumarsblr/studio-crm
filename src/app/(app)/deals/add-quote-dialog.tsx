@@ -31,6 +31,15 @@ export function GenerateQuoteDialog({
     // In a real app, the current user would be derived from session
     const currentUser = users.find(u => u.role === 'Admin') || users[0];
 
+    const totals = data.lineItems.reduce((acc, item) => {
+      const originalLineTotal = item.unitPrice * item.quantity;
+      const finalLineTotal = item.finalUnitPrice * item.quantity;
+      acc.subtotal += originalLineTotal;
+      acc.discount += (originalLineTotal - finalLineTotal);
+      acc.totalBeforeGst += finalLineTotal;
+      return acc;
+    }, { subtotal: 0, discount: 0, totalBeforeGst: 0 });
+
     const newQuote: Quote = {
       id: `qt${new Date().getTime()}`,
       quoteNumber: `QT-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 900) + 100).padStart(3, '0')}`,
@@ -40,14 +49,15 @@ export function GenerateQuoteDialog({
       preparedBy: currentUser.name,
       status: data.attachPo ? "Accepted" : "Draft",
       documentName: data.document?.name,
+      subtotal: totals.subtotal,
+      discount: totals.discount,
+      gstRate: data.gstRate,
+      showGst: data.showGst,
       lineItems: data.lineItems.map(item => ({
         productId: item.productId,
         quantity: item.quantity,
         unitPrice: item.unitPrice,
-        discount: item.discountType !== 'none' && item.discountValue ? {
-          type: item.discountType,
-          value: item.discountValue,
-        } : undefined,
+        finalUnitPrice: item.finalUnitPrice,
       })),
       poNumber: data.attachPo ? data.poNumber : undefined,
       poValue: data.attachPo ? data.poValue : undefined,
@@ -61,7 +71,7 @@ export function GenerateQuoteDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="sm:max-w-3xl max-h-[90vh] flex flex-col">
+      <DialogContent className="sm:max-w-4xl max-h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>Generate Quote</DialogTitle>
           <DialogDescription>
@@ -79,5 +89,3 @@ export function GenerateQuoteDialog({
     </Dialog>
   );
 }
-
-    

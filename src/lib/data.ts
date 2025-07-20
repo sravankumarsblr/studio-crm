@@ -132,10 +132,7 @@ export type QuoteLineItem = {
   productId: string;
   quantity: number;
   unitPrice: number;
-  discount?: {
-    type: 'percentage' | 'fixed';
-    value: number;
-  };
+  finalUnitPrice: number;
 };
 
 export type Quote = {
@@ -148,6 +145,10 @@ export type Quote = {
   status: 'Draft' | 'Sent' | 'Accepted' | 'Rejected';
   documentName?: string;
   lineItems: QuoteLineItem[];
+  subtotal: number;
+  discount: number;
+  gstRate: number;
+  showGst: boolean;
   poNumber?: string;
   poValue?: number;
   poDate?: string;
@@ -339,7 +340,7 @@ export const opportunities: Opportunity[] = [
     source: 'Email',
     lineItems: [{ productId: 'prod1', quantity: 100, price: 49900, priceType: 'NABL' }], 
     quotes: [
-      { id: 'qt1', opportunityId: 'deal1', quoteNumber: 'QT-2024-001', date: '2024-06-10', expiryDate: '2024-07-10', preparedBy: 'Aryan Sharma', status: 'Sent', documentName: 'Vimaan_Quote_v1.pdf', lineItems: [{ productId: 'prod1', quantity: 100, unitPrice: 49900 }] }
+      { id: 'qt1', opportunityId: 'deal1', quoteNumber: 'QT-2024-001', date: '2024-06-10', expiryDate: '2024-07-10', preparedBy: 'Aryan Sharma', status: 'Sent', documentName: 'Vimaan_Quote_v1.pdf', lineItems: [{ productId: 'prod1', quantity: 100, unitPrice: 49900, finalUnitPrice: 49900 }], subtotal: 4990000, discount: 0, gstRate: 18, showGst: true }
     ] 
   },
   { 
@@ -358,8 +359,8 @@ export const opportunities: Opportunity[] = [
     source: 'Phone',
     lineItems: [{ productId: 'prod2', quantity: 92, price: 129900, priceType: 'NABL' }], 
     quotes: [
-       { id: 'qt2', opportunityId: 'deal2', quoteNumber: 'QT-2024-002', date: '2024-06-15', expiryDate: '2024-07-15', preparedBy: 'Aryan Sharma', status: 'Sent', lineItems: [{ productId: 'prod2', quantity: 92, unitPrice: 129900 }] },
-       { id: 'qt3', opportunityId: 'deal2', quoteNumber: 'QT-2024-003', date: '2024-06-20', expiryDate: '2024-07-20', preparedBy: 'Aryan Sharma', status: 'Draft', lineItems: [{ productId: 'prod2', quantity: 92, unitPrice: 129900, discount: { type: 'fixed', value: 500000 } }] }
+       { id: 'qt2', opportunityId: 'deal2', quoteNumber: 'QT-2024-002', date: '2024-06-15', expiryDate: '2024-07-15', preparedBy: 'Aryan Sharma', status: 'Sent', lineItems: [{ productId: 'prod2', quantity: 92, unitPrice: 129900, finalUnitPrice: 129900 }], subtotal: 11950800, discount: 0, gstRate: 18, showGst: true },
+       { id: 'qt3', opportunityId: 'deal2', quoteNumber: 'QT-2024-003', date: '2024-06-20', expiryDate: '2024-07-20', preparedBy: 'Aryan Sharma', status: 'Draft', lineItems: [{ productId: 'prod2', quantity: 92, unitPrice: 129900, finalUnitPrice: 125000 }], subtotal: 11950800, discount: 450800, gstRate: 18, showGst: true }
     ] 
   },
   { 
@@ -381,7 +382,7 @@ export const opportunities: Opportunity[] = [
         { productId: 'prod21', quantity: 2, price: 10000, priceType: 'NABL' }
     ], 
     quotes: [
-      { id: 'qt4', opportunityId: 'deal3', quoteNumber: 'QT-2024-004', date: '2024-06-01', expiryDate: '2024-07-01', preparedBy: 'Aryan Sharma', status: 'Accepted', poNumber: 'PO-ACPL-1138', poValue: 2230000, poDate: '2024-06-14', poDocumentName: 'PO-ACPL-1138.pdf', poStatus: 'Received', lineItems: [{ productId: 'prod3', quantity: 26, unitPrice: 85000, discount: { type: 'fixed', value: 10000 } }] }
+      { id: 'qt4', opportunityId: 'deal3', quoteNumber: 'QT-2024-004', date: '2024-06-01', expiryDate: '2024-07-01', preparedBy: 'Aryan Sharma', status: 'Accepted', poNumber: 'PO-ACPL-1138', poValue: 2230000, poDate: '2024-06-14', poDocumentName: 'PO-ACPL-1138.pdf', poStatus: 'Received', lineItems: [{ productId: 'prod3', quantity: 26, unitPrice: 85000, finalUnitPrice: 85000 }], subtotal: 2210000, discount: 0, gstRate: 18, showGst: false }
     ] 
   },
   { 

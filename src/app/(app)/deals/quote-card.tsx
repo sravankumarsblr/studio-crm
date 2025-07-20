@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import type { Opportunity, Quote, QuoteLineItem } from "@/lib/data";
+import type { Opportunity, Quote } from "@/lib/data";
 import { MoreVertical, Trash2, Download, CheckCircle, XCircle, Clock, FileCheck2 } from "lucide-react";
 import {
   DropdownMenu,
@@ -32,25 +32,9 @@ const statusConfig = {
 export function QuoteCard({ quote, opportunityStatus, onDelete, onAttachPo }: QuoteCardProps) {
     const {variant, icon: Icon, label} = statusConfig[quote.status];
 
-    const calculateTotals = (lineItems: QuoteLineItem[]) => {
-      return lineItems.reduce((acc, item) => {
-          const lineTotal = item.unitPrice * item.quantity;
-          let discountAmount = 0;
-          if (item.discount) {
-              if (item.discount.type === 'percentage') {
-                  discountAmount = lineTotal * (item.discount.value / 100);
-              } else { // fixed
-                  discountAmount = item.discount.value;
-              }
-          }
-          acc.subtotal += lineTotal;
-          acc.discount += discountAmount;
-          acc.grandTotal += (lineTotal - discountAmount);
-          return acc;
-      }, { subtotal: 0, discount: 0, grandTotal: 0 });
-    };
-
-    const totals = calculateTotals(quote.lineItems);
+    const grandTotal = quote.subtotal - quote.discount;
+    const gstAmount = quote.showGst ? grandTotal * (quote.gstRate / 100) : 0;
+    const finalAmount = grandTotal + gstAmount;
 
   return (
     <Card>
@@ -58,12 +42,12 @@ export function QuoteCard({ quote, opportunityStatus, onDelete, onAttachPo }: Qu
         <div>
           <CardTitle className="text-base font-bold">{quote.quoteNumber}</CardTitle>
           <CardDescription className="text-xs">
-             {totals.discount > 0 ? (
+             {quote.discount > 0 ? (
                 <span>
-                    Value: <span className="line-through">₹{totals.subtotal.toLocaleString('en-IN')}</span> &rarr; ₹{totals.grandTotal.toLocaleString('en-IN')}
+                    Value: <span className="line-through">₹{quote.subtotal.toLocaleString('en-IN')}</span> &rarr; ₹{finalAmount.toLocaleString('en-IN')}
                 </span>
             ) : (
-                <span>Value: ₹{totals.grandTotal.toLocaleString('en-IN')}</span>
+                <span>Value: ₹{finalAmount.toLocaleString('en-IN')}</span>
             )}
           </CardDescription>
         </div>
@@ -95,10 +79,10 @@ export function QuoteCard({ quote, opportunityStatus, onDelete, onAttachPo }: Qu
               {label}
             </Badge>
         </div>
-         {totals.discount > 0 && (
+         {quote.discount > 0 && (
             <div className="flex justify-between">
                 <span className="text-muted-foreground">Discount Applied</span>
-                <span className="font-medium text-destructive">₹{totals.discount.toLocaleString('en-IN')}</span>
+                <span className="font-medium text-destructive">₹{quote.discount.toLocaleString('en-IN')}</span>
             </div>
         )}
         <div className="flex justify-between">
