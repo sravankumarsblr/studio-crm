@@ -109,8 +109,7 @@ export function ProductSelectorDialog({
                   <TableRow>
                     <TableHead className="w-[50px]"></TableHead>
                     <TableHead>Product</TableHead>
-                    <TableHead>Category</TableHead>
-                    <TableHead className="text-right">NABL Price</TableHead>
+                    <TableHead>NABL Price</TableHead>
                     <TableHead className="text-right">Non-NABL Price</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -124,8 +123,7 @@ export function ProductSelectorDialog({
                         />
                       </TableCell>
                       <TableCell className="font-medium">{product.name}</TableCell>
-                      <TableCell>{product.category}</TableCell>
-                      <TableCell className="text-right">
+                      <TableCell>
                         {product.nablPrice != null ? `₹${product.nablPrice.toLocaleString('en-IN')}` : '-'}
                       </TableCell>
                       <TableCell className="text-right">

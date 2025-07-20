@@ -569,8 +569,8 @@ export function EditLeadForm({
                                                             <SelectValue />
                                                         </SelectTrigger>
                                                         <SelectContent>
-                                                            {product?.nablPrice != null && <SelectItem value="NABL">NABL (₹{product.nablPrice})</SelectItem>}
-                                                            {product?.nonNablPrice != null && <SelectItem value="Non-NABL">Non-NABL (₹{product.nonNablPrice})</SelectItem>}
+                                                            {product?.nablPrice != null && <SelectItem value="NABL">NABL (₹{product.nablPrice.toLocaleString('en-IN')})</SelectItem>}
+                                                            {product?.nonNablPrice != null && <SelectItem value="Non-NABL">Non-NABL (₹{product.nonNablPrice.toLocaleString('en-IN')})</SelectItem>}
                                                             <SelectItem value="Third Party NABL">Third Party NABL</SelectItem>
                                                             <SelectItem value="Third Party Non-NABL">Third Party Non-NABL</SelectItem>
                                                         </SelectContent>
