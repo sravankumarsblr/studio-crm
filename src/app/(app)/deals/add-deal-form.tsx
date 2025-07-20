@@ -31,7 +31,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar } from "@/components/ui/calendar";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { leadSources, companies as staticCustomers, contacts as initialContacts, products, users, Company as Customer, LineItem, Contact } from "@/lib/data";
+import { leadSources, companies as staticCustomers, contacts as initialContacts, products, users, Company as Customer, LineItem, Contact, priceTypes, PriceType } from "@/lib/data";
 import {
   Select,
   SelectContent,
@@ -41,7 +41,6 @@ import {
 } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import { AddCustomerDialog } from "../customers/add-customer-dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ProductSelectorDialog } from "../products/product-selector-dialog";
@@ -62,6 +61,8 @@ const addOpportunitySchema = z.object({
   lineItems: z.array(z.object({
     productId: z.string().min(1),
     quantity: z.coerce.number().int().min(1, "Qty must be at least 1."),
+    priceType: z.enum(priceTypes),
+    price: z.coerce.number().min(0, "Price must be a positive number."),
   })).min(1, "Please add at least one product."),
 }).refine(
   (data) => {
@@ -123,8 +124,7 @@ export function AddOpportunityForm({
 
   useEffect(() => {
     const newTotal = lineItems.reduce((acc, item) => {
-        const product = products.find(p => p.id === item.productId);
-        return acc + (product ? product.price * item.quantity : 0);
+        return acc + (item.price * item.quantity);
     }, 0);
     setTotalValue(newTotal);
   }, [lineItems]);
@@ -175,40 +175,53 @@ export function AddOpportunityForm({
   const handleProductsAddedFromSelector = (newProductIds: string[]) => {
     const fieldProductIds = fields.map(f => f.productId);
     
-    const productsToUpdate = new Map<number, number>(); // Map index to new quantity
-    const productsToAdd: { productId: string; quantity: number }[] = [];
-
-    newProductIds.forEach(id => {
-      const existingIndex = fieldProductIds.indexOf(id);
-      if (existingIndex > -1) {
-        // This logic could be to increment quantity, but for now we just ensure it exists
-      } else {
-        productsToAdd.push({ productId: id, quantity: 1 });
-      }
-    });
-
+    const productsToAdd = newProductIds
+      .filter(id => !fieldProductIds.includes(id))
+      .map(id => {
+        const product = products.find(p => p.id === id);
+        const defaultPriceType: PriceType = product?.nablPrice ? 'NABL' : product?.nonNablPrice ? 'Non-NABL' : 'N/A';
+        const defaultPrice = defaultPriceType === 'NABL' ? (product?.nablPrice ?? 0) : defaultPriceType === 'Non-NABL' ? (product?.nonNablPrice ?? 0) : 0;
+        
+        return { 
+          productId: id, 
+          quantity: 1,
+          priceType: defaultPriceType,
+          price: defaultPrice,
+        };
+      });
+    
     if (productsToAdd.length > 0) {
       append(productsToAdd);
     }
     
-    // Logic to handle removed products (if any)
-    const productsToRemove = fieldProductIds.reduce((acc, id, index) => {
-      if (!newProductIds.includes(id)) {
-        acc.push(index);
-      }
-      return acc;
-    }, [] as number[]);
-    
-    if(productsToRemove.length > 0) {
-       remove(productsToRemove);
+    const indicesToRemove = fieldProductIds
+      .map((id, index) => (newProductIds.includes(id) ? -1 : index))
+      .filter(index => index !== -1);
+      
+    if(indicesToRemove.length > 0) {
+       indicesToRemove.sort((a, b) => b - a).forEach(index => remove(index));
     }
   };
 
-  const onSubmit = (values: AddOpportunityFormValues) => {
-    // In a real app, status would be set on the server
-    const dataToSave = {
-        ...values,
+  const handlePriceTypeChange = (index: number, newPriceType: PriceType) => {
+    const product = products.find(p => p.id === lineItems[index].productId);
+    if (!product) return;
+    
+    let newPrice = 0;
+    if (newPriceType === 'NABL') {
+        newPrice = product.nablPrice ?? 0;
+    } else if (newPriceType === 'Non-NABL') {
+        newPrice = product.nonNablPrice ?? 0;
     }
+
+    update(index, {
+        ...lineItems[index],
+        priceType: newPriceType,
+        price: newPrice
+    });
+  };
+
+  const onSubmit = (values: AddOpportunityFormValues) => {
     onSave(values);
   };
 
@@ -558,7 +571,7 @@ export function AddOpportunityForm({
                                 <TableRow>
                                     <TableHead>Product</TableHead>
                                     <TableHead className="w-[100px]">Qty</TableHead>
-                                    <TableHead className="w-[120px] text-right">Unit Price</TableHead>
+                                    <TableHead className="w-[220px]">Price Type</TableHead>
                                     <TableHead className="w-[120px] text-right">Total</TableHead>
                                     <TableHead className="w-[50px]"></TableHead>
                                 </TableRow>
@@ -573,22 +586,47 @@ export function AddOpportunityForm({
                                 )}
                                 {fields.map((field, index) => {
                                     const product = products.find(p => p.id === field.productId);
-                                    const price = product?.price ?? 0;
-                                    const total = price * field.quantity;
+                                    const total = field.price * field.quantity;
+                                    const isThirdParty = field.priceType?.startsWith('Third Party');
                                     return (
                                         <TableRow key={field.id}>
-                                            <TableCell className="font-medium">{product?.name}</TableCell>
-                                            <TableCell>
+                                            <TableCell className="font-medium align-top pt-4">{product?.name}</TableCell>
+                                            <TableCell className="align-top pt-2">
                                                 <Input
                                                     type="number"
                                                     min="1"
                                                     {...form.register(`lineItems.${index}.quantity`)}
-                                                    className="h-8"
+                                                    className="h-9"
                                                 />
                                             </TableCell>
-                                            <TableCell className="text-right">₹{price.toLocaleString('en-IN')}</TableCell>
-                                            <TableCell className="text-right">₹{total.toLocaleString('en-IN')}</TableCell>
-                                            <TableCell>
+                                            <TableCell className="align-top pt-2">
+                                               <div className="flex items-start gap-2">
+                                                    <Select 
+                                                        value={field.priceType} 
+                                                        onValueChange={(value: PriceType) => handlePriceTypeChange(index, value)}
+                                                    >
+                                                        <SelectTrigger className="h-9">
+                                                            <SelectValue />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            <SelectItem value="NABL">NABL {product?.nablPrice != null ? `(₹${product.nablPrice.toLocaleString('en-IN')})` : ''}</SelectItem>
+                                                            <SelectItem value="Non-NABL">Non-NABL {product?.nonNablPrice != null ? `(₹${product.nonNablPrice.toLocaleString('en-IN')})` : ''}</SelectItem>
+                                                            <SelectItem value="Third Party NABL">Third Party NABL</SelectItem>
+                                                            <SelectItem value="Third Party Non-NABL">Third Party Non-NABL</SelectItem>
+                                                        </SelectContent>
+                                                    </Select>
+                                                    {isThirdParty && (
+                                                        <Input
+                                                            type="number"
+                                                            placeholder="Price"
+                                                            {...form.register(`lineItems.${index}.price`)}
+                                                            className="h-9 w-28"
+                                                        />
+                                                    )}
+                                               </div>
+                                            </TableCell>
+                                            <TableCell className="text-right align-top pt-4">₹{total.toLocaleString('en-IN')}</TableCell>
+                                            <TableCell className="align-top pt-2">
                                                 <Button variant="ghost" size="icon" onClick={() => remove(index)}>
                                                     <Trash2 className="h-4 w-4 text-destructive"/>
                                                 </Button>

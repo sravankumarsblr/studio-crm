@@ -16,8 +16,6 @@ import { GenerateQuoteDialog } from '../add-quote-dialog';
 import { LogActivityDialog } from '../log-activity-dialog';
 import { EditOpportunityDialog } from '../edit-deal-dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { ProductSelectorDialog } from '@/app/(app)/products/product-selector-dialog';
-import { Input } from '@/components/ui/input';
 import { AttachPoDialog } from '../attach-po-dialog';
 import type { AttachPoFormValues } from '../attach-po-form';
 import { AddContractDialog } from '@/app/(app)/contracts/add-contract-dialog';
@@ -52,7 +50,6 @@ export default function OpportunityDetailPage() {
   const [isGenerateQuoteOpen, setIsGenerateQuoteOpen] = useState(false);
   const [isLogActivityOpen, setIsLogActivityOpen] = useState(false);
   const [isEditOpportunityOpen, setIsEditOpportunityOpen] = useState(false);
-  const [isProductSelectorOpen, setIsProductSelectorOpen] = useState(false);
   const [isAttachPoOpen, setIsAttachPoOpen] = useState(false);
   const [quoteToAttachPo, setQuoteToAttachPo] = useState<Quote | null>(null);
   const [isAddContractOpen, setIsAddContractOpen] = useState(false);
@@ -63,49 +60,6 @@ export default function OpportunityDetailPage() {
   const primaryContact = contacts.find(c => `${c.firstName} ${c.lastName}` === opportunity?.contactName);
   const associatedContacts = company ? contacts.filter(c => c.companyId === company.id) : [];
   const [contracts, setContracts] = useState<Contract[]>([]);
-
-  const updateOpportunityLineItems = (newLineItems: LineItem[]) => {
-    if (opportunity) {
-        const newValue = newLineItems.reduce((acc, item) => {
-            const product = products.find(p => p.id === item.productId);
-            return acc + (product ? product.price * item.quantity : 0);
-        }, 0);
-
-        setOpportunity({
-            ...opportunity,
-            lineItems: newLineItems,
-            value: newValue,
-        });
-    }
-  }
-
-  const handleQuantityChange = (productId: string, quantityStr: string) => {
-    const quantity = parseInt(quantityStr, 10);
-    if (opportunity && !isNaN(quantity)) {
-        const newLineItems = opportunity.lineItems.map(item => 
-            item.productId === productId ? { ...item, quantity: Math.max(1, quantity) } : item
-        );
-        updateOpportunityLineItems(newLineItems);
-    }
-  }
-
-  const handleRemoveItem = (productId: string) => {
-    if (opportunity) {
-        const newLineItems = opportunity.lineItems.filter(item => item.productId !== productId);
-        updateOpportunityLineItems(newLineItems);
-    }
-  }
-
-  const handleProductsUpdated = (newProductIds: string[]) => {
-    if (opportunity) {
-        const existingQuantities = new Map(opportunity.lineItems.map(item => [item.productId, item.quantity]));
-        const newLineItems = newProductIds.map(id => ({
-            productId: id,
-            quantity: existingQuantities.get(id) || 1,
-        }));
-        updateOpportunityLineItems(newLineItems);
-    }
-  };
 
   const handleQuoteAdded = (newQuote: Quote) => {
     if (opportunity) {
@@ -263,9 +217,9 @@ export default function OpportunityDetailPage() {
             <Card>
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle>Products & Services</CardTitle>
-                <Button variant="outline" size="sm" onClick={() => setIsProductSelectorOpen(true)} disabled={isWon}>
-                    <PlusCircle className="mr-2 h-4 w-4" />
-                    Add/Edit Products
+                <Button variant="outline" size="sm" onClick={() => setIsEditOpportunityOpen(true)} >
+                    <Edit className="mr-2 h-4 w-4" />
+                    Edit Products
                 </Button>
               </CardHeader>
               <CardContent>
@@ -273,10 +227,10 @@ export default function OpportunityDetailPage() {
                     <TableHeader>
                         <TableRow>
                             <TableHead>Product</TableHead>
-                            <TableHead className="w-[100px]">Quantity</TableHead>
-                            <TableHead className="w-[120px] text-right">Unit Price</TableHead>
-                            <TableHead className="w-[120px] text-right">Total</TableHead>
-                            {!isWon && <TableHead className="w-[50px]"></TableHead>}
+                            <TableHead>Qty</TableHead>
+                            <TableHead>Price Type</TableHead>
+                            <TableHead className="text-right">Unit Price</TableHead>
+                            <TableHead className="text-right">Total</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -290,29 +244,14 @@ export default function OpportunityDetailPage() {
                         {opportunity.lineItems.map(item => {
                             const product = products.find(p => p.id === item.productId);
                             if (!product) return null;
-                            const total = product.price * item.quantity;
+                            const total = item.price * item.quantity;
                             return (
                                 <TableRow key={item.productId}>
                                     <TableCell className="font-medium">{product.name}</TableCell>
-                                    <TableCell>
-                                        <Input
-                                            type="number"
-                                            min="1"
-                                            value={item.quantity}
-                                            onChange={(e) => handleQuantityChange(item.productId, e.target.value)}
-                                            className="h-8 w-20"
-                                            disabled={isWon}
-                                        />
-                                    </TableCell>
-                                    <TableCell className="text-right">₹{product.price.toLocaleString('en-IN')}</TableCell>
+                                    <TableCell>{item.quantity}</TableCell>
+                                    <TableCell><Badge variant="secondary">{item.priceType}</Badge></TableCell>
+                                    <TableCell className="text-right">₹{item.price.toLocaleString('en-IN')}</TableCell>
                                     <TableCell className="text-right">₹{total.toLocaleString('en-IN')}</TableCell>
-                                    {!isWon && (
-                                        <TableCell>
-                                        <Button variant="ghost" size="icon" onClick={() => handleRemoveItem(item.productId)}>
-                                            <Trash2 className="h-4 w-4 text-destructive"/>
-                                        </Button>
-                                        </TableCell>
-                                    )}
                                 </TableRow>
                             );
                         })}
@@ -393,12 +332,6 @@ export default function OpportunityDetailPage() {
         isOpen={isEditOpportunityOpen}
         setIsOpen={setIsEditOpportunityOpen}
         opportunity={opportunity}
-      />
-       <ProductSelectorDialog
-        isOpen={isProductSelectorOpen}
-        setIsOpen={setIsProductSelectorOpen}
-        onProductsAdded={handleProductsUpdated}
-        initialSelectedIds={opportunity.lineItems.map(item => item.productId)}
       />
       {quoteToAttachPo && (
         <AttachPoDialog

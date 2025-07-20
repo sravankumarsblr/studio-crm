@@ -110,11 +110,10 @@ export function GenerateQuoteForm({
     defaultValues: {
       expiryDate: "",
       lineItems: opportunity.lineItems.map(item => {
-        const product = products.find(p => p.id === item.productId);
         return {
           productId: item.productId,
           quantity: item.quantity,
-          unitPrice: product?.price || 0,
+          unitPrice: item.price,
           discountType: 'none',
           discountValue: 0,
         }
