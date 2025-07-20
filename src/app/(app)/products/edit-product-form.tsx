@@ -42,6 +42,7 @@ const editProductSchema = z.object({
   category: z.string().min(1, "Level - 1 is required."),
   isNabl: z.boolean().default(false),
   location: z.enum(['Lab', 'Site', 'Site & Lab']),
+  resolution: z.string().optional(),
   nablRange: z.string().optional(),
   nonNablRange: z.string().optional(),
   masterRange: z.string().optional(),
@@ -84,6 +85,7 @@ export function EditProductForm({
       nablPrice: product.nablPrice,
       isNabl: product.isNabl,
       location: product.location,
+      resolution: product.resolution,
       nonNablRange: product.nonNablRange,
       nonNablPrice: product.nonNablPrice,
       masterRange: product.masterRange,
@@ -170,7 +172,7 @@ export function EditProductForm({
               )}
             />
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
             <FormField
               control={form.control}
               name="location"
@@ -194,10 +196,17 @@ export function EditProductForm({
               )}
             />
             <FormField
+              control={form.control}
+              name="resolution"
+              render={({ field }) => (
+                  <FormItem><FormLabel>Resolution</FormLabel><FormControl><Input placeholder="e.g., 0.01mm" {...field} /></FormControl><FormMessage /></FormItem>
+              )}
+            />
+            <FormField
                 control={form.control}
                 name="isNabl"
                 render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm h-full mt-2">
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm h-fit mt-auto">
                     <div className="space-y-0.5">
                       <FormLabel>NABL Accredited</FormLabel>
                     </div>
@@ -230,6 +239,13 @@ export function EditProductForm({
             />
             <FormField
               control={form.control}
+              name="masterRange"
+              render={({ field }) => (
+                  <FormItem><FormLabel>Master Range</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
               name="nonNablRange"
               render={({ field }) => (
                   <FormItem><FormLabel>Non-NABL Range</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
@@ -240,13 +256,6 @@ export function EditProductForm({
               name="nonNablPrice"
               render={({ field }) => (
                   <FormItem><FormLabel>Non-NABL Price (INR)</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>
-              )}
-            />
-             <FormField
-              control={form.control}
-              name="masterRange"
-              render={({ field }) => (
-                  <FormItem><FormLabel>Master Range</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
               )}
             />
         </div>

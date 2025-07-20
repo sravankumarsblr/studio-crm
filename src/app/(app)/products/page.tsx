@@ -143,6 +143,7 @@ export default function ProductsPage() {
                     <TableHead>Product Name</TableHead>
                     <TableHead>Level - 1</TableHead>
                     <TableHead>Location</TableHead>
+                    <TableHead>Resolution</TableHead>
                     <TableHead>NABL</TableHead>
                     <TableHead>NABL Price</TableHead>
                     <TableHead>Non-NABL Price</TableHead>
@@ -156,6 +157,7 @@ export default function ProductsPage() {
                       <TableCell className="font-medium">{product.name}</TableCell>
                       <TableCell>{product.category}</TableCell>
                       <TableCell>{product.location}</TableCell>
+                      <TableCell>{product.resolution ?? '-'}</TableCell>
                       <TableCell>
                         <Badge variant={product.isNabl ? "default" : "secondary"}>
                           {product.isNabl ? 'Yes' : 'No'}
@@ -188,7 +190,7 @@ export default function ProductsPage() {
                     </TableRow>
                   )) : (
                      <TableRow>
-                        <TableCell colSpan={8} className="h-24 text-center">
+                        <TableCell colSpan={9} className="h-24 text-center">
                           No results found.
                         </TableCell>
                       </TableRow>
