@@ -5,7 +5,7 @@ import { useState, useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowLeft, Building, Users, Globe, ExternalLink, Edit, Workflow, Clock, ShieldCheck, HeartHandshake, Box, Sigma, Sparkles, Banknote, CalendarDays, Wallet, Ear, FileArchive, HelpCircle, Star, Handshake, Mail, PlusCircle, IndianRupee, ThumbsUp, ThumbsDown, Target } from 'lucide-react';
+import { ArrowLeft, Building, Users, Globe, ExternalLink, Edit, Workflow, Clock, ShieldCheck, HeartHandshake, Box, Sigma, Sparkles, Banknote, CalendarDays, Wallet, Ear, FileArchive, HelpCircle, Star, Handshake, Mail, PlusCircle, IndianRupee, ThumbsUp, ThumbsDown, Target, Percent } from 'lucide-react';
 import { differenceInDays, parseISO } from 'date-fns';
 
 import { Header } from '@/components/header';
@@ -196,6 +196,7 @@ export default function CustomerDetailPage() {
                             <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                 <InfoCard icon={Building} title="Industry">{customer.industry}</InfoCard>
                                 <InfoCard icon={Users} title="Employees">{customer.numberOfEmployees}</InfoCard>
+                                <InfoCard icon={Percent} title="GST Status">{customer.gstStatus || 'N/A'}</InfoCard>
                                 <InfoCard icon={Globe} title="Website">
                                     <a href={customer.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline flex items-center gap-1">
                                         {customer.website} <ExternalLink className="w-3 h-3"/>
