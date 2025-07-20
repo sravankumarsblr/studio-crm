@@ -71,11 +71,19 @@ export default function LeadDetailPage() {
 
   const handleProductsAdded = (newProductIds: string[]) => {
     if (lead) {
-      const existingLineItems = new Map(lead.lineItems.map(item => [item.productId, item.quantity]));
-      const newLineItems = newProductIds.map(id => ({
-          productId: id,
-          quantity: existingLineItems.get(id) || 1,
-      }));
+      const existingLineItems = new Map(lead.lineItems.map(item => [item.productId, item]));
+      const newLineItems = newProductIds.map(id => {
+          const existing = existingLineItems.get(id);
+          if (existing) return existing;
+
+          const product = products.find(p => p.id === id);
+          return {
+              productId: id,
+              quantity: 1,
+              price: product?.nablPrice ?? product?.nonNablPrice ?? 0,
+              priceType: product?.nablPrice ? 'NABL' : 'Non-NABL',
+          };
+      });
       const updatedLead = {
         ...lead,
         lineItems: newLineItems,
@@ -178,7 +186,7 @@ export default function LeadDetailPage() {
                       <TableHeader>
                           <TableRow>
                               <TableHead>Product</TableHead>
-                              <TableHead>Category</TableHead>
+                              <TableHead>Level - 1</TableHead>
                               <TableHead>Quantity</TableHead>
                               <TableHead className="text-right">Price</TableHead>
                           </TableRow>
@@ -193,7 +201,7 @@ export default function LeadDetailPage() {
                                     <TableCell className="font-medium">{item.product.name}</TableCell>
                                     <TableCell>{item.product.category}</TableCell>
                                     <TableCell>{item.quantity}</TableCell>
-                                    <TableCell className="text-right">₹{item.product.price.toLocaleString('en-IN')}</TableCell>
+                                    <TableCell className="text-right">₹{item.price.toLocaleString('en-IN')}</TableCell>
                                 </TableRow>
                               )
                           ))}
