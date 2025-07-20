@@ -194,7 +194,7 @@ export function EditLeadForm({
       .map(id => {
         const product = products.find(p => p.id === id);
         const defaultPrice = product?.nablPrice ?? product?.nonNablPrice ?? 0;
-        const defaultPriceType: PriceType = product?.nablPrice ? 'NABL' : 'Non-NABL';
+        const defaultPriceType: PriceType = product?.nablPrice ? 'NABL' : product?.nonNablPrice ? 'Non-NABL' : 'N/A';
         return { 
             productId: id, 
             quantity: 1,

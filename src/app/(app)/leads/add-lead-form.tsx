@@ -181,14 +181,13 @@ export function AddLeadForm({
       .filter(id => !fieldProductIds.includes(id))
       .map(id => {
         const product = products.find(p => p.id === id);
-        // Default to NABL price if available, otherwise non-NABL, otherwise 0
         const defaultPrice = product?.nablPrice ?? product?.nonNablPrice ?? 0;
-        const defaultPriceType: PriceType = product?.nablPrice ? 'NABL' : 'Non-NABL';
+        const defaultPriceType: PriceType = product?.nablPrice ? 'NABL' : product?.nonNablPrice ? 'Non-NABL' : 'N/A';
         
         return { 
           productId: id, 
           quantity: 1,
-          priceType: defaultPrice,
+          priceType: defaultPriceType,
           price: defaultPrice,
         };
       });
