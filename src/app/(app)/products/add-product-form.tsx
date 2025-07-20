@@ -94,78 +94,80 @@ export function AddProductForm({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 px-1">
-        <FormField
-          control={form.control}
-          name="category"
-          render={({ field }) => (
-            <FormItem className="flex flex-col">
-              <FormLabel>Level - 1</FormLabel>
-              <Popover open={categoryOpen} onOpenChange={setCategoryOpen}>
-                <PopoverTrigger asChild>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 px-1">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+             <FormField
+              control={form.control}
+              name="category"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel>Level - 1</FormLabel>
+                  <Popover open={categoryOpen} onOpenChange={setCategoryOpen}>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          className={cn(
+                            "w-full justify-between",
+                            !field.value && "text-muted-foreground"
+                          )}
+                        >
+                          {field.value || "Select a level - 1"}
+                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                      <Command>
+                        <CommandInput placeholder="Search..." />
+                        <CommandList className="max-h-52">
+                          <CommandEmpty>No category found.</CommandEmpty>
+                          <CommandGroup>
+                            {productCategories.map((category) => (
+                              <CommandItem
+                                value={category}
+                                key={category}
+                                onSelect={() => {
+                                  form.setValue("category", category, { shouldValidate: true });
+                                  setCategoryOpen(false);
+                                }}
+                              >
+                                <Check
+                                  className={cn(
+                                    "mr-2 h-4 w-4",
+                                    category === field.value
+                                      ? "opacity-100"
+                                      : "opacity-0"
+                                  )}
+                                />
+                                {category}
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Product/Service Name</FormLabel>
                   <FormControl>
-                    <Button
-                      variant="outline"
-                      role="combobox"
-                      className={cn(
-                        "w-full justify-between",
-                        !field.value && "text-muted-foreground"
-                      )}
-                    >
-                      {field.value || "Select a level - 1"}
-                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                    </Button>
+                    <Input placeholder="e.g., On-site Industrial Scale Calibration" {...field} />
                   </FormControl>
-                </PopoverTrigger>
-                <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
-                  <Command>
-                    <CommandInput placeholder="Search..." />
-                    <CommandList className="max-h-52">
-                      <CommandEmpty>No category found.</CommandEmpty>
-                      <CommandGroup>
-                        {productCategories.map((category) => (
-                          <CommandItem
-                            value={category}
-                            key={category}
-                            onSelect={() => {
-                              form.setValue("category", category, { shouldValidate: true });
-                              setCategoryOpen(false);
-                            }}
-                          >
-                            <Check
-                              className={cn(
-                                "mr-2 h-4 w-4",
-                                category === field.value
-                                  ? "opacity-100"
-                                  : "opacity-0"
-                              )}
-                            />
-                            {category}
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
-                </PopoverContent>
-              </Popover>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Product/Service Name</FormLabel>
-              <FormControl>
-                <Input placeholder="e.g., On-site Industrial Scale Calibration" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <div className="grid grid-cols-2 gap-4">
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <FormField
               control={form.control}
               name="location"
@@ -192,7 +194,7 @@ export function AddProductForm({
                 control={form.control}
                 name="isNabl"
                 render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm h-full">
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm h-full mt-2">
                     <div className="space-y-0.5">
                       <FormLabel>NABL Accredited</FormLabel>
                     </div>
@@ -207,7 +209,8 @@ export function AddProductForm({
               />
         </div>
         <Separator />
-         <div className="grid grid-cols-2 gap-4">
+        <h4 className="font-medium text-sm">In-House Pricing & Range</h4>
+         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <FormField
               control={form.control}
               name="nablRange"
@@ -245,8 +248,8 @@ export function AddProductForm({
             />
         </div>
         <Separator />
-        <h4 className="font-medium text-sm">Third Party</h4>
-         <div className="grid grid-cols-2 gap-4">
+        <h4 className="font-medium text-sm">Third Party Pricing & Range</h4>
+         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
              <FormField
               control={form.control}
               name="thirdPartyNablRange"
