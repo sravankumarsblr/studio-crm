@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
@@ -210,10 +209,10 @@ export function AddLeadForm({
     if (!product) return;
     
     let newPrice = 0;
-    if (newPriceType === 'NABL' && product.nablPrice) {
-        newPrice = product.nablPrice;
-    } else if (newPriceType === 'Non-NABL' && product.nonNablPrice) {
-        newPrice = product.nonNablPrice;
+    if (newPriceType === 'NABL') {
+        newPrice = product.nablPrice ?? 0;
+    } else if (newPriceType === 'Non-NABL') {
+        newPrice = product.nonNablPrice ?? 0;
     }
 
     update(index, {
@@ -501,7 +500,7 @@ export function AddLeadForm({
             )}
           />
           
-          <FormField
+           <FormField
             control={form.control}
             name="lineItems"
             render={() => (
@@ -551,10 +550,11 @@ export function AddLeadForm({
                                                             <SelectValue />
                                                         </SelectTrigger>
                                                         <SelectContent>
-                                                          <SelectItem value="NABL">NABL {product?.nablPrice != null ? `(₹${product.nablPrice.toLocaleString('en-IN')})` : ''}</SelectItem>
-                                                          <SelectItem value="Non-NABL">Non-NABL {product?.nonNablPrice != null ? `(₹${product.nonNablPrice.toLocaleString('en-IN')})` : ''}</SelectItem>
-                                                          <SelectItem value="Third Party NABL">Third Party NABL</SelectItem>
-                                                          <SelectItem value="Third Party Non-NABL">Third Party Non-NABL</SelectItem>
+                                                            {product?.nablPrice != null && <SelectItem value="NABL">NABL (₹{product.nablPrice.toLocaleString('en-IN')})</SelectItem>}
+                                                            {product?.nonNablPrice != null && <SelectItem value="Non-NABL">Non-NABL (₹{product.nonNablPrice.toLocaleString('en-IN')})</SelectItem>}
+                                                            <SelectItem value="Third Party NABL">Third Party NABL</SelectItem>
+                                                            <SelectItem value="Third Party Non-NABL">Third Party Non-NABL</SelectItem>
+                                                            {product?.nablPrice == null && product?.nonNablPrice == null && <SelectItem value="N/A" disabled>N/A</SelectItem>}
                                                         </SelectContent>
                                                     </Select>
                                                     {isThirdParty && (
@@ -644,3 +644,4 @@ export function AddLeadForm({
     </>
   );
 }
+
