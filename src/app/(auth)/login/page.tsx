@@ -34,7 +34,7 @@ export default function LoginPage() {
           <div className="flex justify-center items-center mb-4">
             <Gem className="w-10 h-10 text-primary" />
           </div>
-          <CardTitle className="text-2xl">Login to CRM</CardTitle>
+          <CardTitle className="text-2xl">Login to CRM APP</CardTitle>
           <CardDescription>
             Enter your credentials to access your account.
           </CardDescription>
