@@ -87,7 +87,7 @@ export function ProductSelectorDialog({
         </DialogHeader>
         <div className="grid grid-cols-4 gap-6 flex-1 overflow-hidden">
           <div className="col-span-1 border-r pr-4 overflow-y-auto">
-            <h4 className="text-sm font-medium mb-2">Level - 1</h4>
+            <h4 className="text-sm font-medium mb-2">Category</h4>
             <RadioGroup value={selectedCategory} onValueChange={setSelectedCategory} className="space-y-1">
               {productCategories.map(category => (
                 <div key={category} className="flex items-center">

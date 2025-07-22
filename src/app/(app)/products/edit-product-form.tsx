@@ -39,7 +39,7 @@ import { Separator } from "@/components/ui/separator";
 
 const editProductSchema = z.object({
   name: z.string().min(1, "Product name is required."),
-  category: z.string().min(1, "Level - 1 is required."),
+  category: z.string().min(1, "Category is required."),
   isNabl: z.boolean().default(false),
   location: z.enum(['Lab', 'Site', 'Site & Lab']),
   resolution: z.string().optional(),
@@ -106,7 +106,7 @@ export function EditProductForm({
               name="category"
               render={({ field }) => (
                 <FormItem className="flex flex-col">
-                  <FormLabel>Level - 1</FormLabel>
+                  <FormLabel>Category</FormLabel>
                   <Popover open={categoryOpen} onOpenChange={setCategoryOpen}>
                     <PopoverTrigger asChild>
                       <FormControl>
@@ -118,7 +118,7 @@ export function EditProductForm({
                             !field.value && "text-muted-foreground"
                           )}
                         >
-                          {field.value || "Select a level - 1"}
+                          {field.value || "Select a category"}
                           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                         </Button>
                       </FormControl>

@@ -186,7 +186,7 @@ export default function LeadDetailPage() {
                       <TableHeader>
                           <TableRow>
                               <TableHead>Product</TableHead>
-                              <TableHead>Level - 1</TableHead>
+                              <TableHead>Category</TableHead>
                               <TableHead>Quantity</TableHead>
                               <TableHead className="text-right">Price</TableHead>
                           </TableRow>

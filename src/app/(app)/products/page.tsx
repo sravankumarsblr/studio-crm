@@ -118,7 +118,7 @@ export default function ProductsPage() {
                 <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <Input placeholder="Filter by name..." value={nameFilter} onChange={e => setNameFilter(e.target.value)} />
                   <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                    <SelectTrigger><SelectValue placeholder="Filter by Level - 1..." /></SelectTrigger>
+                    <SelectTrigger><SelectValue placeholder="Filter by Category..." /></SelectTrigger>
                     <SelectContent>
                       {productCategories.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
                     </SelectContent>
@@ -141,7 +141,7 @@ export default function ProductsPage() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Product Name</TableHead>
-                    <TableHead>Level - 1</TableHead>
+                    <TableHead>Category</TableHead>
                     <TableHead>Location</TableHead>
                     <TableHead>Resolution</TableHead>
                     <TableHead>NABL</TableHead>
