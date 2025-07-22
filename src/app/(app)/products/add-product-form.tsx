@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from "react";
@@ -194,27 +193,36 @@ export function AddProductForm({
                   <FormItem><FormLabel>Resolution</FormLabel><FormControl><Input placeholder="e.g., 0.01mm" {...field} /></FormControl><FormMessage /></FormItem>
               )}
             />
-             <FormField
-                control={form.control}
-                name="isNabl"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm h-fit mt-auto">
-                    <div className="space-y-0.5">
-                      <FormLabel>NABL Accredited</FormLabel>
-                    </div>
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
+            <FormField
+              control={form.control}
+              name="masterRange"
+              render={({ field }) => (
+                  <FormItem><FormLabel>Master Range</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
+              )}
+            />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+            <FormField
+              control={form.control}
+              name="isNabl"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm h-fit">
+                  <div className="space-y-0.5">
+                    <FormLabel>NABL Accredited</FormLabel>
+                  </div>
+                  <FormControl>
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
         </div>
         <Separator />
         <h4 className="font-medium text-sm">In-House Pricing & Range</h4>
-         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormField
               control={form.control}
               name="nablRange"
@@ -227,13 +235,6 @@ export function AddProductForm({
               name="nablPrice"
               render={({ field }) => (
                   <FormItem><FormLabel>NABL Price (INR)</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>
-              )}
-            />
-             <FormField
-              control={form.control}
-              name="masterRange"
-              render={({ field }) => (
-                  <FormItem><FormLabel>Master Range</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
               )}
             />
             <FormField
