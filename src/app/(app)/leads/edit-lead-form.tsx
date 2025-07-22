@@ -62,7 +62,7 @@ const editLeadSchema = z.object({
     priceType: z.enum(priceTypes),
     price: z.coerce.number().min(0, "Price must be a positive number."),
   })).min(1, "Please add at least one product."),
-  convertToDeal: z.boolean().default(false),
+  convertToOpportunity: z.boolean().default(false),
 }).refine(
   (data) => {
     if (data.contactIds.length > 0) {
@@ -221,10 +221,10 @@ export function EditLeadForm({
     if (!product) return;
     
     let newPrice = 0;
-    if (newPriceType === 'NABL') {
-        newPrice = product.nablPrice ?? 0;
-    } else if (newPriceType === 'Non-NABL') {
-        newPrice = product.nonNablPrice ?? 0;
+    if (newPriceType === 'NABL' && product.nablPrice) {
+        newPrice = product.nablPrice;
+    } else if (newPriceType === 'Non-NABL' && product.nonNablPrice) {
+        newPrice = product.nonNablPrice;
     }
 
     update(index, {
@@ -615,7 +615,7 @@ export function EditLeadForm({
 
           <FormField
             control={form.control}
-            name="convertToDeal"
+            name="convertToOpportunity"
             render={({ field }) => (
               <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm bg-secondary/50">
                 <div className="space-y-0.5">

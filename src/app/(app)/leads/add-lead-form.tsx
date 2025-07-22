@@ -83,7 +83,7 @@ export function AddLeadForm({
   onSave,
   onCancel,
 }: {
-  onSave: (data: AddLeadLeadFormValues) => void;
+  onSave: (data: AddLeadFormValues) => void;
   onCancel: () => void;
 }) {
   const [customerOpen, setCustomerOpen] = useState(false);
@@ -181,8 +181,8 @@ export function AddLeadForm({
       .filter(id => !fieldProductIds.includes(id))
       .map(id => {
         const product = products.find(p => p.id === id);
-        const defaultPrice = product?.nablPrice ?? product?.nonNablPrice ?? 0;
         const defaultPriceType: PriceType = product?.nablPrice ? 'NABL' : product?.nonNablPrice ? 'Non-NABL' : 'N/A';
+        const defaultPrice = defaultPriceType === 'NABL' ? (product?.nablPrice ?? 0) : defaultPriceType === 'Non-NABL' ? (product?.nonNablPrice ?? 0) : 0;
         
         return { 
           productId: id, 
@@ -210,10 +210,10 @@ export function AddLeadForm({
     if (!product) return;
     
     let newPrice = 0;
-    if (newPriceType === 'NABL') {
-        newPrice = product.nablPrice ?? 0;
-    } else if (newPriceType === 'Non-NABL') {
-        newPrice = product.nonNablPrice ?? 0;
+    if (newPriceType === 'NABL' && product.nablPrice) {
+        newPrice = product.nablPrice;
+    } else if (newPriceType === 'Non-NABL' && product.nonNablPrice) {
+        newPrice = product.nonNablPrice;
     }
 
     update(index, {
